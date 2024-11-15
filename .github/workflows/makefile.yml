@@ -19,5 +19,5 @@ jobs:
         tar xvJf arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz
     - name: Build
       run:
-        export PATH="$(pwd)/aarch64-none-elf="arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz/bin"; 
+        export PATH="$(pwd)/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz/bin:$PATH"; 
         make
