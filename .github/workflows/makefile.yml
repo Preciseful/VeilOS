@@ -19,4 +19,4 @@ jobs:
         tar xvJf arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz
     - name: Build
       run: 
-        make ARMGNU=$(pwd)/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz/bin/aarch64-none-elf all
+        make ARMGNU=$(pwd)/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf all
