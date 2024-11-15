@@ -15,6 +15,14 @@ all : clean kernel8.img
 clean :
 	rm -rf $(BUILD_DIR) *.img 
 
+qemu :
+	sudo apt install python3 ninja
+	wget https://download.qemu.org/qemu-9.2.0-rc0.tar.xz
+	tar xvJf qemu-9.2.0-rc0.tar.xz
+	cd qemu-9.2.0-rc0
+	./configure
+	make -j4
+
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
