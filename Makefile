@@ -16,7 +16,7 @@ clean :
 	rm -rf $(BUILD_DIR) *.img 
 
 qemu :
-	sudo apt install python3 ninja
+	sudo apt install python3
 	wget https://download.qemu.org/qemu-9.2.0-rc0.tar.xz
 	tar xvJf qemu-9.2.0-rc0.tar.xz
 	cd qemu-9.2.0-rc0
