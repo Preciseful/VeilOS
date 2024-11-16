@@ -12,7 +12,7 @@ jobs:
     - name: Install Dependencies for QEMU
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build pkg-config libglib2.0-dev libpixman-1-dev
+        sudo apt-get install -y ninja-build pkg-config libglib2.0-dev libpixman-1-dev tree
 
     - name: Clone QEMU Source
       run: git clone https://gitlab.com/qemu-project/qemu.git
@@ -25,4 +25,4 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
-        ls ./qemu
+        tree
