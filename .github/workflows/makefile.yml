@@ -1,22 +1,31 @@
 name: Makefile CI
 
-on:
-  push:
-    branches: [ "master", "development" ]
-  pull_request:
-    branches: [ "master", "development" ]
+on: [push, pull_request]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Install ARM GNU compiler
-      run: 
-        wget https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz;
-        tar xvJf arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf.tar.xz
-    - name: Build
-      run: 
-        make ARMGNU=$(pwd)/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-elf/bin/aarch64-none-elf all
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies for QEMU
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build pkg-config libglib2.0-dev libpixman-1-dev
+
+    - name: Clone QEMU Source
+      run: git clone https://gitlab.com/qemu-project/qemu.git
+
+    - name: Build QEMU
+      run: |
+        cd qemu
+        ./configure --target-list=aarch64-softmmu
+        make -j$(nproc)
+
+    - name: Run OS in QEMU
+      run: |
+        ./qemu/aarch64-softmmu/qemu-system-aarch64 \
+          -M raspi4 \
+          -kernel path_to_your_kernel_file \
+          -nographic
