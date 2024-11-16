@@ -25,7 +25,7 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
-        ./qemu/qemu-system-aarch64 \
+        ./qemu/build/qemu-system-aarch64 \
           -M raspi4b \
           -kernel kernel8.img \
           -nographic
