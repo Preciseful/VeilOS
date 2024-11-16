@@ -25,5 +25,5 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
-        ls
+        tree
         ./Oxaminer/.venv/bin/python3 ./Oxaminer/main.py
