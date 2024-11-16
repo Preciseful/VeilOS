@@ -5,4 +5,4 @@ jobs:
     timeout: 1
     run: make test ALT_DIR=tests/UART
     expect: abcdef
-    emulator_args: -serial out
+    emulator_args: -serial file:out
