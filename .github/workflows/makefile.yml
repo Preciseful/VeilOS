@@ -25,4 +25,5 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
+        cd VeilOS
         ./Oxaminer/.venv/bin/python3 ./Oxaminer/main.py
