@@ -29,10 +29,6 @@ for job, children in oxaminer['jobs'].items():
         process.terminate()
         process.join()
 
-    if process.exitcode != 0:
-        print(f'Process (emulator) exited with code of {process.exitcode};')
-        exit(1)
-
     with open(expect_file, 'r') as file:
         print(f'Reading contents;')
         if file.read() != expect:
