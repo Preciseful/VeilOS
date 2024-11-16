@@ -27,5 +27,5 @@ jobs:
       run: |
         ./qemu/aarch64-softmmu/qemu-system-aarch64 \
           -M raspi4 \
-          -kernel path_to_your_kernel_file \
+          -kernel kernel8.img \
           -nographic
