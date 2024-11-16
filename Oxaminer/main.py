@@ -3,14 +3,14 @@ import multiprocessing
 import time
 import yaml
 
-print("Running...")
+print("Running OXAMINER.")
 with open('oxaminer.yml', 'r') as file:
     oxaminer = yaml.safe_load(file)
 
 emulator = oxaminer['emulator']
 
 for job, children in oxaminer['jobs'].items():
-    print(job)
+    print(f'Current job running: {job};')
 
     timeout = children.get('timeout') or 10
     run = children.get('run')
@@ -18,7 +18,7 @@ for job, children in oxaminer['jobs'].items():
     expect_file = children.get('expect_file') or 'out'
     emulator_args = children.get('emulator_args') or ''
     system(run)
-    print(expect_file)
+    print(f'Uploading data to: {expect_file};')
     
     process = multiprocessing.Process(target=system, args=(f'{emulator} {emulator_args}',))
     process.start()
@@ -30,9 +30,12 @@ for job, children in oxaminer['jobs'].items():
         process.join()
 
     if process.exitcode != 0:
+        print(f'Process (emulator) exited with code of {process.exitcode};')
         exit(1)
 
     with open(expect_file, 'r') as file:
+        print(f'Reading contents;')
         if file.read() != expect:
+            print(f'Contents don\'t match:')
             print(file.read())
             exit(2)
