@@ -25,4 +25,4 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
-        ls
+        ls ./qemu
