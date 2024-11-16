@@ -1,9 +1,9 @@
-name: Makefile CI
+name: Emulate and Test OS
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  Run:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
@@ -25,7 +25,4 @@ jobs:
 
     - name: Run OS in QEMU
       run: |
-        ./qemu/build/qemu-system-aarch64 \
-          -M raspi4b \
-          -kernel kernel8.img \
-          -nographic
+        ./Oxaminer/.venv/bin/python3 ./Oxaminer/main.py

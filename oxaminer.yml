@@ -1,0 +1,8 @@
+emulator: ./qemu/build/qemu-system-aarch64 -M raspi4b -kernel kernel8.img -nographic
+
+jobs:
+  uart:
+    timeout: 1
+    run: make test ALT_DIR=tests/UART
+    expect: abcdef
+    emulator_args: -serial out
