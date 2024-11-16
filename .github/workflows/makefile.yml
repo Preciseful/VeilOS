@@ -12,7 +12,7 @@ jobs:
     - name: Install Dependencies for QEMU
       run: |
         sudo apt-get update
-        sudo apt-get install -y ninja-build pkg-config libglib2.0-dev libpixman-1-dev tree
+        sudo apt-get install -y ninja-build pkg-config libglib2.0-dev libpixman-1-dev tree python3
 
     - name: Clone QEMU Source
       run: git clone https://gitlab.com/qemu-project/qemu.git
@@ -26,4 +26,6 @@ jobs:
     - name: Run OS in QEMU
       run: |
         tree
+        python3 -m venv Oxaminer/.venv
+        ./Oxaminer/.venv/bin/pip install pyyaml
         ./Oxaminer/.venv/bin/python3 ./Oxaminer/main.py
