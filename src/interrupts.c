@@ -2,8 +2,7 @@
 #include <Veil.h>
 #include <lib/printf.h>
 #include <drivers/timer.h>
-
-#define TIMER_HANDLERS_ACCESS
+#include <drivers/miniuart.h>
 
 void enable_vc_irq(enum videocore_irqs irq)
 {
@@ -41,6 +40,8 @@ void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr,
 {
     unsigned int ec = esr >> 26;
     unsigned int il = esr >> 31;
+    printf_use_framebuffer = false;
+
     printf("interrupt encountered:\n"
            "-> type %lu\n"
            "-> esr %lu\n"
@@ -65,4 +66,6 @@ void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr,
         veil();
         break;
     }
+
+    printf_use_framebuffer = true;
 }

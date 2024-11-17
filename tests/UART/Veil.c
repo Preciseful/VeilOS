@@ -7,7 +7,7 @@
 #include <interrupts.h>
 #include <scheduler.h>
 
-#include <drivers/uart.h>
+#include <drivers/miniuart.h>
 #include <drivers/watchdog.h>
 #include <drivers/timer.h>
 
