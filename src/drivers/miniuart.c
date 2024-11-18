@@ -1,10 +1,12 @@
-#include <drivers/uart.h>
+#include <drivers/miniuart.h>
 #include <drivers/gpio.h>
-#include <stdbool.h>
+#include <drivers/framebuffer.h>
 
 unsigned char uart_output_queue[UART_MAX_QUEUE];
 unsigned int uart_output_queue_write = 0;
 unsigned int uart_output_queue_read = 0;
+
+bool printf_use_framebuffer = false;
 
 void uart_init()
 {
@@ -121,4 +123,6 @@ unsigned char uart_update()
 void putc(void *p, char c)
 {
     uart_put((unsigned char)c);
+    if (framebuffer != 0 && printf_use_framebuffer)
+        framebuffer_putc(c, 0x0f);
 }

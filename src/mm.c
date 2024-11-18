@@ -1,4 +1,5 @@
 #include <mm.h>
+#include <lib/printf.h>
 
 static unsigned short mem_map[PAGING_PAGES] = {0};
 
@@ -9,6 +10,7 @@ unsigned long get_free_page()
         if (mem_map[i] == 0)
         {
             mem_map[i] = 1;
+            printf("%lu\n", LOW_MEMORY + i * PAGE_SIZE);
             return LOW_MEMORY + i * PAGE_SIZE;
         }
     }

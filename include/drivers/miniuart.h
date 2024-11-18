@@ -2,6 +2,7 @@
 #define UART_H
 
 #include <lib/base.h>
+#include <stdbool.h>
 
 #define AUX_MU_BAUD(baud) ((AUX_UART_CLOCK / (baud * 8)) - 1)
 
@@ -24,6 +25,8 @@ enum AUX
     AUX_UART_CLOCK = 500000000,
     UART_MAX_QUEUE = 16 * 1024
 };
+
+extern bool printf_use_framebuffer;
 
 void uart_init();
 void uart_write(char *text);

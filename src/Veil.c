@@ -7,9 +7,10 @@
 #include <interrupts.h>
 #include <scheduler.h>
 
-#include <drivers/uart.h>
+#include <drivers/miniuart.h>
 #include <drivers/watchdog.h>
 #include <drivers/timer.h>
+#include <drivers/framebuffer.h>
 
 #include <lib/string.h>
 #include <lib/printf.h>
@@ -23,6 +24,7 @@ void unveil()
 {
     uart_init();
     init_printf(0, putc);
+    framebuffer_init();
     interrupt_init_vectors();
     timer_init();
     scheduler_init();
@@ -70,6 +72,7 @@ void process(unsigned long args)
 
 void kmain()
 {
+    // drawString(0, 2, "eat this up like candy", 0x0f, 2);
     printf("\n\nhello world!!\n");
 
     unsigned int el = get_el();
@@ -89,6 +92,8 @@ void kmain()
 
     res = fork((unsigned long)&process, 0);
     printf("%d\n", res);
+
+    printf("%lu\n", (unsigned long)framebuffer);
 
     while (true)
         schedule();

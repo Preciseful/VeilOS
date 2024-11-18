@@ -14,6 +14,8 @@
 struct task high_task = INIT_TASK;
 struct task low_task = INIT_TASK;
 struct task *scheduler_current = &high_task;
+
+static unsigned long lows = 0, highs = 0;
 static bool moved_next;
 
 void preempt_disable()
@@ -51,6 +53,8 @@ void add_task(struct task *task, bool high)
 
         c->next = task;
         task->next = &low_task;
+
+        highs++;
     }
     else
     {
@@ -60,6 +64,8 @@ void add_task(struct task *task, bool high)
 
         c->next = task;
         task->next = &high_task;
+
+        lows++;
     }
 }
 
@@ -86,7 +92,6 @@ void schedule()
 
     while (true)
     {
-        int i = 0;
         p = 0;
 
         for (struct task *c = high_task.next; c && c != &high_task; c = c->next)
@@ -96,8 +101,6 @@ void schedule()
                 p = c;
                 break;
             }
-
-            i++;
         }
 
         if (p)
