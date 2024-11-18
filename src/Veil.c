@@ -72,7 +72,6 @@ void process(unsigned long args)
 
 void kmain()
 {
-    // drawString(0, 2, "eat this up like candy", 0x0f, 2);
     printf("\n\nhello world!!\n");
 
     unsigned int el = get_el();
