@@ -11,6 +11,7 @@
 #include <drivers/watchdog.h>
 #include <drivers/timer.h>
 #include <drivers/framebuffer.h>
+#include <drivers/sdcard.h>
 
 #include <lib/string.h>
 #include <lib/printf.h>
@@ -24,9 +25,17 @@ void unveil()
 {
     uart_init();
     init_printf(0, putc);
+    printf("\n\n[INIT]\n");
     framebuffer_init();
+
     interrupt_init_vectors();
     timer_init();
+    enable_vc_irq(SYS_TIMER_IRQ_1 | SYS_TIMER_IRQ_3);
+    irq_barrier();
+    irq_enable();
+    breakpoint_enable();
+
+    sdcard_init();
     scheduler_init();
 
     kmain();
@@ -72,16 +81,12 @@ void process(unsigned long args)
 
 void kmain()
 {
-    printf("\n\nhello world!!\n");
+    printf("\n[KERNEL MAIN]\n");
+    printf("hello world!!\n");
 
     unsigned int el = get_el();
     printf("with exception level %d\n", el);
 
-    enable_vc_irq(SYS_TIMER_IRQ_1 | SYS_TIMER_IRQ_3);
-    irq_barrier();
-    irq_enable();
-
-    breakpoint_enable();
     breakpoint();
 
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);

@@ -18,6 +18,7 @@ struct timer_registers
 void timer_init();
 void set_timer_function(enum videocore_irqs irq, timer_function func);
 void remove_timer_function(enum videocore_irqs irq);
+void timer_sleep(unsigned int ms);
 
 void handle_timer_1();
 void handle_timer_3();
