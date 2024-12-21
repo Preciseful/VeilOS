@@ -1,8 +1,16 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include <stdbool.h>
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-int strcmp(const unsigned char *s1, unsigned const char *s2);
+    unsigned long strlen(const unsigned char *str);
+    int strcmp(const unsigned char *s1, unsigned const char *s2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

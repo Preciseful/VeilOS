@@ -5,6 +5,12 @@
 
 #ifndef __ASSEMBLER__
 
+// clang-format off
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 #include <stdbool.h>
 
 #define THREAD_SIZE 4096
@@ -54,6 +60,10 @@ void scheduler_move_next();
 void add_task(struct task *task, bool high);
 
 extern struct task *scheduler_current;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif
