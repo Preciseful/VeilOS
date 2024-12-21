@@ -14,12 +14,14 @@
 
 #define MAILBOX_REQUEST 0x0
 #define MAILBOX_RESPONSE 0x80000000
+#define MAILBOX_SUCCESS 0x80000000
+#define MAILBOX_FAIL 0x80000001
 #define MAILBOX_FULL 0x80000000
 #define MAILBOX_EMPTY 0x40000000
 
 enum MAILBOX_CLOCKS
 {
-    EMMC = 1
+    EMMC_CLOCK = 1
 };
 
 enum MAILBOX_CHANNELS
@@ -37,6 +39,7 @@ enum MAILBOX_CHANNELS
 
 extern volatile unsigned int mailbox[36];
 
+unsigned int mailbox_clock(enum MAILBOX_CLOCKS clock);
 bool mailbox_call(unsigned char channel);
 
 #endif
