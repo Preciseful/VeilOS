@@ -1,8 +1,6 @@
 #include <drivers/timer.h>
 #include <funcs.h>
 
-#define CLOCKHZ 10000
-
 const unsigned int timer1_int = CLOCKHZ;
 const unsigned int timer3_int = CLOCKHZ;
 
