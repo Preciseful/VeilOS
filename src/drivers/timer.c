@@ -1,8 +1,6 @@
 #include <drivers/timer.h>
 #include <funcs.h>
 
-#define CLOCKHZ 10000
-
 const unsigned int timer1_int = CLOCKHZ;
 const unsigned int timer3_int = CLOCKHZ;
 
@@ -40,6 +38,29 @@ void remove_timer_function(enum videocore_irqs irq)
         timer1_function = 0;
     else if (irq == SYS_TIMER_IRQ_3)
         timer3_function = 0;
+}
+
+unsigned long timer_get_ticks()
+{
+    unsigned int hi = TIMER->counter_high;
+    unsigned int lo = TIMER->counter_low;
+
+    // double check hi value didn't change after setting it...
+    if (hi != TIMER->counter_high)
+    {
+        hi = TIMER->counter_high;
+        lo = TIMER->counter_low;
+    }
+
+    return ((unsigned long)hi << 32) | lo;
+}
+
+void timer_sleep(unsigned int ms)
+{
+    unsigned int start = timer_get_ticks();
+
+    while (timer_get_ticks() < start + (ms * 1000))
+        ;
 }
 
 void handle_timer_1()

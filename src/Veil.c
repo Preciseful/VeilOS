@@ -6,15 +6,20 @@
 #include <funcs.h>
 #include <interrupts.h>
 #include <scheduler.h>
+#include <mm.h>
+#include <drivers/emmc.h>
 
 #include <drivers/miniuart.h>
 #include <drivers/watchdog.h>
 #include <drivers/timer.h>
 #include <drivers/framebuffer.h>
+#include <drivers/emmc.h>
 
 #include <lib/string.h>
 #include <lib/printf.h>
 #include <lib/fork.h>
+
+#include <fs/vfs/vfs.h>
 
 unsigned char unveil_phrase[] = {'u', 'n', 'v', 'e', 'i', 'l'};
 
@@ -24,10 +29,20 @@ void unveil()
 {
     uart_init();
     init_printf(0, putc);
+    printf("\n\n[INIT]\n");
     framebuffer_init();
+
     interrupt_init_vectors();
     timer_init();
+    enable_vc_irq(SYS_TIMER_IRQ_1 | SYS_TIMER_IRQ_3);
+    irq_barrier();
+    irq_enable();
+    breakpoint_enable();
+
+    emmc_init();
     scheduler_init();
+
+    vfs_init();
 
     kmain();
 }
@@ -72,28 +87,33 @@ void process(unsigned long args)
 
 void kmain()
 {
-    // drawString(0, 2, "eat this up like candy", 0x0f, 2);
-    printf("\n\nhello world!!\n");
+    printf("\n[KERNEL MAIN]\n");
+    printf("hello world!!\n");
 
     unsigned int el = get_el();
     printf("with exception level %d\n", el);
 
-    enable_vc_irq(SYS_TIMER_IRQ_1 | SYS_TIMER_IRQ_3);
-    irq_barrier();
-    irq_enable();
-
-    breakpoint_enable();
     breakpoint();
 
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);
 
     int res = fork((unsigned long)&input_process, 0);
-    printf("%d\n", res);
+    printf("Fork result: %d\n", res);
 
     res = fork((unsigned long)&process, 0);
-    printf("%d\n", res);
+    printf("Fork result: %d\n", res);
 
-    printf("%lu\n", (unsigned long)framebuffer);
+    printf("Framebuffer: %lu\n", (unsigned long)framebuffer);
+
+    int *x = qalloc(int);
+    *x = 100;
+    printf("%d", *x);
+    vfree(x);
+
+    x = qalloc(int);
+    *x = 500;
+    printf("%d", *x);
+    vfree(x);
 
     while (true)
         schedule();

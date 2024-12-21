@@ -6,7 +6,7 @@
 bool fork(unsigned long fn, unsigned long arg)
 {
     preempt_disable();
-    struct task *task = (struct task *)get_free_page();
+    struct task *task = (struct task *)valloc(PAGE_SIZE_BYTES);
     if (!task)
         return false;
 

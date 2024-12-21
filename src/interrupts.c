@@ -55,14 +55,17 @@ void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr,
         printf("-> type of interrupt: brk\n");
         (*addon) = 1;
         break;
+    case 0b100101:
+        printf("-> type of interrupt: data abort\n");
+        goto leave;
 
-    case 0b000001:
-        printf("the voices..");
     case 0b000000:
         printf("-> type of interrupt: unknown reason\n");
+        goto leave;
 
     default:
         printf("exception type not implemented\n");
+    leave:
         veil();
         break;
     }

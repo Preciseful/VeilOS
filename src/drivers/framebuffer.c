@@ -82,7 +82,7 @@ void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom)
 {
     unsigned char *glyph = (unsigned char *)&font + (ch < FONT_NUMGLYPHS ? ch : 0) * FONT_BPG;
 
-    for (int i = 1; i <= (FONT_HEIGHT * zoom); i++)
+    for (int i = 0; i <= (FONT_HEIGHT * zoom); i++)
     {
         for (int j = 0; j < (FONT_WIDTH * zoom); j++)
         {
