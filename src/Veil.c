@@ -6,16 +6,20 @@
 #include <funcs.h>
 #include <interrupts.h>
 #include <scheduler.h>
+#include <mm.h>
+#include <drivers/emmc.h>
 
 #include <drivers/miniuart.h>
 #include <drivers/watchdog.h>
 #include <drivers/timer.h>
 #include <drivers/framebuffer.h>
-#include <drivers/sdcard.h>
+#include <drivers/emmc.h>
 
 #include <lib/string.h>
 #include <lib/printf.h>
 #include <lib/fork.h>
+
+#include <fs/vfs/vfs.h>
 
 unsigned char unveil_phrase[] = {'u', 'n', 'v', 'e', 'i', 'l'};
 
@@ -35,8 +39,10 @@ void unveil()
     irq_enable();
     breakpoint_enable();
 
-    sdcard_init();
+    emmc_init();
     scheduler_init();
+
+    vfs_init();
 
     kmain();
 }
@@ -92,12 +98,22 @@ void kmain()
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);
 
     int res = fork((unsigned long)&input_process, 0);
-    printf("%d\n", res);
+    printf("Fork result: %d\n", res);
 
     res = fork((unsigned long)&process, 0);
-    printf("%d\n", res);
+    printf("Fork result: %d\n", res);
 
-    printf("%lu\n", (unsigned long)framebuffer);
+    printf("Framebuffer: %lu\n", (unsigned long)framebuffer);
+
+    int *x = qalloc(int);
+    *x = 100;
+    printf("%d", *x);
+    vfree(x);
+
+    x = qalloc(int);
+    *x = 500;
+    printf("%d", *x);
+    vfree(x);
 
     while (true)
         schedule();
