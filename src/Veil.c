@@ -88,7 +88,6 @@ void process(unsigned long args)
 void kmain()
 {
     printf("\n[KERNEL MAIN]\n");
-    printf("hello world!!\n");
 
     unsigned int el = get_el();
     printf("with exception level %d\n", el);
