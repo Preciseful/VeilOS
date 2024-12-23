@@ -21,6 +21,9 @@ endif
 
 all : clean kernel8.img
 
+dump:
+	$(ARMGNU)-objdump -D build/kernel8.elf > dump
+
 clean :
 	rm -rf $(BUILD_DIR) *.img 
 
