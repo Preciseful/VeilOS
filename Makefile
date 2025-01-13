@@ -25,7 +25,7 @@ dump:
 	$(ARMGNU)-objdump -D build/kernel8.elf > dump
 
 clean :
-	rm -rf $(BUILD_DIR) *.img 
+	rm -rf $(BUILD_DIR) *.img dump
 
 ifdef ALT_DIR
 $(BUILD_DIR)/%_c.o: $(ALT_DIR)/%.c
