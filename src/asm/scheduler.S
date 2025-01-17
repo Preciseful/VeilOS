@@ -20,5 +20,6 @@ cpu_switch_task:
 	ldp	x27, x28, [x8], #16
 	ldp	x29, x9, [x8], #16
 	ldr	x30, [x8]
+	mov x11, x2
 	mov	sp, x9
     ret

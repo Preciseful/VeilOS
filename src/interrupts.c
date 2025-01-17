@@ -36,7 +36,7 @@ void handle_irq()
     }
 }
 
-void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr, unsigned int *addon)
+unsigned int interrupt_message(unsigned long type, unsigned long esr, unsigned long elr)
 {
     unsigned int ec = esr >> 26;
     unsigned int il = esr >> 31;
@@ -45,24 +45,28 @@ void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr,
     printf("interrupt encountered:\n"
            "-> type %lu\n"
            "-> esr %lu\n"
-           "-> elr %lu\n"
+           "-> elr 0x%lX\n"
            "-> il %u\n",
            type, esr, elr, il);
 
     switch (ec)
     {
+    case 0b010101:
+        printf("-> type of interrupt: svc\n");
+        printf_use_framebuffer = true;
+        return 1;
+
     case 0b111100:
         printf("-> type of interrupt: brk\n");
-        (*addon) = 1;
-        break;
+        printf_use_framebuffer = true;
+        return 1;
+
     case 0b100101:
         printf("-> type of interrupt: data abort\n");
         goto leave;
-
     case 0b000000:
         printf("-> type of interrupt: unknown reason\n");
         goto leave;
-
     default:
         printf("exception type not implemented\n");
     leave:
@@ -70,5 +74,5 @@ void interrupt_message(unsigned long type, unsigned long esr, unsigned long elr,
         break;
     }
 
-    printf_use_framebuffer = true;
+    return 0;
 }

@@ -47,9 +47,10 @@ struct task
     long counter;
     struct task *next;
     long preempt_count;
+    long kernel;
 };
 
-extern void cpu_switch_task(struct task *prev, struct task *next);
+extern void cpu_switch_task(struct task *prev, struct task *next, long kernel);
 
 void preempt_disable();
 void preempt_enable();

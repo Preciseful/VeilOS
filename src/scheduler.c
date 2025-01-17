@@ -9,7 +9,8 @@
      TASK_POINT,                              \
      0,                                       \
      0,                                       \
-     0}
+     0,                                       \
+     true}
 
 struct task high_task = INIT_TASK;
 struct task low_task = INIT_TASK;
@@ -17,6 +18,11 @@ struct task *scheduler_current = &high_task;
 
 static unsigned long lows = 0, highs = 0;
 static bool moved_next;
+
+void printx(unsigned long x)
+{
+    printf("x: %lu\n", x);
+}
 
 void preempt_disable()
 {
@@ -40,7 +46,7 @@ void switch_to(struct task *next)
     //        scheduler_current->preempt_count);
 
     moved_next = true;
-    cpu_switch_task(prev, next);
+    cpu_switch_task(prev, next, next->kernel);
 }
 
 void add_task(struct task *task, bool high)
@@ -117,6 +123,7 @@ void schedule()
 
 void scheduler_tick(unsigned int counter, unsigned int multiplier)
 {
+    // printf(".");
     scheduler_current->counter--;
     if (scheduler_current->counter > 0 || scheduler_current->preempt_count > 0)
         return;

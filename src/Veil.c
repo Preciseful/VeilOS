@@ -95,11 +95,12 @@ void kmain()
     breakpoint();
 
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);
+    int res;
 
-    int res = fork((unsigned long)&input_process, 0);
+    res = fork((unsigned long)&process, 0, 0);
     printf("Fork result: %d\n", res);
 
-    res = fork((unsigned long)&process, 0);
+    res = fork((unsigned long)&input_process, 0, 1);
     printf("Fork result: %d\n", res);
 
     printf("Framebuffer: %lu\n", (unsigned long)framebuffer);

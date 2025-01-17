@@ -50,7 +50,7 @@ void vfs_init()
 {
     FSCashier *cashier = new FSCashier;
 
-    fork((unsigned long)FSCashier::CleanupTask, (unsigned long)cashier);
+    // fork((unsigned long)FSCashier::CleanupTask, (unsigned long)cashier, true);
     FatFS *fs = new FatFS;
 
     if (!fs->succeded)

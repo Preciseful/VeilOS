@@ -8,7 +8,7 @@ extern "C"
 {
 #endif
 
-    bool fork(unsigned long fn, unsigned long arg);
+    bool fork(unsigned long fn, unsigned long arg, long kernel);
     extern void return_from_fork();
 
 #ifdef __cplusplus

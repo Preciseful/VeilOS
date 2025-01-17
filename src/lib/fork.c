@@ -3,13 +3,14 @@
 #include <mm.h>
 #include <stdbool.h>
 
-bool fork(unsigned long fn, unsigned long arg)
+bool fork(unsigned long fn, unsigned long arg, long kernel)
 {
     preempt_disable();
     struct task *task = (struct task *)valloc(PAGE_SIZE_BYTES);
     if (!task)
         return false;
 
+    task->kernel = kernel;
     task->next = 0;
     task->state = TASK_RUNNING;
     task->counter = QUANTUM;
