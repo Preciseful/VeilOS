@@ -46,6 +46,7 @@ void switch_to(struct task *next)
     //        scheduler_current->preempt_count);
 
     moved_next = true;
+    // printf("next: %lu \n", next->cpu_context.pc);
     cpu_switch_task(prev, next, next->kernel);
 }
 
@@ -117,6 +118,7 @@ void schedule()
             p->counter = QUANTUM;
     }
 
+    printf("running p %s: %lu %lu\n", p->cpu_context.x20, p->cpu_context.pc, p->cpu_context.sp);
     switch_to(p);
     preempt_enable();
 }

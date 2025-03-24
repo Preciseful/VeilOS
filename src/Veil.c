@@ -75,7 +75,7 @@ void input_process(unsigned long args)
     }
 }
 
-void process(unsigned long args)
+void stage(unsigned long args)
 {
     int i = 0;
     while (true)
@@ -83,6 +83,25 @@ void process(unsigned long args)
         i++;
         delay(10000);
     }
+}
+
+void process(unsigned long args)
+{
+    int i = 0;
+    while (true)
+    {
+        i++;
+        printf("a");
+        delay(10000);
+    }
+}
+
+void kernel_process(unsigned long args)
+{
+    printf("Kernel process started. EL %d\r\n", get_el());
+    int err = move_to_user_mode((unsigned long)&process);
+    if (err < 0)
+        printf("Error while moving process to user mode\n\r");
 }
 
 void kmain()
@@ -97,24 +116,25 @@ void kmain()
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);
     int res;
 
-    res = fork((unsigned long)&process, 0, 0);
+    res = fork((unsigned long)&kernel_process, "A", 1);
     printf("Fork result: %d\n", res);
 
-    res = fork((unsigned long)&input_process, 0, 1);
+    res = fork((unsigned long)&stage, "B", 1);
     printf("Fork result: %d\n", res);
 
     printf("Framebuffer: %lu\n", (unsigned long)framebuffer);
 
     int *x = qalloc(int);
     *x = 100;
-    printf("%d", *x);
+    printf("%d\n", *x);
     vfree(x);
 
     x = qalloc(int);
     *x = 500;
-    printf("%d", *x);
+    printf("%d\n", *x);
     vfree(x);
 
+    printf("Scheduling is now taking place...\n");
     while (true)
         schedule();
 }

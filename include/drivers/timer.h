@@ -12,7 +12,7 @@ extern "C"
 #endif
 
 #define TIMER ((struct timer_registers *)(PERIPHERAL_BASE + 0x00003000))
-#define CLOCKHZ 10000
+#define CLOCKHZ 500000
 typedef void (*timer_function)(unsigned int counter, unsigned int multiplier);
 
 struct timer_registers

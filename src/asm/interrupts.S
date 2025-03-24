@@ -1,29 +1,27 @@
-#define SYNC_INVALID_EL1t		0 
-#define IRQ_INVALID_EL1t		1 
-#define FIQ_INVALID_EL1t		2 
-#define ERROR_INVALID_EL1t		3 
+#define SYNC_INVALID_EL1t		0
+#define IRQ_INVALID_EL1t		1
+#define FIQ_INVALID_EL1t		2
+#define ERROR_INVALID_EL1t		3
 
-#define SYNC_INVALID_EL1h		4 
-#define IRQ_INVALID_EL1h		5 
-#define FIQ_INVALID_EL1h		6 
-#define ERROR_INVALID_EL1h		7 
+#define SYNC_INVALID_EL1h		4
+#define IRQ_INVALID_EL1h		5
+#define FIQ_INVALID_EL1h		6
+#define ERROR_INVALID_EL1h		7
 
-#define SYNC_INVALID_EL0_64		8 
-#define IRQ_INVALID_EL0_64		9 
-#define FIQ_INVALID_EL0_64		10 
-#define ERROR_INVALID_EL0_64	11 
+#define SYNC_INVALID_EL0_64		8
+#define IRQ_INVALID_EL0_64		9
+#define FIQ_INVALID_EL0_64		10
+#define ERROR_INVALID_EL0_64	11
 
-#define SYNC_INVALID_EL0_32		12 
-#define IRQ_INVALID_EL0_32		13 
-#define FIQ_INVALID_EL0_32		14 
-#define ERROR_INVALID_EL0_32	15 
+#define SYNC_INVALID_EL0_32		12
+#define IRQ_INVALID_EL0_32		13
+#define FIQ_INVALID_EL0_32		14
+#define ERROR_INVALID_EL0_32	15
 
 //stack frame size
 #define S_FRAME_SIZE			272
 
-#define GO_EL_COMMAND			8
-
-.macro kernel_entry, el
+.macro	kernel_entry, el
 	sub	sp, sp, #S_FRAME_SIZE
 	stp	x0, x1, [sp, #16 * 0]
 	stp	x2, x3, [sp, #16 * 1]
@@ -45,25 +43,26 @@
 		mrs	x21, sp_el0
 	.else
 		add	x21, sp, #S_FRAME_SIZE
-	.endif
+	.endif /* \el == 0 */
 
 	mrs	x22, elr_el1
 	mrs	x23, spsr_el1
 
-	stp	x30, x21, [sp, #16 * 15] 
+	stp	x30, x21, [sp, #16 * 15]
 	stp	x22, x23, [sp, #16 * 16]
 .endm
 
-.macro kernel_exit, el
+.macro	kernel_exit, el
 	ldp	x22, x23, [sp, #16 * 16]
-	ldp	x30, x21, [sp, #16 * 15] 
+	ldp	x30, x21, [sp, #16 * 15]
 
 	.if	\el == 0
-		msr sp_el0, x21
-	.endif
+		msr	sp_el0, x21
+	.endif /* \el == 0 */
 
-	msr elr_el1, x22			
+	msr	elr_el1, x22
 	msr	spsr_el1, x23
+
 
 	ldp	x0, x1, [sp, #16 * 0]
 	ldp	x2, x3, [sp, #16 * 1]
@@ -84,35 +83,38 @@
 	eret
 .endm
 
-.macro handle_invalid_entry el, type 
-	cmp x0, #GO_EL_COMMAND
-	bne 2f
+.macro handle_invalid_entry el, type
+	kernel_entry \el
 
-	cmp x1, #0
-	beq 0f
-	bne 1f
-
-0:	mov x0, #0
-	msr spsr_el1, x0 
- 	eret
-
-1:  mov x0, #5
-	msr spsr_el1, x0
-	eret
-
-2:	kernel_entry \el
+	str xzr, [sp, #-16]!      // Allocate 16 bytes (8 for addon, 8 for alignment)
+	mov x4, x8
 	mov x0, #\type
     mrs x1, esr_el1
     mrs x2, elr_el1
-	
+	mov x3, sp
+
 	bl interrupt_message
 
-	cbz w0, 3f
-	ldp	x22, x23, [sp, #16 * 16] 
+	mov x2, x0
+
+	ldr w3, [sp, #8]          // Load 'addon' value from stack
+	add sp, sp, #16
+	cbz w3, 2f
+	cmp w3, #1
+	bne 1f
+	ldp	x22, x23, [sp, #16 * 16]
 	add x22, x22, #4
-	stp	x22, x23, [sp, #16 * 16] 
-	
-3: kernel_exit \el
+	stp	x22, x23, [sp, #16 * 16]
+	b 2f
+
+1:
+
+	ldp	x0, x1, [sp, #16 * 0]
+	mov x0, x2
+	stp	x0, x1, [sp, #16 * 0]
+	b 2f
+
+2:	kernel_exit \el
 .endm
 
 .macro	ventry	label
@@ -122,7 +124,7 @@
 
 // Exception vectors table
 .align	11
-.global vectors 
+.global vectors
 vectors:
 	ventry	sync_invalid_el1t			// Synchronous EL1t
 	ventry	irq_invalid_el1t			// IRQ EL1t
@@ -137,7 +139,7 @@ vectors:
 	ventry	sync_invalid_el0_64			// Synchronous 64-bit EL0
 	ventry	handle_el0_irq				// IRQ 64-bit EL0
 	ventry	fiq_invalid_el0_64			// FIQ 64-bit EL0
-	ventry	error_invalid_el0_64		// Error 64-bit EL0
+	ventry	error_invalid_el0_64		 // Error 64-bit EL0
 
 	ventry	sync_invalid_el0_32			// Synchronous 32-bit EL0
 	ventry	irq_invalid_el0_32			// IRQ 32-bit EL0
@@ -146,76 +148,56 @@ vectors:
 
 
 sync_invalid_el1t:
-	handle_invalid_entry 1, SYNC_INVALID_EL1t
+	handle_invalid_entry 1,  SYNC_INVALID_EL1t
 
 irq_invalid_el1t:
-	handle_invalid_entry 1, IRQ_INVALID_EL1t
+	handle_invalid_entry  1, IRQ_INVALID_EL1t
 
 fiq_invalid_el1t:
-	handle_invalid_entry 1, FIQ_INVALID_EL1t
+	handle_invalid_entry  1, FIQ_INVALID_EL1t
 
 error_invalid_el1t:
-	handle_invalid_entry 1, ERROR_INVALID_EL1t
+	handle_invalid_entry  1, ERROR_INVALID_EL1t
 
 sync_invalid_el1h:
 	handle_invalid_entry 1, SYNC_INVALID_EL1h
 
 fiq_invalid_el1h:
-	handle_invalid_entry 1, FIQ_INVALID_EL1h
+	handle_invalid_entry  1, FIQ_INVALID_EL1h
 
 error_invalid_el1h:
-	handle_invalid_entry 1, ERROR_INVALID_EL1h
+	handle_invalid_entry  1, ERROR_INVALID_EL1h
 
 sync_invalid_el0_64:
-	handle_invalid_entry 0, SYNC_INVALID_EL0_64
-
-irq_invalid_el0_64:
-	handle_invalid_entry 0, IRQ_INVALID_EL0_64
+	handle_invalid_entry  0, SYNC_INVALID_EL0_64
 
 fiq_invalid_el0_64:
-	handle_invalid_entry 0, FIQ_INVALID_EL0_64
+	handle_invalid_entry  0, FIQ_INVALID_EL0_64
 
 error_invalid_el0_64:
-	handle_invalid_entry 0, ERROR_INVALID_EL0_64
+	handle_invalid_entry  0, ERROR_INVALID_EL0_64
 
 sync_invalid_el0_32:
-	handle_invalid_entry 0, SYNC_INVALID_EL0_32
+	handle_invalid_entry  0, SYNC_INVALID_EL0_32
 
 irq_invalid_el0_32:
-	handle_invalid_entry 0, IRQ_INVALID_EL0_32
+	handle_invalid_entry  0, IRQ_INVALID_EL0_32
 
 fiq_invalid_el0_32:
-	handle_invalid_entry 0, FIQ_INVALID_EL0_32
+	handle_invalid_entry  0, FIQ_INVALID_EL0_32
 
 error_invalid_el0_32:
-	handle_invalid_entry 0, ERROR_INVALID_EL0_32
+	handle_invalid_entry  0, ERROR_INVALID_EL0_32
 
 handle_el1_irq:
 	kernel_entry 1
-	bl handle_irq
+	bl	handle_irq
 	kernel_exit 1
 
 handle_el0_irq:
 	kernel_entry 0
-	bl go_el1
-	bl handle_irq
+	bl	handle_irq
 	kernel_exit 0
-
-.global go_el0
-go_el0:
-	mov x0, #GO_EL_COMMAND
-	mov x1, #0
-	msr spsel, #0
-	svc #0
-	ret
-
-.global go_el1
-go_el1:
-	mov x0, #GO_EL_COMMAND
-	mov x1, #1
-	msr spsel, #1
-	svc #0
-	ret
 
 .global err_hang
 err_hang: b err_hang
@@ -250,3 +232,8 @@ breakpoint_enable:
 breakpoint_disable:
 	msr daifset, #0
 	ret
+
+.global ret_to_user
+ret_to_user:
+	bl irq_disable
+	kernel_exit 0
