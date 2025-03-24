@@ -34,16 +34,11 @@ bool fork(unsigned long fn, unsigned long arg, long kernel)
 int move_to_user_mode(unsigned long pc)
 {
     struct pt_regs *regs = task_pt_regs(scheduler_current);
-    printf("moving to user mode from pc %lu to %lu\n", regs->pc, pc);
-    qmemzero(regs);
+    printf("regs: %lu\n", regs);
+    // qmemzero(regs);
 
     regs->pc = pc;
     regs->pstate = PSR_MODE_EL0t;
-
-    unsigned long stack = valloc(PAGE_SIZE_BYTES); // allocate new user stack
-    if (!stack)
-        return false;
-    regs->sp = stack + PAGE_SIZE;
 
     return true;
 }

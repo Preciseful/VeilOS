@@ -81,6 +81,7 @@ void stage(unsigned long args)
     while (true)
     {
         i++;
+        printf("b");
         delay(10000);
     }
 }
@@ -99,9 +100,7 @@ void process(unsigned long args)
 void kernel_process(unsigned long args)
 {
     printf("Kernel process started. EL %d\r\n", get_el());
-    int err = move_to_user_mode((unsigned long)&process);
-    if (err < 0)
-        printf("Error while moving process to user mode\n\r");
+    set_pc((unsigned long)&process);
 }
 
 void kmain()

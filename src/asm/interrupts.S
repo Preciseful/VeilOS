@@ -191,11 +191,13 @@ error_invalid_el0_32:
 
 handle_el1_irq:
 	kernel_entry 1
+	mov x0, sp
 	bl	handle_irq
 	kernel_exit 1
 
 handle_el0_irq:
 	kernel_entry 0
+	mov x0, sp
 	bl	handle_irq
 	kernel_exit 0
 

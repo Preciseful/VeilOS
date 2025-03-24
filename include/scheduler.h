@@ -52,6 +52,7 @@ struct task
 
 extern void cpu_switch_task(struct task *prev, struct task *next, long kernel);
 
+void set_pc(unsigned long pc);
 void preempt_disable();
 void preempt_enable();
 void scheduler_init();
@@ -59,6 +60,7 @@ void schedule();
 void scheduler_tick(unsigned int counter, unsigned int multiplier);
 void scheduler_move_next();
 void add_task(struct task *task, bool high);
+void set_stack(unsigned long *st);
 
 extern struct task *scheduler_current;
 

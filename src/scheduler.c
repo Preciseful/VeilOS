@@ -3,6 +3,8 @@
 #include <interrupts.h>
 #include <lib/printf.h>
 #include <funcs.h>
+#include <lib/fork.h>
+#include <mm.h>
 
 #define INIT_TASK                             \
     {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, \
@@ -15,6 +17,8 @@
 struct task high_task = INIT_TASK;
 struct task low_task = INIT_TASK;
 struct task *scheduler_current = &high_task;
+unsigned long to_pc = 0;
+unsigned long *stack = 0;
 
 static unsigned long lows = 0, highs = 0;
 static bool moved_next;
@@ -22,6 +26,16 @@ static bool moved_next;
 void printx(unsigned long x)
 {
     printf("x: %lu\n", x);
+}
+
+void set_pc(unsigned long pc)
+{
+    to_pc = pc;
+}
+
+void set_stack(unsigned long *st)
+{
+    stack = st;
 }
 
 void preempt_disable()
@@ -118,7 +132,6 @@ void schedule()
             p->counter = QUANTUM;
     }
 
-    printf("running p %s: %lu %lu\n", p->cpu_context.x20, p->cpu_context.pc, p->cpu_context.sp);
     switch_to(p);
     preempt_enable();
 }
@@ -129,6 +142,27 @@ void scheduler_tick(unsigned int counter, unsigned int multiplier)
     scheduler_current->counter--;
     if (scheduler_current->counter > 0 || scheduler_current->preempt_count > 0)
         return;
+
+    if (to_pc != 0)
+    {
+        struct pt_regs *regs = (struct pt_regs *)stack;
+        // qmemzero(regs);
+
+        regs->pc = to_pc;
+        regs->pstate = PSR_MODE_EL0t;
+
+        unsigned long stack = valloc(PAGE_SIZE_BYTES); // allocate new user stack
+        if (!stack)
+            return false;
+        regs->sp = stack + PAGE_SIZE;
+        asm("mov x0, %0\n"
+            "msr sp_el0, x0"
+            :               // No outputs
+            : "r"(regs->sp) // Input: regs->sp, passed as a general-purpose register
+            : "x0");        // Clobbered register: x0 is used by the assembly code);
+
+        to_pc = 0;
+    }
 
     struct task *next = next_running_task(scheduler_current);
     next->counter = QUANTUM;

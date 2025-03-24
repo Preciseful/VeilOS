@@ -5,6 +5,7 @@
 #include <drivers/miniuart.h>
 #include <mm.h>
 #include <lib/base.h>
+#include <scheduler.h>
 
 #define IRQ ((struct irq_registers *)(PERIPHERAL_BASE + 0x0000B200))
 
@@ -20,7 +21,7 @@ void disable_vc_irq(enum videocore_irqs irq)
     IRQ->irq0_enable_0 &= ~irq;
 }
 
-void handle_irq()
+void handle_irq(unsigned long *stack)
 {
     unsigned int irq = IRQ->irq0_pending_0;
 
@@ -28,6 +29,7 @@ void handle_irq()
     {
         if (irq & SYS_TIMER_IRQ_1)
         {
+            set_stack(stack);
             irq &= ~SYS_TIMER_IRQ_1;
             handle_timer_1();
         }
@@ -94,6 +96,11 @@ unsigned long interrupt_message(unsigned long type, unsigned long esr, unsigned 
 
     switch (ec)
     {
+
+    case 0b100100:
+        printf("-> type of interrupt: data abort from lower EL\n");
+        goto leave;
+
     case 0b111100:
         printf("-> type of interrupt: brk\n");
         *addon = 1;
