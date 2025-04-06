@@ -40,11 +40,11 @@ set_el1:
 
 main_core:
     ldr x1, =__bss_start
-    ldr w2, =__bss_size
-1:  cbz w2, 2f
+    ldr x2, =__bss_size
+1:  cbz x2, 2f
     str xzr, [x1], #8
-    sub w2, w2, #1
-    cbnz w2, 1b
+    sub x2, x2, #1
+    cbnz x2, 1b
     mov sp, #(2 * SECTION_SIZE)
 2:  bl unveil
     b loop
