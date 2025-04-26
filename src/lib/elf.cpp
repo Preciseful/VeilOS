@@ -127,6 +127,8 @@ void flush_instruction_cache(void *start, void *end)
     asm volatile("isb");
 }
 
+// ELF format cheatsheet (very helpful thank u whoever made it)
+// https://gist.github.com/x0nu11byt3/bcb35c3de461e5fb66173071a2379779
 bool ELF::Initialize()
 {
     printf("Verifying ELF file...\n");
