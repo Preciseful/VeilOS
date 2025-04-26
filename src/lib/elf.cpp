@@ -13,7 +13,6 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
     unsigned long A = addend;
     unsigned long P = load_address + offset;
     unsigned long S = load_address;
-    unsigned long X = 0;
 
     switch (type)
     {
@@ -147,7 +146,18 @@ bool ELF::Initialize()
 
     unsigned long base = valloc(file->Size());
     auto header = (Elf64_Ehdr *)content;
-    // todo: more condition checks
+
+    if (header->e_machine != EM_AARCH64)
+    {
+        printf("ELF file is not of type AARCH64!\n");
+        return false;
+    }
+
+    if (header->e_type != ET_DYN)
+    {
+        printf("DYN ELF files are the only supported format!\n");
+        return false;
+    }
 
     auto tphdr = (Elf64_Phdr *)(content + header->e_phoff);
 
