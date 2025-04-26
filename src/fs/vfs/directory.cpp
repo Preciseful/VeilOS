@@ -1,7 +1,7 @@
 #include <fs/vfs/directory.hpp>
 #include <fs/vfs/fscashier.hpp>
 
-using namespace veil::fs::vfs;
+using namespace veil;
 
 Directory::Directory(FatFS *fs, FAT32DirectoryEntry entry, veil::std::List<FAT32DirectoryEntry> entries, const unsigned char *name)
     : VFSNode(fs, name),
@@ -27,9 +27,11 @@ veil::std::List<Directory *> Directory::GetDirectories()
 {
     veil::std::List<Directory *> ret;
 
+    printf("Reading with %lu entries...\n", entries.Count());
     for (unsigned long i = 0; i < entries.Count(); i++)
     {
         // skip over "." and ".."
+        printf("%lu entry: %s\n", i, entries[i].name);
         if (i == 0 && entries[i].Attributes() & 0x10)
         {
             i++;

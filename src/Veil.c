@@ -20,6 +20,7 @@
 #include <lib/fork.h>
 
 #include <fs/vfs/vfs.h>
+#include <modules.h>
 
 unsigned char unveil_phrase[] = {'u', 'n', 'v', 'e', 'i', 'l'};
 
@@ -43,6 +44,8 @@ void unveil()
     scheduler_init();
 
     vfs_init();
+
+    modules_init();
 
     kmain();
 }
@@ -140,5 +143,6 @@ void kmain()
 
 void veil()
 {
+    emmc_command(CTGoIdle, 0, 2000);
     watchdog_start(0x120);
 }

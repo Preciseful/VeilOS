@@ -6,7 +6,7 @@
 #include <fs/vfs/vfsnode.hpp>
 #include <fs/vfs/file.hpp>
 
-namespace veil::fs::vfs
+namespace veil
 {
     class Directory : public VFSNode
     {

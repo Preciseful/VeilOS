@@ -5,7 +5,7 @@
 #include <scheduler.h>
 #include <stdbool.h>
 
-using namespace veil::fs::vfs;
+using namespace veil;
 
 FSCashier *cashier = 0;
 

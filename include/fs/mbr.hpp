@@ -3,7 +3,7 @@
 
 #define BOOT_SIGNATURE 0xAA55
 
-namespace veil::fs
+namespace veil
 {
     struct chs_address
     {

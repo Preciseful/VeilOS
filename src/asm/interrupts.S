@@ -86,7 +86,9 @@
 .macro handle_invalid_entry el, type
 	kernel_entry \el
 
-	str xzr, [sp, #-16]!      // Allocate 16 bytes (8 for addon, 8 for alignment)
+	str xzr, [sp, #-16]!
+	mrs x0, far_el1
+	str x0, [sp, #8]
 	mov x4, x8
 	mov x0, #\type
     mrs x1, esr_el1
@@ -97,10 +99,10 @@
 
 	mov x2, x0
 
-	ldr w3, [sp, #8]          // Load 'addon' value from stack
+	ldr x3, [sp, #0]          // Load 'addon' value from stack
 	add sp, sp, #16
-	cbz w3, 2f
-	cmp w3, #1
+	cbz x3, 2f
+	cmp x3, #1
 	bne 1f
 	ldp	x22, x23, [sp, #16 * 16]
 	add x22, x22, #4

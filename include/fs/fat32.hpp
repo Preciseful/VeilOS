@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <lib/list.hpp>
 
-namespace veil::fs
+namespace veil
 {
     struct fat32_extbs
     {

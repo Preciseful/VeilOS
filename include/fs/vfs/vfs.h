@@ -2,6 +2,9 @@
 #define VFS_HPP
 
 #ifdef __cplusplus
+#include <fs/vfs/directory.hpp>
+extern veil::Directory *root_directory;
+
 extern "C"
 {
 #endif

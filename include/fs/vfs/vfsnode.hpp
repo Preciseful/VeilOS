@@ -3,7 +3,7 @@
 
 #include <fs/fat32.hpp>
 
-namespace veil::fs::vfs
+namespace veil
 {
     class VFSNode
     {

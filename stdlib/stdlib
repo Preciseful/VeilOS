@@ -1,0 +1,42 @@
+#ifndef MALLOC_H
+#define MALLOC_H
+
+#include <stddef.h>
+#include "svc"
+
+inline unsigned long malloc(unsigned int size)
+{
+    return svc0(1, size);
+}
+
+inline void free(void *data)
+{
+    svc0(2, (unsigned long)data);
+}
+
+inline void *operator new(size_t size)
+{
+    return (void *)malloc(size);
+}
+
+inline void *operator new[](size_t size)
+{
+    return (void *)malloc(size);
+}
+
+inline void operator delete(void *p)
+{
+    free(p);
+}
+
+inline void operator delete(void *ptr, unsigned long extra)
+{
+    free(ptr);
+}
+
+inline void operator delete[](void *p)
+{
+    free(p);
+}
+
+#endif

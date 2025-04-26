@@ -4,7 +4,7 @@
 #include <lib/map.hpp>
 #include <fs/vfs/vfsnode.hpp>
 
-namespace veil::fs::vfs
+namespace veil
 {
     class FSCashier
     {

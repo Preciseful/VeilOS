@@ -5,7 +5,7 @@
 #include <mm.h>
 #include <lib/string.h>
 
-using namespace veil::fs;
+using namespace veil;
 using namespace veil::std;
 
 unsigned char FAT32LongFileNameEntry::GetCountFrom(unsigned long index)

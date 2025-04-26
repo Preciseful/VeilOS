@@ -376,7 +376,7 @@ static bool emmc_issue_command(emmc_cmd cmd, unsigned int arg, unsigned int time
     return true;
 }
 
-static bool emmc_command(unsigned int command, unsigned int arg, unsigned int timeout)
+bool emmc_command(unsigned int command, unsigned int arg, unsigned int timeout)
 {
     if (command & 0x80000000)
     {

@@ -8,10 +8,9 @@
 #include <fs/vfs/fscashier.hpp>
 
 using namespace veil::std;
-using namespace veil::fs;
-using namespace veil::fs::vfs;
+using namespace veil;
 
-Directory *root = nullptr;
+Directory *root_directory = nullptr;
 
 void list_dirs(List<VFSNode *> nodes, bool read, unsigned int level)
 {
@@ -60,6 +59,6 @@ void vfs_init()
     }
 
     auto root_entry = fs->GetEntries(fs->root_cluster);
-    Directory *root = new Directory(fs, fs->GetEntry(fs->root_cluster), root_entry, "/");
-    root->Preserve();
+    root_directory = new Directory(fs, fs->GetEntry(fs->root_cluster), root_entry, "/");
+    root_directory->Preserve();
 }

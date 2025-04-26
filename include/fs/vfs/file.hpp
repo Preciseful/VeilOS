@@ -5,7 +5,7 @@
 #include <fs/vfs/vfsnode.hpp>
 #include <fs/vfs/fscashier.hpp>
 
-namespace veil::fs::vfs
+namespace veil
 {
     class File : public VFSNode
     {
@@ -22,6 +22,11 @@ namespace veil::fs::vfs
             return entry.Attributes();
         }
 
+        unsigned long Size()
+        {
+            return entry.Size();
+        }
+
         File(FatFS *fs, FAT32DirectoryEntry entry, const unsigned char *name)
             : VFSNode(fs, name), entry(entry)
         {
@@ -33,6 +38,8 @@ namespace veil::fs::vfs
         {
             FSCashier::GetCashier()->Add(this);
         }
+
+        static File *Find(const char *dir);
     };
 }
 

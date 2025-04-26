@@ -50,12 +50,12 @@ unsigned long handle_svc(unsigned long svc, unsigned long *stack)
     {
     // test
     case 0:
-        printf("x0: %lu\n", stack[2]);
-        printf("x1: %lu\n", stack[3]);
-        printf("x2: %lu\n", stack[4]);
-        printf("x3: %lu\n", stack[5]);
-        printf("x4: %lu\n", stack[6]);
-        printf("x5: %lu\n", stack[7]);
+        printf("x0: %lu\n", x0);
+        printf("x1: %lu\n", x1);
+        printf("x2: %lu\n", x2);
+        printf("x3: %lu\n", x3);
+        printf("x4: %lu\n", x4);
+        printf("x5: %lu\n", x5);
         return 123;
 
     case 1:
@@ -63,6 +63,10 @@ unsigned long handle_svc(unsigned long svc, unsigned long *stack)
 
     case 2:
         vfree((void *)x0);
+        return 0;
+
+    case 3:
+        printf("%s", x0);
         return 0;
 
     default:
@@ -76,7 +80,8 @@ unsigned long interrupt_message(unsigned long type, unsigned long esr, unsigned 
     unsigned int ec = esr >> 26;
     unsigned int il = esr >> 31;
     printf_use_framebuffer = false;
-    unsigned long *addon = (unsigned long *)(stack + 1);
+    unsigned long *addon = (unsigned long *)(stack + 0);
+    unsigned long far = stack[1];
     *addon = 0;
 
     if (ec == 0b010101)
@@ -91,8 +96,9 @@ unsigned long interrupt_message(unsigned long type, unsigned long esr, unsigned 
            "-> type %lu\n"
            "-> esr %lu\n"
            "-> elr 0x%lX\n"
-           "-> il %u\n",
-           type, esr, elr, il);
+           "-> il %u\n"
+           "-> far %lu\n",
+           type, esr, elr, il, far);
 
     switch (ec)
     {
