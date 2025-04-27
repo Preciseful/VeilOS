@@ -1,6 +1,8 @@
 #ifndef STRING_H
 #define STRING_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -13,6 +15,7 @@ extern "C"
     unsigned char *ltrim(const unsigned char *s);
     int isspace(const unsigned char s);
     void *memset(void *dest, int value, unsigned long size);
+    bool strcontains(const unsigned char *sub, const unsigned char *s);
 
 #ifdef __cplusplus
 }

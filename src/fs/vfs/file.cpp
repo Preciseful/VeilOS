@@ -2,10 +2,12 @@
 #include <fs/vfs/directory.hpp>
 #include <fs/vfs/vfs.h>
 #include <lib/string.h>
+#include <cxxabi.h>
 using namespace veil;
 
 File *File::Find(const char *dir)
 {
+    printf("WUTIWANT");
     char temp[100] = "";
     unsigned long i = 0;
     if (dir[0] == '/' || dir[0] == '\\')
@@ -62,4 +64,9 @@ File *File::Find(const char *dir)
 
     printf("Cannot find file '%s'\n", temp);
     return 0;
+}
+
+unsigned long fileFind(char *path)
+{
+    return (unsigned long)File::Find(path);
 }

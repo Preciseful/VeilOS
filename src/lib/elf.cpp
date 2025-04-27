@@ -13,13 +13,18 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
     unsigned long A = addend;
     unsigned long P = load_address + offset;
     unsigned long S = load_address;
-
+    if (type == R_AARCH64_JUMP_SLOT)
+    {
+        printf("Applying jump slot relocation for %lx -> %lx\n",
+               *(unsigned long *)fixup_addr, S + A);
+    }
     switch (type)
     {
+    case R_AARCH64_JUMP_SLOT:
     case R_AARCH64_RELATIVE:
     case R_AARCH64_ABS64:
     {
-        if ((unsigned long)fixup_addr & 7 == 0)
+        if (((unsigned long)fixup_addr & 7) == 0)
             *(unsigned long *)fixup_addr = S + A;
         else
         {
@@ -102,6 +107,7 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
         *(unsigned int *)fixup_addr |= (imm12 << 10);
         break;
     }
+
     default:
         printf("Unhandled relocation type: %lu\n", type);
         break;
@@ -146,7 +152,7 @@ bool ELF::Initialize()
         return false;
     }
 
-    unsigned long base = valloc(file->Size());
+    this->base = valloc(file->Size());
     auto header = (Elf64_Ehdr *)content;
 
     if (header->e_machine != EM_AARCH64)
@@ -187,6 +193,7 @@ bool ELF::Initialize()
             unsigned long strtab_addr = 0;
             unsigned long pltrel_addr = 0;
             unsigned long pltrel_size = 0;
+            unsigned long needed = 0;
 
             for (Elf64_Dyn *entry = dyn; entry->d_tag != DT_NULL; entry++)
             {
@@ -210,10 +217,17 @@ bool ELF::Initialize()
                 case DT_PLTRELSZ:
                     pltrel_size = entry->d_un.d_val;
                     break;
+                case DT_NEEDED:
+                    needed = entry->d_un.d_val;
+                    break;
                 }
             }
 
             Elf64_Sym *symtab = (Elf64_Sym *)(base + symtab_addr);
+            unsigned char *strtab = (unsigned char *)(base + strtab_addr);
+
+            if (needed != 0)
+                printf("Library required: '%s'!\n", strtab + needed);
 
             if (pltrel_addr && pltrel_size)
             {
@@ -231,7 +245,17 @@ bool ELF::Initialize()
 
                     unsigned long S = base;
                     if (sym != 0)
-                        S = base + symtab[sym].st_value;
+                    {
+                        const unsigned char *symbol_name = strtab + symtab[sym].st_name;
+                        if (strcontains((unsigned char *)"N4veil", symbol_name))
+                        {
+                            symtab[sym].st_value = (unsigned long)&File::Find;
+                            S = symtab[sym].st_value;
+                            printf("VEIL SYMBOL PATCHED!\n");
+                        }
+                        else
+                            S = base + symtab[sym].st_value;
+                    }
 
                     unsigned long *fixup_addr = (unsigned long *)(base + offset);
                     apply_relocation(fixup_addr, type, S, offset, addend);
@@ -254,10 +278,12 @@ bool ELF::Initialize()
                     long addend = r->r_addend;
 
                     unsigned long S = base;
-                    if (type == R_X86_64_GLOB_DAT || type == R_X86_64_JUMP_SLOT || type == R_X86_64_PC32)
+                    if (type == R_AARCH64_GLOB_DAT || type == R_AARCH64_JUMP_SLOT || type == R_AARCH64_PREL32)
                     {
                         if (sym != 0)
+                        {
                             S = base + symtab[sym].st_value;
+                        }
                     }
 
                     unsigned long *fixup_addr = (unsigned long *)(base + offset);

@@ -28,6 +28,8 @@ private:
     } __attribute__((packed));
 
 public:
+    unsigned long base;
+
     int (*Entry)(void);
     bool Initialize();
 

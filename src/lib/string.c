@@ -57,3 +57,35 @@ void *memset(void *dest, int value, unsigned long size)
     }
     return dest;
 }
+
+bool strcontains(const unsigned char *sub, const unsigned char *s)
+{
+    unsigned long sublen = strlen(sub);
+    unsigned long slen = strlen(s);
+    if (sublen > slen)
+        return false;
+    if (sublen == slen)
+        return (strcmp(s, sub) == 0);
+
+    for (unsigned long i = 0; i < slen - sublen; i++)
+    {
+        if (s[i] == sub[0])
+        {
+            bool ok = true;
+
+            for (unsigned long j = 1; j < sublen; j++)
+            {
+                if (s[i + j] != sub[j])
+                {
+                    ok = false;
+                    break;
+                }
+            }
+
+            if (ok)
+                return true;
+        }
+    }
+
+    return false;
+}
