@@ -1,5 +1,6 @@
 #include "file.hpp"
 
-veil::File *veil::File::Find(const char *dir)
-{
-}
+using namespace veil;
+
+File *File::Find(const char *dir) {}
+unsigned char *File::GetContent() {}

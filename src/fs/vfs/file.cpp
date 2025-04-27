@@ -7,7 +7,6 @@ using namespace veil;
 
 File *File::Find(const char *dir)
 {
-    printf("WUTIWANT");
     char temp[100] = "";
     unsigned long i = 0;
     if (dir[0] == '/' || dir[0] == '\\')
@@ -55,7 +54,7 @@ File *File::Find(const char *dir)
 
     for (unsigned long i = 0; i < files.Count(); i++)
     {
-        if (strcmp(files[i]->Name(), (const unsigned char *)temp) == 0)
+        if (strcmp(rtrim(files[i]->Name()), rtrim((const unsigned char *)temp)) == 0)
         {
             files[i]->Preserve();
             return files[i];

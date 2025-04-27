@@ -7,8 +7,8 @@ using namespace veil;
 #define Page(expr) ((expr) & ~0xFFF)
 
 struct ELF::kpatch patches[] = {
-    {"4File", "4Find", (unsigned long)&File::Find},
-    {}};
+    {"File", "Find", (unsigned long)&File::Find},
+    {"File", "GetContent", (unsigned long)(void *)&File::GetContent}};
 
 void apply_relocation(unsigned long *fixup_addr, unsigned long type,
                       unsigned long load_address, unsigned long offset,
@@ -145,6 +145,7 @@ unsigned long find_patch(unsigned char *name)
             return patch.func;
     }
 
+    printf("No patch found for %s.\n", name);
     return 0;
 }
 
