@@ -6,6 +6,10 @@ using namespace veil;
 
 #define Page(expr) ((expr) & ~0xFFF)
 
+struct ELF::kpatch patches[] = {
+    {"4File", "4Find", (unsigned long)&File::Find},
+    {}};
+
 void apply_relocation(unsigned long *fixup_addr, unsigned long type,
                       unsigned long load_address, unsigned long offset,
                       long addend)
@@ -133,6 +137,17 @@ void flush_instruction_cache(void *start, void *end)
     asm volatile("isb");
 }
 
+unsigned long find_patch(unsigned char *name)
+{
+    for (auto patch : patches)
+    {
+        if (strcontains((unsigned char *)patch.first, name) && strcontains((unsigned char *)patch.second, name))
+            return patch.func;
+    }
+
+    return 0;
+}
+
 // ELF format cheatsheet (very helpful thank u whoever made it)
 // https://gist.github.com/x0nu11byt3/bcb35c3de461e5fb66173071a2379779
 bool ELF::Initialize()
@@ -247,9 +262,9 @@ bool ELF::Initialize()
                     if (sym != 0)
                     {
                         const unsigned char *symbol_name = strtab + symtab[sym].st_name;
-                        if (strcontains((unsigned char *)"N4veil", symbol_name))
+                        if (unsigned long addr = find_patch((unsigned char *)symbol_name))
                         {
-                            symtab[sym].st_value = (unsigned long)&File::Find;
+                            symtab[sym].st_value = addr;
                             S = symtab[sym].st_value;
                             printf("VEIL SYMBOL PATCHED!\n");
                         }

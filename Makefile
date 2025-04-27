@@ -15,6 +15,9 @@ VFS_DIR = $(FS_DIR)/vfs
 
 all : clean kernel8.img
 
+dyn:
+	$(MAKE) -C stdlib
+
 dump:
 	$(ARMGNU)-objdump -D build/kernel8.elf > dump
 

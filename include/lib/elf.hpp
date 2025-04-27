@@ -28,6 +28,13 @@ private:
     } __attribute__((packed));
 
 public:
+    struct kpatch
+    {
+        const char *first;
+        const char *second;
+        unsigned long func;
+    };
+
     unsigned long base;
 
     int (*Entry)(void);
