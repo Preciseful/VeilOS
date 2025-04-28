@@ -1,37 +1,32 @@
 #include <fs/vfs/directory.hpp>
-#include <fs/vfs/fscashier.hpp>
 
 using namespace veil;
 
 Directory::Directory(FatFS *fs, FAT32DirectoryEntry entry, veil::std::List<FAT32DirectoryEntry> entries, const unsigned char *name)
-    : VFSNode(fs, name),
-      entry(entry),
+    : VFSNode(fs, name, entry),
       entries(entries),
       directories(entries.Count(), entries.Capacity()),
       files(entries.Count(), entries.Capacity())
 {
-    FSCashier::GetCashier()->Add(this);
 }
 
 Directory::Directory(FatFS *fs, FAT32DirectoryEntry entry, veil::std::List<FAT32DirectoryEntry> entries, const char *name)
-    : VFSNode(fs, (const unsigned char *)name),
-      entry(entry),
+    : VFSNode(fs, (const unsigned char *)name, entry),
       entries(entries),
       directories(entries.Count(), entries.Capacity()),
       files(entries.Count(), entries.Capacity())
 {
-    FSCashier::GetCashier()->Add(this);
 }
 
 veil::std::List<Directory *> Directory::GetDirectories()
 {
     veil::std::List<Directory *> ret;
 
-    printf("Reading with %lu entries...\n", entries.Count());
+    //  printf("Reading %s with %lu entries...\n", this->Name(), entries.Count());
     for (unsigned long i = 0; i < entries.Count(); i++)
     {
         // skip over "." and ".."
-        printf("%lu entry: %s\n", i, entries[i].name);
+        // printf("%lu entry: %s\n", i, entries[i].name);
         if (i == 0 && entries[i].Attributes() & 0x10)
         {
             i++;
@@ -45,11 +40,7 @@ veil::std::List<Directory *> Directory::GetDirectories()
         if (!(entries[i].Attributes() & 0x10))
             continue;
 
-        if (directories[i])
-            FSCashier::GetCashier()->RefreshExpiration(directories[i]);
-        else
-            directories[i] = new Directory(fs, fs->GetEntry(entries[i].cluster), fs->GetEntries(entries[i].cluster), entries[i].name);
-
+        directories[i] = new Directory(fs, fs->GetEntry(entries[i].cluster), fs->GetEntries(entries[i].cluster), entries[i].name);
         ret.Add(directories[i]);
     }
 
@@ -65,11 +56,7 @@ veil::std::List<File *> Directory::GetFiles()
         if (entries[i].Attributes() & 0x10 || entries[i].Attributes() & 0x08)
             continue;
 
-        if (files[i])
-            FSCashier::GetCashier()->RefreshExpiration(files[i]);
-        else
-            files[i] = new File(fs, entries[i], entries[i].name);
-
+        files[i] = new File(fs, entries[i], entries[i].name);
         ret.Add(files[i]);
     }
 

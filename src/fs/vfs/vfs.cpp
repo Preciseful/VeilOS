@@ -5,12 +5,15 @@
 #include <lib/fork.h>
 
 #include <fs/vfs/directory.hpp>
-#include <fs/vfs/fscashier.hpp>
+#include <fs/vfs/city.hpp>
+
+#include <lib/string.hpp>
 
 using namespace veil::std;
 using namespace veil;
 
 Directory *root_directory = nullptr;
+City *root_city = nullptr;
 
 void list_dirs(List<VFSNode *> nodes, bool read, unsigned int level)
 {
@@ -45,12 +48,29 @@ void list_dirs(List<VFSNode *> nodes, bool read, unsigned int level)
     }
 }
 
+void cities_init(City *city, List<VFSNode *> nodes)
+{
+    for (unsigned long i = 0; i < nodes.Count(); i++)
+    {
+        if (nodes[i]->Attributes() & 0x10)
+        {
+            City *newcity = new City(rtrim(nodes[i]->Name()), DirectoryType, nodes[i]->GetEntry(), nodes[i]->GetFS());
+            city->AddSubcity(newcity);
+            printf("Added subcity %s to city %s\n", newcity->GetName(), city->GetName());
+            cities_init(newcity, ((Directory *)nodes[i])->GetTotalNodes());
+        }
+        else
+        {
+            City *newcity = new City(rtrim(nodes[i]->Name()), FileType, nodes[i]->GetEntry(), nodes[i]->GetFS());
+            city->AddSubcity(newcity);
+            printf("Added subcity %s to city %s\n", newcity->GetName(), city->GetName());
+        }
+    }
+}
+
 void vfs_init()
 {
-    FSCashier *cashier = new FSCashier;
-
-    // fork((unsigned long)FSCashier::CleanupTask, (unsigned long)cashier, true);
-    FatFS *fs = new FatFS;
+    auto fs = new FatFS;
 
     if (!fs->succeded)
     {
@@ -58,7 +78,12 @@ void vfs_init()
         return;
     }
 
-    auto root_entry = fs->GetEntries(fs->root_cluster);
-    root_directory = new Directory(fs, fs->GetEntry(fs->root_cluster), root_entry, "/");
-    root_directory->Preserve();
+    auto root_entries = fs->GetEntries(fs->root_cluster);
+    auto root_entry = fs->GetEntry(fs->root_cluster);
+
+    root_city = new City("/", DirectoryType, root_entry, fs);
+    root_directory = new Directory(fs, root_entry, root_entries, "/");
+
+    cities_init(root_city, root_directory->GetTotalNodes());
+    printf("\n");
 }

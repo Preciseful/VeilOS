@@ -3,7 +3,9 @@
 
 #ifdef __cplusplus
 #include <fs/vfs/directory.hpp>
+#include <fs/vfs/city.hpp>
 extern veil::Directory *root_directory;
+extern veil::City *root_city;
 
 extern "C"
 {

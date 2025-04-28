@@ -2,5 +2,5 @@
 
 using namespace veil;
 
-File *File::Find(const char *dir) {}
+File *File::Open(const char *dir) {}
 unsigned char *File::GetContent() {}

@@ -7,7 +7,7 @@ namespace veil
     {
     public:
         unsigned char *GetContent();
-        static File *Find(const char *dir);
+        static File *Open(const char *dir);
     };
 }
 

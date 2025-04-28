@@ -7,24 +7,24 @@ namespace veil
 {
     class VFSNode
     {
-        bool preserve = false;
         unsigned long interactions = 0;
 
     protected:
         FatFS *fs;
         const unsigned char *name;
+        FAT32DirectoryEntry entry;
 
-        VFSNode(FatFS *fs, const unsigned char *name) : fs(fs), name(name) {}
+        VFSNode(FatFS *fs, const unsigned char *name, FAT32DirectoryEntry entry) : fs(fs), name(name), entry(entry) {}
 
     public:
-        void Preserve()
+        FatFS *GetFS()
         {
-            this->preserve = true;
+            return fs;
         }
 
-        bool IsPreserved()
+        FAT32DirectoryEntry GetEntry()
         {
-            return preserve;
+            return entry;
         }
 
         unsigned long Interactions()

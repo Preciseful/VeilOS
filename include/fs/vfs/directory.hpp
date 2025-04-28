@@ -10,7 +10,6 @@ namespace veil
 {
     class Directory : public VFSNode
     {
-        FAT32DirectoryEntry entry;
         veil::std::List<FAT32DirectoryEntry> entries;
         veil::std::List<Directory *> directories;
         veil::std::List<File *> files;

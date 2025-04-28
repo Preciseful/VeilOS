@@ -1,38 +1,31 @@
 #include <fs/vfs/file.hpp>
 #include <fs/vfs/directory.hpp>
 #include <fs/vfs/vfs.h>
-#include <lib/string.h>
-#include <cxxabi.h>
+#include <lib/string.hpp>
+#include <fs/vfs/city.hpp>
 using namespace veil;
 
-File *File::Find(const char *dir)
+File *File::Open(const char *dir)
 {
     char temp[100] = "";
     unsigned long i = 0;
     if (dir[0] == '/' || dir[0] == '\\')
         dir++;
     else
+    {
+        printf("Invalid directory name '%s'! Must be absolute.\n", dir);
         return 0;
+    }
 
-    Directory *current = root_directory;
+    City *current = root_city;
 
     while (*dir)
     {
         if (*dir == '/' || *dir == '\\')
         {
-            auto subdirectories = current->GetDirectories();
-            bool found = false;
-            for (unsigned long i = 0; i < subdirectories.Count(); i++)
-            {
-                if (strcmp(rtrim(subdirectories[i]->Name()), rtrim((const unsigned char *)temp)) == 0)
-                {
-                    current = subdirectories[i];
-                    found = true;
-                    break;
-                }
-            }
+            current = current->GetSubcity(rtrim((unsigned char *)temp));
 
-            if (!found)
+            if (!current)
             {
                 printf("Cannot find subdirectory '%s'\n", temp);
                 return 0;
@@ -49,23 +42,28 @@ File *File::Find(const char *dir)
 
         dir++;
     }
+    auto filename = rtrim((unsigned char *)temp);
 
-    auto files = current->GetFiles();
-
-    for (unsigned long i = 0; i < files.Count(); i++)
+    auto filecity = current->GetSubcity(filename);
+    if (filecity->Attributes & 0x2)
     {
-        if (strcmp(rtrim(files[i]->Name()), rtrim((const unsigned char *)temp)) == 0)
-        {
-            files[i]->Preserve();
-            return files[i];
-        }
+        printf("File '%s' is already open!\n", filename);
+        return nullptr;
     }
 
-    printf("Cannot find file '%s'\n", temp);
-    return 0;
+    filecity->Attributes |= 0x2;
+
+    auto file = current->GetFile(filename);
+    if (!file)
+    {
+        printf("Cannot find file '%s'\n", temp);
+        filecity->Attributes &= ~0x2;
+    }
+
+    return file;
 }
 
 unsigned long fileFind(char *path)
 {
-    return (unsigned long)File::Find(path);
+    return (unsigned long)File::Open(path);
 }

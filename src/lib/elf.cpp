@@ -1,13 +1,13 @@
 #include <lib/elf.hpp>
 #include <elf.h>
-#include <lib/string.h>
+#include <lib/string.hpp>
 
 using namespace veil;
 
 #define Page(expr) ((expr) & ~0xFFF)
 
 struct ELF::kpatch patches[] = {
-    {"File", "Find", (unsigned long)&File::Find},
+    {"File", "Open", (unsigned long)&File::Open},
     {"File", "GetContent", (unsigned long)(void *)&File::GetContent}};
 
 void apply_relocation(unsigned long *fixup_addr, unsigned long type,
@@ -17,11 +17,7 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
     unsigned long A = addend;
     unsigned long P = load_address + offset;
     unsigned long S = load_address;
-    if (type == R_AARCH64_JUMP_SLOT)
-    {
-        printf("Applying jump slot relocation for %lx -> %lx\n",
-               *(unsigned long *)fixup_addr, S + A);
-    }
+
     switch (type)
     {
     case R_AARCH64_JUMP_SLOT:
@@ -243,7 +239,7 @@ bool ELF::Initialize()
             unsigned char *strtab = (unsigned char *)(base + strtab_addr);
 
             if (needed != 0)
-                printf("Library required: '%s'!\n", strtab + needed);
+                printf("Library '%s' required for %s!\n", strtab + needed, this->file->Name());
 
             if (pltrel_addr && pltrel_size)
             {
@@ -267,7 +263,6 @@ bool ELF::Initialize()
                         {
                             symtab[sym].st_value = addr;
                             S = symtab[sym].st_value;
-                            printf("VEIL SYMBOL PATCHED!\n");
                         }
                         else
                             S = base + symtab[sym].st_value;

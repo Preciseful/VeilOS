@@ -132,7 +132,7 @@ void schedule()
             p->counter = QUANTUM;
     }
 
-    printf("Switching to: %lu\n", p->cpu_context.x19);
+    printf("\nSwitching to: %lu\n\n", p->cpu_context.x19);
     switch_to(p);
     preempt_enable();
 }
