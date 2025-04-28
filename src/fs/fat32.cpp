@@ -3,7 +3,7 @@
 #include <lib/printf.h>
 #include <fs/mbr.hpp>
 #include <mm.h>
-#include <lib/string.hpp>
+#include <lib/string.h>
 
 using namespace veil;
 using namespace veil::std;

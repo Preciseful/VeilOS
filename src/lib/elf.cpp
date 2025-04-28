@@ -1,6 +1,6 @@
 #include <lib/elf.hpp>
 #include <elf.h>
-#include <lib/string.hpp>
+#include <lib/string.h>
 
 using namespace veil;
 

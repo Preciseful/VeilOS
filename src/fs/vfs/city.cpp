@@ -1,6 +1,6 @@
 #include <fs/vfs/city.hpp>
 #include <fs/vfs/file.hpp>
-#include <lib/string.hpp>
+#include <lib/string.h>
 
 using namespace veil;
 

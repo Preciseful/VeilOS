@@ -1,7 +1,7 @@
 #include <fs/vfs/file.hpp>
 #include <fs/vfs/directory.hpp>
 #include <fs/vfs/vfs.h>
-#include <lib/string.hpp>
+#include <lib/string.h>
 #include <fs/vfs/city.hpp>
 using namespace veil;
 
