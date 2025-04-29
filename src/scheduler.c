@@ -158,9 +158,9 @@ void scheduler_tick(unsigned int counter, unsigned int multiplier)
         regs->sp = stack + PAGE_SIZE;
         asm("mov x0, %0\n"
             "msr sp_el0, x0"
-            :               // No outputs
-            : "r"(regs->sp) // Input: regs->sp, passed as a general-purpose register
-            : "x0");        // Clobbered register: x0 is used by the assembly code);
+            :
+            : "r"(regs->sp)
+            : "x0");
 
         to_pc = 0;
     }

@@ -92,7 +92,6 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
         unsigned int imm21 = (unsigned int)((delta >> 12) & 0x1FFFFF);
         unsigned int instruction = *(unsigned int *)fixup_addr;
 
-        // Clear the immediate field in the instruction
         instruction &= 0x9F00001F;
         instruction |= ((imm21 & 0x3) << 29) | ((imm21 & 0x1FFFFC) << 3);
         *(unsigned int *)fixup_addr = instruction;

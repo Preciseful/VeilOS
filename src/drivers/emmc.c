@@ -181,8 +181,8 @@ static const emmc_cmd commands[] = {
     RES_CMD,
     RES_CMD,
     RES_CMD,
-    RES_CMD,
-    RES_CMD,
+    {0, 0, 0, 0, 0, 0, RT48Busy, 0, 1, 0, 1, 0, 24, 0},
+    {0, 1, 1, 0, 1, 0, RT48Busy, 0, 1, 0, 1, 0, 25, 0},
     RES_CMD,
     RES_CMD,
     RES_CMD,
@@ -923,6 +923,27 @@ int emmc_read(unsigned char *buffer, unsigned int size)
     unsigned int block = device.offset / 512;
 
     int r = do_read(buffer, size, block);
+
+    if (r != size)
+    {
+        printf("READ FAILED: %d\n", r);
+        return -1;
+    }
+
+    return size;
+}
+
+int emmc_write(unsigned char *buffer, unsigned int size)
+{
+    if (device.offset % 512 != 0)
+    {
+        printf("INVALID OFFSET: %d\n", device.offset);
+        return -1;
+    }
+
+    unsigned int block = device.offset / 512;
+
+    int r = do_write(buffer, size, block);
 
     if (r != size)
     {

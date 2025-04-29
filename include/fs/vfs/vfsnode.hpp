@@ -12,19 +12,15 @@ namespace veil
     protected:
         FatFS *fs;
         const unsigned char *name;
-        FAT32DirectoryEntry entry;
 
         VFSNode(FatFS *fs, const unsigned char *name, FAT32DirectoryEntry entry) : fs(fs), name(name), entry(entry) {}
 
     public:
+        FAT32DirectoryEntry entry;
+
         FatFS *GetFS()
         {
             return fs;
-        }
-
-        FAT32DirectoryEntry GetEntry()
-        {
-            return entry;
         }
 
         unsigned long Interactions()

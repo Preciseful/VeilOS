@@ -164,6 +164,7 @@ extern "C"
 
     bool emmc_init();
     int emmc_read(unsigned char *buffer, unsigned int size);
+    int emmc_write(unsigned char *buffer, unsigned int size);
     void emmc_seek(unsigned long offset);
     bool emmc_command(unsigned int command, unsigned int arg, unsigned int timeout);
 

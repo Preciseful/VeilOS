@@ -2,8 +2,9 @@
 #define CITY_HPP
 
 #include <lib/list.hpp>
-#include <fs/fat32.hpp>
 #include <fs/vfs/file.hpp>
+#include <fs/vfs/directory.hpp>
+#include <fs/fat32.hpp>
 
 namespace veil
 {
@@ -23,26 +24,36 @@ namespace veil
         FatFS *fs;
 
     public:
+        City *Parent;
         unsigned char Attributes;
 
         City *GetSubcity(const unsigned char *name);
         void AddSubcity(City *city);
         void RemoveCity(const unsigned char *name);
         File *GetFile(const unsigned char *city);
+        Directory *GetDirectory(const unsigned char *city_name);
+        unsigned char *AbsolutePath();
 
         const unsigned char *GetName()
         {
             return name;
         }
 
-        City(const unsigned char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name(name),
-                                                                                               entry(entry),
-                                                                                               fs(fs),
-                                                                                               Attributes(type) {}
-        City(const char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name((const unsigned char *)name),
-                                                                                      entry(entry),
-                                                                                      fs(fs),
-                                                                                      Attributes(type) {}
+        unsigned int GetCluster()
+        {
+            return entry.cluster;
+        }
+
+        City(City *parent, const unsigned char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name(name),
+                                                                                                             entry(entry),
+                                                                                                             fs(fs),
+                                                                                                             Parent(parent),
+                                                                                                             Attributes(type) {}
+        City(City *parent, const char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name((const unsigned char *)name),
+                                                                                                    entry(entry),
+                                                                                                    fs(fs),
+                                                                                                    Parent(parent),
+                                                                                                    Attributes(type) {}
     };
 }
 

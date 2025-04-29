@@ -36,6 +36,7 @@ namespace veil
         }
 
         static File *Open(const char *dir);
+        static bool Exists(const char *dir);
     };
 }
 

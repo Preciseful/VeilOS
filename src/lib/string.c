@@ -20,6 +20,19 @@ int strcmp(const unsigned char *s1, const unsigned char *s2)
     return (*s1 > *s2) - (*s2 > *s1);
 }
 
+int memcmp(const unsigned char *s1, const unsigned char *s2, unsigned long size)
+{
+    int i = 0;
+    while (i < size && *s1 && *s1 == *s2)
+    {
+        ++s1;
+        ++s2;
+        ++i;
+    }
+
+    return (*s1 > *s2) - (*s2 > *s1);
+}
+
 int isspace(const unsigned char s)
 {
     if (s == ' ')
@@ -88,4 +101,24 @@ bool strcontains(const unsigned char *sub, const unsigned char *s)
     }
 
     return false;
+}
+
+unsigned char toupper(unsigned char x)
+{
+    if (x >= 'a' && x <= 'z')
+        return x - ('a' - 'A');
+    return x;
+}
+
+unsigned char *strcat(unsigned char *x, unsigned char *y)
+{
+    unsigned char *ptr = x;
+
+    while (*ptr)
+        ptr++;
+    while (*y)
+        *ptr++ = *y++;
+
+    *ptr = '\0';
+    return x;
 }

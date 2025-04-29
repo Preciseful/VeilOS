@@ -4,6 +4,8 @@
 #include <fs/mbr.hpp>
 #include <mm.h>
 #include <lib/string.h>
+#include <fs/vfs/file.hpp>
+#include <fs/vfs/city.hpp>
 
 using namespace veil;
 using namespace veil::std;
@@ -154,7 +156,6 @@ unsigned int FatFS::nextCluster(unsigned int cluster_no)
     unsigned int fat_sector = first_fat_sector + (fat_offset / bs->bytes_per_sector);
     unsigned int ent_offset = fat_offset % bs->bytes_per_sector;
 
-    // 8192 again being hard value
     emmc_seek(fat_sector * 512);
     emmc_read(FAT_table, 512);
 
@@ -167,6 +168,68 @@ unsigned int FatFS::nextCluster(unsigned int cluster_no)
     return table_value;
 }
 
+unsigned int FatFS::findFreeCluster()
+{
+    unsigned char FAT_table[512];
+    unsigned int entries = bs->bytes_per_sector / 4;
+
+    for (unsigned int i = 0; i < sectors_per_fat; i++)
+    {
+        emmc_seek((first_fat_sector + i) * 512);
+        emmc_read(FAT_table, 512);
+
+        for (unsigned int entry = 0; entry < entries; entry++)
+        {
+            unsigned int value = *(unsigned int *)&FAT_table[entry * 4];
+            value &= 0x0FFFFFFF;
+
+            if (value == 0x00000000)
+            {
+                unsigned int cluster = (i * entries) + entry;
+
+                if (cluster >= 2)
+                    return cluster;
+            }
+        }
+    }
+
+    return 0;
+}
+
+void FatFS::writeToEntry(unsigned int cluster_no, unsigned int value)
+{
+    unsigned char FAT_table[512];
+    unsigned int fat_offset = cluster_no * 4;
+    unsigned int fat_sector = first_fat_sector + (fat_offset / bs->bytes_per_sector);
+    unsigned int ent_offset = fat_offset % bs->bytes_per_sector;
+
+    emmc_seek(fat_sector * 512);
+    emmc_read(FAT_table, 512);
+
+    value &= 0x0FFFFFFF;
+    *(unsigned int *)&FAT_table[ent_offset] = value;
+
+    emmc_seek(fat_sector * 512);
+    emmc_write(FAT_table, 512);
+}
+
+unsigned int FatFS::linkFreeCluster(unsigned int cluster)
+{
+    unsigned int free = findFreeCluster();
+    unsigned int last = cluster;
+    while (true)
+    {
+        unsigned int next = nextCluster(last);
+        if (!next)
+            break;
+        last = next;
+    }
+
+    writeToEntry(last, free);
+    writeToEntry(free, 0x0FFFFFFF);
+    return free;
+}
+
 unsigned int FatFS::readBytesFromCluster(unsigned int cluster, unsigned char *&buf)
 {
     unsigned int cluster_sector = ((cluster - 2) * bs->sectors_per_cluster) + first_data_sector;
@@ -177,6 +240,190 @@ unsigned int FatFS::readBytesFromCluster(unsigned int cluster, unsigned char *&b
     emmc_read(buf, entries_bytes);
 
     return entries_bytes;
+}
+
+unsigned int FatFS::writeBytesToCluster(unsigned int cluster, unsigned char *buf)
+{
+    unsigned int cluster_sector = ((cluster - 2) * bs->sectors_per_cluster) + first_data_sector;
+    unsigned int entries_bytes = bs->sectors_per_cluster * bs->bytes_per_sector;
+
+    emmc_seek(cluster_sector * 512);
+    emmc_write(buf, entries_bytes);
+
+    return entries_bytes;
+}
+
+unsigned char lfn_checksum(const unsigned char *short_name)
+{
+    unsigned char sum = 0;
+    for (int i = 11; i != 0; i--)
+        sum = ((sum & 1) ? 0x80 : 0) + (sum >> 1) + *short_name++;
+    return sum;
+}
+
+unsigned char *generate_short(const char *name)
+{
+    unsigned char *short_name = (unsigned char *)valloc(11);
+    memset(short_name, ' ', 11);
+    int dot = 0;
+
+    for (unsigned long i = 0; i < strlen((unsigned char *)name); i++)
+    {
+        if (name[i] == '.')
+        {
+            dot = i;
+            break;
+        }
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        if (name[i] == '.')
+            break;
+
+        short_name[i] = toupper(name[i]);
+    }
+
+    for (int i = dot + 1; i < dot + 4 && name[i]; i++)
+        short_name[(i - dot - 1) + 8] = toupper(name[i]);
+
+    return short_name;
+}
+
+FAT32DirectoryEntry FatFS::WriteEntry(City *parent_city, unsigned int parent_cluster, const char *name)
+{
+    unsigned char *short_name = generate_short(name);
+    unsigned long namelen = strlen((const unsigned char *)name);
+    bool lfn = namelen > 11;
+    unsigned char checksum = lfn_checksum(short_name);
+
+    while (true)
+    {
+        unsigned char *buf;
+        unsigned int entries_bytes = readBytesFromCluster(parent_cluster, buf);
+        bool null_terminated = false;
+
+        for (unsigned int i = 0; i < entries_bytes; i += 32)
+        {
+            if (buf[i] != 0x0 && buf[i] != 0xE5)
+                continue;
+
+            struct fat32_dir_entry *dir = (struct fat32_dir_entry *)&buf[i];
+            if (lfn)
+            {
+                unsigned int lfn_count = (namelen + 12) / 13;
+                bool ok = true;
+                for (unsigned int j = 0; j < lfn_count + 1; j++)
+                {
+                    if ((buf[i + j * 32] != 0x0 && buf[i + j * 32] != 0xE5) || i + j * 32 >= entries_bytes)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (!ok)
+                    continue;
+
+                for (unsigned int j = 0; j < lfn_count; j++)
+                {
+                    struct long_filename *lfn = (struct long_filename *)&buf[i + (lfn_count - j - 1) * 32];
+                    memzero((unsigned long)lfn, sizeof(struct long_filename));
+
+                    lfn->checksum = checksum;
+                    lfn->order = (j + 1);
+                    if (j == lfn_count - 1)
+                        lfn->order |= 0x40;
+                    lfn->attrs = 0x0F;
+                    lfn->res1 = 0x0000;
+                    lfn->res2 = 0x0000;
+
+                    unsigned int name_offset = j * 13;
+
+                    for (int k = 0; k < 5; k++)
+                    {
+                        if (name_offset + k < namelen)
+                            lfn->characters1[k] = (unsigned short)name[name_offset + k];
+                        else if (name_offset + k == namelen && !null_terminated)
+                        {
+                            lfn->characters1[k] = '\0';
+                            null_terminated = true;
+                        }
+                        else
+                            lfn->characters1[k] = 0xFFFF;
+                    }
+
+                    for (int k = 0; k < 6; k++)
+                    {
+                        if (name_offset + 5 + k < namelen)
+                            lfn->characters2[k] = (unsigned short)name[name_offset + 5 + k];
+                        else if (name_offset + 5 + k == namelen && !null_terminated)
+                        {
+                            lfn->characters2[k] = '\0';
+                            null_terminated = true;
+                        }
+                        else
+                            lfn->characters2[k] = 0xFFFF;
+                    }
+
+                    for (int k = 0; k < 2; k++)
+                    {
+                        if (name_offset + 11 + k < namelen)
+                            lfn->characters3[k] = (unsigned short)name[name_offset + 11 + k];
+                        else if (name_offset + 11 + k == namelen && !null_terminated)
+                        {
+                            lfn->characters3[k] = '\0';
+                            null_terminated = true;
+                        }
+                        else
+                            lfn->characters3[k] = 0xFFFF;
+                    }
+                }
+
+                unsigned int offset = i + lfn_count * 32;
+                dir = (struct fat32_dir_entry *)&buf[offset];
+            }
+
+            unsigned int cluster = 0;
+
+            memzero((unsigned long)dir, sizeof(struct fat32_dir_entry));
+            memcpy(dir->name, short_name, 8);
+            memcpy(dir->ext, short_name + 8, 3);
+
+            dir->attrs = 0x20;
+            dir->cluster_high = (cluster >> 16) & 0xFFFF;
+            dir->cluster_low = cluster & 0xFFFF;
+            dir->size = 0;
+
+            dir->create_time = 0x0000;
+            dir->create_date = 0x28C0;
+            dir->modification_time = 0x0000;
+            dir->modification_date = 0x28C0;
+            dir->access_date = 0x28C0;
+
+            unsigned int cluster_sector = ((parent_cluster - 2) * bs->sectors_per_cluster) + first_data_sector;
+
+            emmc_seek(cluster_sector * 512);
+            emmc_write(buf, entries_bytes);
+            printf("Created file %s.\n", name);
+
+            delete[] short_name;
+            auto finalent = FAT32DirectoryEntry(dir);
+            City *city = new City(parent_city, name, FileType, finalent, this);
+            parent_city->AddSubcity(city);
+            finalent.parent_cluster = parent_cluster;
+
+            return finalent;
+        }
+
+        unsigned int next = nextCluster(parent_cluster);
+        if (next == 0)
+        {
+            next = linkFreeCluster(parent_cluster);
+        }
+
+        parent_cluster = next;
+    }
 }
 
 FAT32DirectoryEntry FatFS::GetEntry(unsigned int cluster)
@@ -286,4 +533,86 @@ unsigned char *FatFS::ReadFile(FAT32DirectoryEntry *entry)
     }
 
     return file;
+}
+
+bool FatFS::updateDirectoryEntry(unsigned int parent_cluster, FAT32DirectoryEntry *target_entry)
+{
+    unsigned int cluster_sector = (parent_cluster - 2) * bs->sectors_per_cluster + first_data_sector;
+
+    for (unsigned int sector = 0; sector < bs->sectors_per_cluster; sector++)
+    {
+        unsigned char sector_buf[512];
+        emmc_seek((cluster_sector + sector) * 512);
+        emmc_read(sector_buf, 512);
+
+        fat32_dir_entry *entries = (fat32_dir_entry *)sector_buf;
+        for (unsigned int i = 0; i < 16; i++)
+        {
+            unsigned char x[12];
+            memcpy(x, entries[i].name, 11);
+            x[11] = '\0';
+
+            unsigned char y[12];
+            memcpy(y, target_entry->internal->name, 11);
+            y[11] = '\0';
+
+            if (strcmp(x, y) == 0)
+            {
+                memcpy(&entries[i], target_entry->internal, sizeof(fat32_dir_entry));
+
+                emmc_seek((cluster_sector + sector) * 512);
+                emmc_write(sector_buf, 512);
+                return true;
+            }
+        }
+    }
+
+    unsigned int next_cluster = nextCluster(parent_cluster);
+    if (next_cluster != 0)
+        return updateDirectoryEntry(next_cluster, target_entry);
+
+    return false;
+}
+
+bool FatFS::WriteFile(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size)
+{
+    unsigned long padded_size = ((size + 511) / 512) * 512;
+    unsigned char *padded_buf = nullptr;
+    unsigned int cluster = entry->cluster;
+
+    if (size % 512 != 0)
+    {
+        padded_buf = new unsigned char[padded_size];
+        memset(padded_buf, 0, padded_size);
+        memcpy(padded_buf, buf, size);
+        buf = padded_buf;
+    }
+
+    if (cluster == 0)
+    {
+        cluster = findFreeCluster();
+        writeToEntry(cluster, 0x0FFFFFFF);
+        entry->cluster = cluster;
+        entry->internal->cluster_low = cluster & 0xFFFF;
+        entry->internal->cluster_high = (cluster >> 16) & 0xFFFF;
+    }
+
+    for (unsigned long i = 0; i < padded_size; i += 512)
+    {
+        writeBytesToCluster(cluster, buf + i);
+        unsigned int next = nextCluster(cluster);
+        if (next == 0)
+            next = linkFreeCluster(cluster);
+
+        cluster = next;
+    }
+
+    entry->internal->size = size;
+
+    updateDirectoryEntry(entry->parent_cluster, entry);
+
+    if (padded_buf)
+        delete[] padded_buf;
+
+    return true;
 }

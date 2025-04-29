@@ -99,7 +99,7 @@
 
 	mov x2, x0
 
-	ldr x3, [sp, #0]          // Load 'addon' value from stack
+	ldr x3, [sp, #0]
 	add sp, sp, #16
 	cbz x3, 2f
 	cmp x3, #1

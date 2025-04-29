@@ -6,6 +6,11 @@
 
 namespace veil
 {
+    class City;
+}
+
+namespace veil
+{
     struct fat32_extbs
     {
         unsigned int table_size_32;
@@ -89,13 +94,14 @@ namespace veil
     class FAT32DirectoryEntry
     {
         FAT32LongFileNameEntry filename;
-        struct fat32_dir_entry *internal;
 
     public:
         unsigned char *name;
         unsigned char *extension;
         bool filename_set = false;
         unsigned int cluster;
+        unsigned int parent_cluster = 0;
+        struct fat32_dir_entry *internal;
 
         void SetFilename(FAT32LongFileNameEntry filename);
 
@@ -121,13 +127,20 @@ namespace veil
 
         unsigned int nextCluster(unsigned int cluster_no);
         unsigned int readBytesFromCluster(unsigned int cluster, unsigned char *&buf);
+        unsigned int writeBytesToCluster(unsigned int cluster, unsigned char *buf);
+        unsigned int findFreeCluster();
+        unsigned int linkFreeCluster(unsigned int cluster);
+        void writeToEntry(unsigned int cluster_no, unsigned int value);
+        bool updateDirectoryEntry(unsigned int parent_cluster, FAT32DirectoryEntry *target_entry);
 
     public:
         bool succeded;
         unsigned int root_cluster;
+        FAT32DirectoryEntry WriteEntry(City *parent_city, unsigned int parent_cluster, const char *name);
         veil::std::List<FAT32DirectoryEntry> GetEntries(unsigned int cluster);
         FAT32DirectoryEntry GetEntry(unsigned int cluster);
         unsigned char *ReadFile(FAT32DirectoryEntry *entry);
+        bool WriteFile(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size);
         FatFS();
     };
 }

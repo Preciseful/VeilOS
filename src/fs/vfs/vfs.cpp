@@ -48,20 +48,22 @@ void list_dirs(List<VFSNode *> nodes, bool read, unsigned int level)
     }
 }
 
-void cities_init(City *city, List<VFSNode *> nodes)
+void cities_init(City *city, List<VFSNode *> nodes, unsigned int parent_cluster)
 {
     for (unsigned long i = 0; i < nodes.Count(); i++)
     {
+        nodes[i]->entry.parent_cluster = parent_cluster;
+
         if (nodes[i]->Attributes() & 0x10)
         {
-            City *newcity = new City(rtrim(nodes[i]->Name()), DirectoryType, nodes[i]->GetEntry(), nodes[i]->GetFS());
+            City *newcity = new City(city, rtrim(nodes[i]->Name()), DirectoryType, nodes[i]->entry, nodes[i]->GetFS());
             city->AddSubcity(newcity);
             printf("Added subcity %s to city %s\n", newcity->GetName(), city->GetName());
-            cities_init(newcity, ((Directory *)nodes[i])->GetTotalNodes());
+            cities_init(newcity, ((Directory *)nodes[i])->GetTotalNodes(), nodes[i]->entry.cluster);
         }
         else
         {
-            City *newcity = new City(rtrim(nodes[i]->Name()), FileType, nodes[i]->GetEntry(), nodes[i]->GetFS());
+            City *newcity = new City(city, rtrim(nodes[i]->Name()), FileType, nodes[i]->entry, nodes[i]->GetFS());
             city->AddSubcity(newcity);
             printf("Added subcity %s to city %s\n", newcity->GetName(), city->GetName());
         }
@@ -81,9 +83,17 @@ void vfs_init()
     auto root_entries = fs->GetEntries(fs->root_cluster);
     auto root_entry = fs->GetEntry(fs->root_cluster);
 
-    root_city = new City("/", DirectoryType, root_entry, fs);
+    root_city = new City(nullptr, "/", DirectoryType, root_entry, fs);
     root_directory = new Directory(fs, root_entry, root_entries, "/");
 
-    cities_init(root_city, root_directory->GetTotalNodes());
+    cities_init(root_city, root_directory->GetTotalNodes(), fs->root_cluster);
+
+    auto ego = File::Open("/text");
+    City *dir = root_city->GetSubcity((unsigned char *)"modules");
+    auto newf = fs->WriteEntry(root_city, fs->root_cluster, "imhotsoheshootsabsolutely.ext");
+
+    char *x = (char *)valloc(4);
+    memcpy(x, "aa\x0A", 3);
+    fs->WriteFile(&newf, (unsigned char *)x, 3);
     printf("\n");
 }

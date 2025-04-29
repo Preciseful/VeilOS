@@ -63,7 +63,51 @@ File *File::Open(const char *dir)
     return file;
 }
 
-unsigned long fileFind(char *path)
+bool File::Exists(const char *dir)
 {
-    return (unsigned long)File::Open(path);
+    char temp[100] = "";
+    unsigned long i = 0;
+    if (dir[0] == '/' || dir[0] == '\\')
+        dir++;
+    else
+    {
+        printf("Invalid directory name '%s'! Must be absolute.\n", dir);
+        return false;
+    }
+
+    City *current = root_city;
+
+    while (*dir)
+    {
+        if (*dir == '/' || *dir == '\\')
+        {
+            current = current->GetSubcity(rtrim((unsigned char *)temp));
+
+            if (!current)
+            {
+                printf("Cannot find subdirectory '%s'\n", temp);
+                return false;
+            }
+
+            i = 0;
+        }
+        else
+        {
+            temp[i] = *dir;
+            temp[i + 1] = '\0';
+            i++;
+        }
+
+        dir++;
+    }
+
+    auto filename = rtrim((unsigned char *)temp);
+    auto file = current->GetFile(filename);
+    if (!file)
+    {
+        printf("Cannot find file '%s'\n", temp);
+        return false;
+    }
+
+    return true;
 }
