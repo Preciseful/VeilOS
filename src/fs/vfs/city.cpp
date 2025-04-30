@@ -41,7 +41,9 @@ File *City::GetFile(const unsigned char *city_name)
     if (!filecity)
         return nullptr;
 
-    return new File(filecity->fs, filecity->entry, filecity->name);
+    auto file = new File(filecity->fs, filecity->entry, filecity->name);
+    file->OwnCity = filecity;
+    return file;
 }
 
 Directory *City::GetDirectory(const unsigned char *city_name)
@@ -50,7 +52,9 @@ Directory *City::GetDirectory(const unsigned char *city_name)
     if (!dircity)
         return nullptr;
 
-    return new Directory(dircity->fs, dircity->entry, fs->GetEntries(dircity->GetCluster()), dircity->name);
+    auto dir = new Directory(dircity->fs, dircity->entry, fs->GetEntries(dircity->GetCluster()), dircity->name);
+    dir->OwnCity = dircity;
+    return dir;
 }
 
 unsigned char *City::AbsolutePath()

@@ -96,6 +96,7 @@ namespace veil
         FAT32LongFileNameEntry filename;
 
     public:
+        unsigned long lfn_count = 0;
         unsigned char *name;
         unsigned char *extension;
         bool filename_set = false;
@@ -131,16 +132,18 @@ namespace veil
         unsigned int findFreeCluster();
         unsigned int linkFreeCluster(unsigned int cluster);
         void writeToEntry(unsigned int cluster_no, unsigned int value);
-        bool updateDirectoryEntry(unsigned int parent_cluster, FAT32DirectoryEntry *target_entry);
+        bool updateDirectoryEntry(unsigned int parent_cluster, FAT32DirectoryEntry *target_entry, bool clean_clusters);
 
     public:
         bool succeded;
         unsigned int root_cluster;
-        FAT32DirectoryEntry WriteEntry(City *parent_city, unsigned int parent_cluster, const char *name);
+        FAT32DirectoryEntry WriteNewEntry(City *parent_city, unsigned int parent_cluster, const char *name);
+        FAT32DirectoryEntry MoveEntry(City *parent_city, FAT32DirectoryEntry entry, const char *name);
         veil::std::List<FAT32DirectoryEntry> GetEntries(unsigned int cluster);
         FAT32DirectoryEntry GetEntry(unsigned int cluster);
         unsigned char *ReadFile(FAT32DirectoryEntry *entry);
-        bool WriteFile(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size);
+        bool WriteToEntry(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size);
+        bool DeleteEntry(FAT32DirectoryEntry *entry, bool keep_data);
         FatFS();
     };
 }

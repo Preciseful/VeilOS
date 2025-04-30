@@ -15,6 +15,16 @@ namespace veil
             return fs->ReadFile(&this->entry);
         }
 
+        void Write(unsigned char *buf, unsigned long size)
+        {
+            fs->WriteToEntry(&this->entry, buf, size);
+        }
+
+        void Delete()
+        {
+            fs->DeleteEntry(&this->entry, false);
+        }
+
         unsigned char Attributes()
         {
             return entry.Attributes();
@@ -35,8 +45,11 @@ namespace veil
         {
         }
 
+        void Rename(const char *new_name);
         static File *Open(const char *dir);
+        static void Close(File *&file);
         static bool Exists(const char *dir);
+        static File *Create(const char *dir);
     };
 }
 

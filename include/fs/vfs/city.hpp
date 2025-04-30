@@ -17,13 +17,14 @@ namespace veil
     class City
     {
     private:
-        veil::std::List<const unsigned char *> names;
         veil::std::List<City *> cities;
-        const unsigned char *name;
+        unsigned int cluster = 0;
         FAT32DirectoryEntry entry;
-        FatFS *fs;
 
     public:
+        const unsigned char *name;
+        veil::std::List<const unsigned char *> names;
+        FatFS *fs;
         City *Parent;
         unsigned char Attributes;
 
@@ -41,16 +42,23 @@ namespace veil
 
         unsigned int GetCluster()
         {
-            return entry.cluster;
+            if (cluster == 0)
+                return entry.cluster;
+            return cluster;
         }
 
-        City(City *parent, const unsigned char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name(name),
-                                                                                                             entry(entry),
+        void SetCluster(unsigned int cluster)
+        {
+            this->cluster = cluster;
+        }
+
+        City(City *parent, const unsigned char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : entry(entry),
+                                                                                                             name(name),
                                                                                                              fs(fs),
                                                                                                              Parent(parent),
                                                                                                              Attributes(type) {}
-        City(City *parent, const char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : name((const unsigned char *)name),
-                                                                                                    entry(entry),
+        City(City *parent, const char *name, CityType type, FAT32DirectoryEntry entry, FatFS *fs) : entry(entry),
+                                                                                                    name((const unsigned char *)name),
                                                                                                     fs(fs),
                                                                                                     Parent(parent),
                                                                                                     Attributes(type) {}

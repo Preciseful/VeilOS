@@ -11,11 +11,12 @@ namespace veil
 
     protected:
         FatFS *fs;
-        const unsigned char *name;
 
         VFSNode(FatFS *fs, const unsigned char *name, FAT32DirectoryEntry entry) : fs(fs), name(name), entry(entry) {}
 
     public:
+        const unsigned char *name;
+        City *OwnCity = nullptr;
         FAT32DirectoryEntry entry;
 
         FatFS *GetFS()
@@ -36,11 +37,6 @@ namespace veil
         virtual unsigned char Attributes()
         {
             return 0;
-        }
-
-        virtual ~VFSNode()
-        {
-            delete name;
         }
     };
 }

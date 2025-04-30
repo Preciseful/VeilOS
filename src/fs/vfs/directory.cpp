@@ -1,4 +1,5 @@
 #include <fs/vfs/directory.hpp>
+#include <fs/vfs/city.hpp>
 
 using namespace veil;
 
