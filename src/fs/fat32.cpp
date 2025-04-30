@@ -474,12 +474,10 @@ FAT32DirectoryEntry FatFS::WriteNewEntry(City *parent_city, unsigned int parent_
 
 FAT32DirectoryEntry FatFS::MoveEntry(City *parent_city, FAT32DirectoryEntry entry, const char *name)
 {
-    printf("clusters: %u %u\n", entry.internal->cluster_high, entry.internal->cluster_low);
     FAT32DirectoryEntry copy = entry;
     DeleteEntry(&entry, false);
     entry = WriteNewEntry(parent_city, parent_city->GetCluster(), name);
 
-    printf("clusters: %u %u\n", copy.internal->cluster_high, copy.internal->cluster_low);
     entry.internal->attrs = copy.internal->attrs;
     entry.internal->size = copy.internal->size;
     entry.internal->cluster_high = copy.internal->cluster_high;
