@@ -7,8 +7,16 @@ using namespace veil;
 #define Page(expr) ((expr) & ~0xFFF)
 
 struct ELF::kpatch patches[] = {
+    {"File", "GetContent", (unsigned long)(void *)&File::GetContent},
+    {"File", "Size", (unsigned long)(void *)&File::Size},
+    {"File", "5Write", (unsigned long)(void *)&File::Write},
+    {"File", "9WriteText", (unsigned long)(void *)&File::WriteText},
+    {"File", "Delete", (unsigned long)(void *)&File::Delete},
+    {"File", "Rename", (unsigned long)(void *)&File::Rename},
     {"File", "Open", (unsigned long)&File::Open},
-    {"File", "GetContent", (unsigned long)(void *)&File::GetContent}};
+    {"File", "Close", (unsigned long)&File::Close},
+    {"File", "Exists", (unsigned long)&File::Exists},
+    {"File", "Create", (unsigned long)&File::Create}};
 
 void apply_relocation(unsigned long *fixup_addr, unsigned long type,
                       unsigned long load_address, unsigned long offset,
@@ -260,6 +268,7 @@ bool ELF::Initialize()
                         const unsigned char *symbol_name = strtab + symtab[sym].st_name;
                         if (unsigned long addr = find_patch((unsigned char *)symbol_name))
                         {
+                            printf("Patched symbol '%s'!\n", symbol_name);
                             symtab[sym].st_value = addr;
                             S = symtab[sym].st_value;
                         }

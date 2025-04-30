@@ -91,16 +91,5 @@ void vfs_init()
 
     cities_init(root_city, root_directory->GetTotalNodes(), fs->root_cluster);
 
-    char *x = (char *)valloc(4);
-    memcpy(x, "aa\x0A", 3);
-    auto ego = File::Open("/text");
-    if (!ego)
-    {
-        ego = File::Create("/text");
-        ego->Write((unsigned char *)x, 3);
-    }
-
-    ego->Rename("sex");
-
     printf("\n");
 }

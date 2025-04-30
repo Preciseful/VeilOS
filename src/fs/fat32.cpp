@@ -600,8 +600,11 @@ unsigned char *FatFS::ReadFile(FAT32DirectoryEntry *entry)
     return file;
 }
 
-bool FatFS::WriteToEntry(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size)
+bool FatFS::WriteToEntry(FAT32DirectoryEntry *entry, const char *cbuf, unsigned long size)
 {
+    unsigned char *buf = new unsigned char[size];
+    memcpy(buf, cbuf, size);
+
     unsigned int cluster = entry->cluster;
     if (cluster == 0)
     {
@@ -635,9 +638,9 @@ bool FatFS::WriteToEntry(FAT32DirectoryEntry *entry, unsigned char *buf, unsigne
     }
 
     entry->internal->size = size;
-
     updateDirectoryEntry(entry->parent_cluster, entry, false);
 
+    delete[] buf;
     if (padded_buf)
         delete[] padded_buf;
 

@@ -78,6 +78,7 @@ File *File::Create(const char *dir)
     current->AddSubcity(filecity);
     auto file = new File(current->fs, entry, filename);
     file->OwnCity = filecity;
+    filecity->Attributes |= 0x2;
     return file;
 }
 

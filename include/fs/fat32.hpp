@@ -142,7 +142,7 @@ namespace veil
         veil::std::List<FAT32DirectoryEntry> GetEntries(unsigned int cluster);
         FAT32DirectoryEntry GetEntry(unsigned int cluster);
         unsigned char *ReadFile(FAT32DirectoryEntry *entry);
-        bool WriteToEntry(FAT32DirectoryEntry *entry, unsigned char *buf, unsigned long size);
+        bool WriteToEntry(FAT32DirectoryEntry *entry, const char *cbuf, unsigned long size);
         bool DeleteEntry(FAT32DirectoryEntry *entry, bool keep_data);
         FatFS();
     };

@@ -3,6 +3,7 @@
 
 #include <fs/fat32.hpp>
 #include <fs/vfs/vfsnode.hpp>
+#include <lib/string.h>
 
 namespace veil
 {
@@ -15,9 +16,20 @@ namespace veil
             return fs->ReadFile(&this->entry);
         }
 
-        void Write(unsigned char *buf, unsigned long size)
+        void Write(const char *buf, unsigned long size)
         {
             fs->WriteToEntry(&this->entry, buf, size);
+        }
+
+        void WriteText(const char *buf)
+        {
+            unsigned long size = strlen((const unsigned char *)buf);
+            char *newbuf = new char[size];
+            memcpy(newbuf, buf, size);
+
+            fs->WriteToEntry(&this->entry, newbuf, size);
+
+            delete[] newbuf;
         }
 
         void Delete()
