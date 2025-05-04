@@ -18,35 +18,59 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
-#ifndef __TFP_PRINTF__
-#define __TFP_PRINTF__
+
+#ifndef STDIO_H
+#define STDIO_H
 
 #include <stdarg.h>
-#include "svc"
+#include "svc.h"
+#include "stdlib.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-    static char temp[100];
-    static int temp_index = 0;
-
-    static void print(void *p, char c)
+#define printf tfp_printf
+#define sprintf tfp_sprintf
+    static inline char read()
     {
-        temp[temp_index] = c;
-        temp[temp_index + 1] = '\0';
-        temp_index++;
+        return svc(5);
+    }
 
-        svc0(3, (unsigned long)temp);
-        temp_index = 0;
+    static inline char *readline()
+    {
+        unsigned long capacity = 1024;
+        char *buf = (char *)malloc(capacity);
+        int bufi = 0;
+
+        while (true)
+        {
+            char x = read();
+            if (bufi + 1 >= capacity)
+            {
+                capacity *= 2;
+                char *new_buf = (char *)realloc(buf, capacity / 2, capacity);
+                buf = new_buf;
+            }
+
+            if (x == '\n')
+                break;
+
+            buf[bufi++] = x;
+        }
+
+        buf[bufi] = '\0';
+        return buf;
+    }
+
+    static inline void put(void *x, char s)
+    {
+        svc0(3, s);
     }
 
     typedef void (*putcf)(void *, char);
-    static putcf stdout_putf = print;
+    static putcf stdout_putf = put;
     static void *stdout_putp = 0;
-
-#define printf tfp_printf
-#define sprintf tfp_sprintf
 
 #define PRINTF_LONG_SUPPORT
 
@@ -242,104 +266,12 @@ extern "C"
     abort:;
     }
 
-    void tfp_format_array(void *putp, putcf putf, char *fmt, unsigned long *args)
-    {
-        char bf[12];
-
-        char ch;
-        int index = 0;
-
-        while ((ch = *(fmt++)))
-        {
-            if (ch != '%')
-                putf(putp, ch);
-            else
-            {
-                char lz = 0;
-#ifdef PRINTF_LONG_SUPPORT
-                char lng = 0;
-#endif
-                int w = 0;
-                ch = *(fmt++);
-                if (ch == '0')
-                {
-                    ch = *(fmt++);
-                    lz = 1;
-                }
-                if (ch >= '0' && ch <= '9')
-                {
-                    ch = a2i(ch, &fmt, 10, &w);
-                }
-#ifdef PRINTF_LONG_SUPPORT
-                if (ch == 'l')
-                {
-                    ch = *(fmt++);
-                    lng = 1;
-                }
-#endif
-                switch (ch)
-                {
-                case 0:
-                    goto abort;
-                case 'u':
-                {
-#ifdef PRINTF_LONG_SUPPORT
-                    if (lng)
-                        uli2a((unsigned long int)args[index++], 10, 0, bf);
-                    else
-#endif
-                        ui2a((unsigned int)args[index++], 10, 0, bf);
-                    putchw(putp, putf, w, lz, bf);
-                    break;
-                }
-                case 'd':
-                {
-#ifdef PRINTF_LONG_SUPPORT
-                    if (lng)
-                        li2a((unsigned long int)args[index++], bf);
-                    else
-#endif
-                        i2a((int)args[index++], bf);
-                    putchw(putp, putf, w, lz, bf);
-                    break;
-                }
-                case 'x':
-                case 'X':
-#ifdef PRINTF_LONG_SUPPORT
-                    if (lng)
-                        uli2a((unsigned long int)args[index++], 16, (ch == 'X'), bf);
-                    else
-#endif
-                        ui2a((unsigned int)args[index++], 16, (ch == 'X'), bf);
-                    putchw(putp, putf, w, lz, bf);
-                    break;
-                case 'c':
-                    putf(putp, (char)((int)args[index++]));
-                    break;
-                case 's':
-                    putchw(putp, putf, w, 0, (char *)args[index++]);
-                    break;
-                case '%':
-                    putf(putp, ch);
-                default:
-                    break;
-                }
-            }
-        }
-    abort:;
-    }
-
     void tfp_printf(char *fmt, ...)
     {
         va_list va;
         va_start(va, fmt);
         tfp_format(stdout_putp, stdout_putf, fmt, va);
         va_end(va);
-    }
-
-    void tfp_printf_array(char *fmt, unsigned long *args)
-    {
-        tfp_format_array(stdout_putp, stdout_putf, fmt, args);
     }
 
     static void putcp(void *p, char c)
@@ -355,9 +287,7 @@ extern "C"
         putcp(&s, 0);
         va_end(va);
     }
-
 #ifdef __cplusplus
 }
 #endif
-
 #endif

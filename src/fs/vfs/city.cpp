@@ -37,8 +37,12 @@ void City::RemoveCity(const unsigned char *name)
 
 File *City::GetFile(const unsigned char *city_name)
 {
-    auto filecity = this->GetSubcity(city_name);
+    City *filecity = this->GetSubcity(city_name);
     if (!filecity)
+        return nullptr;
+    if (!(filecity->Attributes & FileType))
+        return nullptr;
+    if (filecity->entry.internal->attrs & 0x10)
         return nullptr;
 
     auto file = new File(filecity->fs, filecity->entry, filecity->name);
@@ -50,6 +54,10 @@ Directory *City::GetDirectory(const unsigned char *city_name)
 {
     auto dircity = this->GetSubcity(city_name);
     if (!dircity)
+        return nullptr;
+    if (!(dircity->Attributes & DirectoryType))
+        return nullptr;
+    if (!(dircity->entry.internal->attrs & 0x10))
         return nullptr;
 
     auto dir = new Directory(dircity->fs, dircity->entry, fs->GetEntries(dircity->GetCluster()), dircity->name);

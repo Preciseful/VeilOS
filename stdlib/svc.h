@@ -1,6 +1,20 @@
 #ifndef SVC_H
 #define SVC_H
 
+static inline unsigned long svc(unsigned long svc_number)
+{
+    register unsigned long x8 asm("x8") = svc_number;
+    register unsigned long x0 asm("x0") = 0;
+
+    asm volatile(
+        "svc #0"
+        : "+r"(x0)
+        : "r"(x8)
+        : "memory", "cc");
+
+    return x0;
+}
+
 static inline unsigned long svc0(unsigned long svc_number, unsigned long arg0)
 {
     register unsigned long x8 asm("x8") = svc_number;

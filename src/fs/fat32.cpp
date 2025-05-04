@@ -89,27 +89,27 @@ struct fat32_bs *find_fat(unsigned int offset)
 
     if (read < 0)
     {
-        printf("Read failed.\n");
+        ERROR("Read failed.\n");
         return 0;
     }
 
     if (read != 512)
     {
-        printf("Read only %d bytes.\n", read);
+        ERROR("Read only %d bytes.\n", read);
         return 0;
     }
 
     struct fat32_bs *bs = (struct fat32_bs *)buf;
     if (bs->bootjmp[0] != 0xeb)
     {
-        printf("Not a valid FAT filesystem.\n", bs->bootjmp[0]);
+        ERROR("Not a valid FAT filesystem.\n", bs->bootjmp[0]);
         return 0;
     }
 
     unsigned int root_dir_sectors = (bs->root_entry_count * 32 + bs->bytes_per_sector - 1) / bs->bytes_per_sector;
     if (root_dir_sectors != 0)
     {
-        printf("Root dir sectors isnt 0. FAT32 requires this to be 0.\n");
+        ERROR("Root dir sectors isnt 0. FAT32 requires this to be 0.\n");
         return 0;
     }
 
@@ -125,7 +125,7 @@ FatFS::FatFS()
 
     if (mbr.bootSignature != BOOT_SIGNATURE)
     {
-        printf("Bad MBR signature.");
+        ERROR("Bad MBR signature.");
         return;
     }
 
@@ -340,7 +340,7 @@ unsigned char *generate_short(const char *name)
     return short_name;
 }
 
-FAT32DirectoryEntry FatFS::WriteNewEntry(City *parent_city, unsigned int parent_cluster, const char *name)
+FAT32DirectoryEntry FatFS::WriteNewEntry(City *parent_city, unsigned int parent_cluster, const char *name, unsigned char attrs)
 {
     unsigned char *short_name = generate_short(name);
     unsigned long namelen = strlen((const unsigned char *)name);
@@ -435,7 +435,7 @@ FAT32DirectoryEntry FatFS::WriteNewEntry(City *parent_city, unsigned int parent_
             memcpy(dir->name, short_name, 8);
             memcpy(dir->ext, short_name + 8, 3);
 
-            dir->attrs = 0x20;
+            dir->attrs = attrs;
             dir->cluster_high = (cluster >> 16) & 0xFFFF;
             dir->cluster_low = cluster & 0xFFFF;
             dir->size = 0;
@@ -450,7 +450,7 @@ FAT32DirectoryEntry FatFS::WriteNewEntry(City *parent_city, unsigned int parent_
 
             emmc_seek(cluster_sector * 512);
             emmc_write(buf, entries_bytes);
-            printf("Created file %s.\n", name);
+            INFO("Created file %s.\n", name);
 
             delete[] short_name;
             auto finalent = FAT32DirectoryEntry(dir);
@@ -476,9 +476,8 @@ FAT32DirectoryEntry FatFS::MoveEntry(City *parent_city, FAT32DirectoryEntry entr
 {
     FAT32DirectoryEntry copy = entry;
     DeleteEntry(&entry, false);
-    entry = WriteNewEntry(parent_city, parent_city->GetCluster(), name);
+    entry = WriteNewEntry(parent_city, parent_city->GetCluster(), name, copy.internal->attrs);
 
-    entry.internal->attrs = copy.internal->attrs;
     entry.internal->size = copy.internal->size;
     entry.internal->cluster_high = copy.internal->cluster_high;
     entry.internal->cluster_low = copy.internal->cluster_low;
@@ -614,8 +613,6 @@ bool FatFS::WriteToEntry(FAT32DirectoryEntry *entry, const char *cbuf, unsigned 
         entry->internal->cluster_low = cluster & 0xFFFF;
         entry->internal->cluster_high = (cluster >> 16) & 0xFFFF;
     }
-    else
-        size = entry->Size();
 
     unsigned long padded_size = ((size + 511) / 512) * 512;
     unsigned char *padded_buf = nullptr;

@@ -1,8 +1,14 @@
-#ifndef FILE_HPP
-#define FILE_HPP
+#ifndef FILESYSTEM_HPP
+#define FILESYSTEM_HPP
 
 namespace veil
 {
+    class Directory
+    {
+    public:
+        static bool Exists(const char *dir);
+    };
+
     class File
     {
     public:
@@ -18,6 +24,7 @@ namespace veil
         static bool Exists(const char *dir);
         static File *Create(const char *dir);
     };
+
 }
 
 #endif

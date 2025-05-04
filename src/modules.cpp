@@ -4,7 +4,7 @@
 
 using namespace veil;
 
-void init_module(const char *dir)
+void init_module(const char *dir, unsigned long flags)
 {
     char full[100];
     tfp_sprintf(full, "/modules/%s.elf", dir);
@@ -12,25 +12,25 @@ void init_module(const char *dir)
     File *file = File::Open(full);
     if (!file)
     {
-        printf("No file exists for module (\"%s\").\n\n", dir);
+        ERROR("No file exists for module (\"%s\").\n\n", dir);
         return;
     }
 
     ELF *bin = new ELF(file);
     if (!bin->Initialize())
     {
-        printf("Module \"%s\" failed to initialize.\n\n", dir);
+        ERROR("Module \"%s\" failed to initialize.\n\n", dir);
         return;
     }
     else
-        printf("Module \"%s\" was initialized.\n\n", dir);
+        SUCCESS("Module \"%s\" was initialized.\n\n", dir);
 
-    fork((unsigned long)bin->Entry, 0, 1);
+    fork((unsigned long)bin->Entry, 0, flags, 0);
 }
 
 void modules_init()
 {
-    printf("Initializing modules..\n");
-    init_module("Vela");
-    init_module("Luna");
+    INFO("Initializing modules..\n");
+    init_module("Vela", KERNEL_FLAG);
+    init_module("Luna", SHELL_FLAG | KERNEL_FLAG);
 }

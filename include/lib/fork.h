@@ -25,7 +25,8 @@ extern "C"
         unsigned long pstate;
     };
 
-    bool fork(unsigned long fn, unsigned long arg, long kernel);
+    bool fork(unsigned long fn, unsigned long arg, long flags, struct task *parent);
+    bool clone();
     extern void return_from_fork();
 
     int move_to_user_mode(unsigned long pc);

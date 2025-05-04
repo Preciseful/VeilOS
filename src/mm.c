@@ -41,7 +41,7 @@ unsigned long valloc(unsigned int size)
     int headerI = get_free_header();
     if (headerI == -1)
     {
-        printf("No available headers.");
+        ERROR("No available headers.");
         return 0;
     }
 

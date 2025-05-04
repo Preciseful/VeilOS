@@ -21,6 +21,8 @@ namespace veil
         veil::std::List<Directory *> GetDirectories();
         veil::std::List<File *> GetFiles();
         veil::std::List<VFSNode *> GetTotalNodes();
+        static bool Exists(const char *dir);
+        static Directory *Create(const char *dir);
 
         unsigned char Attributes()
         {

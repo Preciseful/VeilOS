@@ -2,6 +2,7 @@
 #define IRQ_H
 
 #include <lib/base.h>
+#include <stdbool.h>
 
 #define IRQ ((struct irq_registers *)(PERIPHERAL_BASE + 0x0000B200))
 

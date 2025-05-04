@@ -97,15 +97,24 @@ extern "C"
 {
 #endif
 
-void init_printf(void *putp, void (*putf)(void *, char));
+    void init_printf(void *putp, void (*putf)(void *, char));
 
-void tfp_printf(char *fmt, ...);
-void tfp_sprintf(char *s, char *fmt, ...);
+    void tfp_printf(char *fmt, ...);
+    void tfp_sprintf(char *s, char *fmt, ...);
 
-void tfp_format(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
+    void tfp_format(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
 
 #define printf tfp_printf
 #define sprintf tfp_sprintf
+#define INFO(x, ...) tfp_printf("\033[1m\033[37m[-] " x "\033[0m", ##__VA_ARGS__)
+#define ERROR(x, ...) tfp_printf("\033[31m[!] " x "\033[0m", ##__VA_ARGS__)
+#define WARN(x, ...) tfp_printf("\033[33m[?] " x "\033[0m", ##__VA_ARGS__)
+#define SUCCESS(x, ...) tfp_printf("\033[32m[*] " x "\033[0m", ##__VA_ARGS__)
+
+#define PINFO(y, x, ...) tfp_printf(y "\033[1m\033[37m[-] " x "\033[0m", ##__VA_ARGS__)
+#define PERROR(y, x, ...) tfp_printf(y "\033[31m[!] " x "\033[0m", ##__VA_ARGS__)
+#define PWARN(y, x, ...) tfp_printf(y "\033[33m[?] " x "\033[0m", ##__VA_ARGS__)
+#define PSUCCESS(y, x, ...) tfp_printf(y "\033[32m[*] " x "\033[0m", ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }

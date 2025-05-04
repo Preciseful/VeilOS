@@ -1,5 +1,6 @@
 #include <fs/vfs/directory.hpp>
 #include <fs/vfs/city.hpp>
+#include <fs/vfs/vfs.h>
 
 using namespace veil;
 
@@ -69,4 +70,125 @@ veil::std::List<VFSNode *> Directory::GetTotalNodes()
     veil::std::List<VFSNode *> stuff = GetDirectories().Convert<VFSNode *>();
     stuff.AddRange(GetFiles().Convert<VFSNode *>());
     return stuff;
+}
+
+bool Directory::Exists(const char *dir)
+{
+    char temp[100] = "";
+    unsigned long i = 0;
+    if (dir[0] == '/')
+    {
+        if (dir[1] == '\0')
+            return true;
+        dir++;
+    }
+    else
+    {
+        ERROR("Invalid directory name '%s'! Must be absolute.\n", dir);
+        return false;
+    }
+
+    City *current = root_city;
+
+    while (*dir)
+    {
+        if (*dir == '/')
+        {
+            current = current->GetSubcity(rtrim((unsigned char *)temp));
+
+            if (!current)
+            {
+                ERROR("Cannot find subdirectory '%s'!\n", temp);
+                return false;
+            }
+
+            i = 0;
+        }
+        else
+        {
+            temp[i] = *dir;
+            temp[i + 1] = '\0';
+            i++;
+        }
+
+        dir++;
+    }
+
+    if (i != 0)
+    {
+        auto dirname = rtrim((unsigned char *)temp);
+        auto file = current->GetDirectory(dirname);
+        if (!file)
+        {
+            ERROR("Cannot find directory '%s'!\n", temp);
+            return false;
+        }
+
+        return true;
+    }
+    else
+        return current->Attributes & DirectoryType;
+}
+
+Directory *Directory::Create(const char *dir)
+{
+    char temp[100] = "";
+    unsigned long i = 0;
+    if (dir[0] == '/' || dir[0] == '\\')
+        dir++;
+    else
+    {
+        ERROR("Invalid directory name '%s'! Must be absolute.\n", dir);
+        return 0;
+    }
+
+    City *current = root_city;
+
+    while (*dir)
+    {
+        if (*dir == '/' || *dir == '\\')
+        {
+            current = current->GetSubcity(rtrim((unsigned char *)temp));
+
+            if (*(dir + 1) == '\0')
+            {
+                if (current)
+                {
+                    ERROR("Directory '%s' already exists!\n", temp);
+                    return 0;
+                }
+                else
+                {
+                    ERROR("Cannot find subdirectory '%s'!\n", temp);
+                    return 0;
+                }
+            }
+
+            i = 0;
+        }
+        else
+        {
+            temp[i] = *dir;
+            temp[i + 1] = '\0';
+            i++;
+        }
+
+        dir++;
+    }
+
+    auto dirname = rtrim((unsigned char *)temp);
+    auto dircity = current->GetSubcity(dirname);
+    if (dircity)
+    {
+        ERROR("Directory %s exists already!\n", dirname);
+        return 0;
+    }
+
+    auto entry = current->fs->WriteNewEntry(current, current->GetCluster(), (char *)dirname, 0x10);
+    dircity = new City(current, dirname, FileType, entry, current->fs);
+    current->AddSubcity(dircity);
+
+    auto dirfile = new Directory(current->fs, entry, veil::std::List<FAT32DirectoryEntry>(), dirname);
+    dirfile->OwnCity = dircity;
+    return dirfile;
 }

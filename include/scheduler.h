@@ -12,6 +12,7 @@ extern "C"
 {
 #endif
 #include <stdbool.h>
+#include <iodevice.h>
 
 #define THREAD_SIZE 4096
 #define NUMBER_OF_TASKS 64
@@ -22,6 +23,9 @@ extern "C"
 #define NR_TASKS 64
 
 #define QUANTUM 5
+
+#define KERNEL_FLAG 1
+#define SHELL_FLAG 2
 
 struct cpu_context
 {
@@ -47,10 +51,13 @@ struct task
     long counter;
     struct task *next;
     long preempt_count;
-    long kernel;
+    unsigned long flags;
+    struct task *parent;
+    unsigned long pid;
+    struct io_device *io;
 };
 
-extern void cpu_switch_task(struct task *prev, struct task *next, long kernel);
+extern void cpu_switch_task(struct task *prev, struct task *next);
 
 void set_pc(unsigned long pc);
 void preempt_disable();
@@ -59,7 +66,7 @@ void scheduler_init();
 void schedule();
 void scheduler_tick(unsigned int counter, unsigned int multiplier);
 void scheduler_move_next();
-void add_task(struct task *task, bool high);
+unsigned long add_task(struct task *task, bool high);
 void set_stack(unsigned long *st);
 
 extern struct task *scheduler_current;

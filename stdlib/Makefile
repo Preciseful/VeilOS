@@ -1,7 +1,7 @@
 ARMGNU ?= aarch64-none-elf
-FILES = file.cpp
+FILES = filesystem.cpp
 
 all: build
 
 build:
-	aarch64-none-elf-g++ -ffreestanding -nostdlib -fPIC -shared -o libveil.so file.cpp
+	aarch64-none-elf-g++ -Wno-return-type -ffreestanding -nostdlib -fPIC -shared -o libveil.so $(FILES)

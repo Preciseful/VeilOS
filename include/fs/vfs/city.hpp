@@ -10,8 +10,8 @@ namespace veil
 {
     enum CityType
     {
-        DirectoryType = 0,
-        FileType = 1
+        DirectoryType = 1,
+        FileType = 2
     };
 
     class City

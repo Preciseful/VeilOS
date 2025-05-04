@@ -16,7 +16,7 @@ namespace veil::std
         T &get(unsigned long index)
         {
             if (index >= count)
-                printf("bad indexo %lu", index);
+                ERROR("bad indexo %lu\n", index);
             return backing_data[index];
         }
 

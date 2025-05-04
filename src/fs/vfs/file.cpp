@@ -23,7 +23,7 @@ void File::Rename(const char *new_name)
 
 void File::Close(File *&file)
 {
-    file->OwnCity->Attributes &= ~0x2;
+    file->OwnCity->Attributes &= ~0x4;
     file = nullptr;
 }
 
@@ -35,7 +35,7 @@ File *File::Create(const char *dir)
         dir++;
     else
     {
-        printf("Invalid directory name '%s'! Must be absolute.\n", dir);
+        ERROR("Invalid directory name '%s'! Must be absolute.\n", dir);
         return 0;
     }
 
@@ -49,7 +49,7 @@ File *File::Create(const char *dir)
 
             if (!current)
             {
-                printf("Cannot find subdirectory '%s'\n", temp);
+                ERROR("Cannot find subdirectory '%s'\n", temp);
                 return 0;
             }
 
@@ -69,16 +69,16 @@ File *File::Create(const char *dir)
     auto filecity = current->GetSubcity(filename);
     if (filecity)
     {
-        printf("File %s exists already!\n", filename);
+        ERROR("File %s exists already!\n", filename);
         return 0;
     }
 
-    auto entry = current->fs->WriteNewEntry(current, current->GetCluster(), (char *)filename);
+    auto entry = current->fs->WriteNewEntry(current, current->GetCluster(), (char *)filename, 0x20);
     filecity = new City(current, filename, FileType, entry, current->fs);
     current->AddSubcity(filecity);
     auto file = new File(current->fs, entry, filename);
     file->OwnCity = filecity;
-    filecity->Attributes |= 0x2;
+    filecity->Attributes |= 0x4;
     return file;
 }
 
@@ -86,11 +86,11 @@ File *File::Open(const char *dir)
 {
     char temp[100] = "";
     unsigned long i = 0;
-    if (dir[0] == '/' || dir[0] == '\\')
+    if (dir[0] == '/')
         dir++;
     else
     {
-        printf("Invalid directory name '%s'! Must be absolute.\n", dir);
+        ERROR("Invalid directory name '%s'! Must be absolute.\n", dir);
         return 0;
     }
 
@@ -98,13 +98,13 @@ File *File::Open(const char *dir)
 
     while (*dir)
     {
-        if (*dir == '/' || *dir == '\\')
+        if (*dir == '/')
         {
             current = current->GetSubcity(rtrim((unsigned char *)temp));
 
             if (!current)
             {
-                printf("Cannot find subdirectory '%s'\n", temp);
+                ERROR("Cannot find subdirectory '%s'\n", temp);
                 return 0;
             }
 
@@ -122,19 +122,19 @@ File *File::Open(const char *dir)
 
     auto filename = rtrim((unsigned char *)temp);
     auto filecity = current->GetSubcity(filename);
-    if (filecity->Attributes & 0x2)
+    if (filecity->Attributes & 0x4)
     {
-        printf("File '%s' is already open!\n", filename);
+        ERROR("File '%s' is already open!\n", filename);
         return nullptr;
     }
 
-    filecity->Attributes |= 0x2;
+    filecity->Attributes |= 0x4;
 
     auto file = current->GetFile(filename);
     if (!file)
     {
-        printf("Cannot find file '%s'\n", temp);
-        filecity->Attributes &= ~0x2;
+        ERROR("Cannot find file '%s'\n", temp);
+        filecity->Attributes &= ~0x4;
     }
 
     return file;
@@ -148,7 +148,7 @@ bool File::Exists(const char *dir)
         dir++;
     else
     {
-        printf("Invalid directory name '%s'! Must be absolute.\n", dir);
+        ERROR("Invalid directory name '%s'! Must be absolute.\n", dir);
         return false;
     }
 
@@ -162,7 +162,7 @@ bool File::Exists(const char *dir)
 
             if (!current)
             {
-                printf("Cannot find subdirectory '%s'\n", temp);
+                ERROR("Cannot find subdirectory '%s'\n", temp);
                 return false;
             }
 
@@ -182,7 +182,7 @@ bool File::Exists(const char *dir)
     auto file = current->GetFile(filename);
     if (!file)
     {
-        printf("Cannot find file '%s'\n", temp);
+        ERROR("Cannot find file '%s'\n", temp);
         return false;
     }
 

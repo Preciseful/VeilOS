@@ -58,7 +58,7 @@ void cities_init(City *parent_city, List<VFSNode *> nodes, unsigned int parent_c
             City *newcity = new City(parent_city, rtrim(nodes[i]->Name()), DirectoryType, nodes[i]->entry, nodes[i]->GetFS());
             parent_city->AddSubcity(newcity);
             nodes[i]->OwnCity = newcity;
-            printf("Added subcity %s to city %s\n", newcity->GetName(), parent_city->GetName());
+            INFO("Added subcity %s to city %s\n", newcity->GetName(), parent_city->GetName());
             cities_init(newcity, ((Directory *)nodes[i])->GetTotalNodes(), nodes[i]->entry.cluster);
         }
         else
@@ -66,7 +66,7 @@ void cities_init(City *parent_city, List<VFSNode *> nodes, unsigned int parent_c
             City *newcity = new City(parent_city, rtrim(nodes[i]->Name()), FileType, nodes[i]->entry, nodes[i]->GetFS());
             parent_city->AddSubcity(newcity);
             nodes[i]->OwnCity = newcity;
-            printf("Added subcity %s to city %s\n", newcity->GetName(), parent_city->GetName());
+            INFO("Added subcity %s to city %s\n", newcity->GetName(), parent_city->GetName());
         }
     }
 }
@@ -77,7 +77,7 @@ void vfs_init()
 
     if (!fs->succeded)
     {
-        printf("FS failed.\n");
+        ERROR("FS failed.\n");
         return;
     }
 

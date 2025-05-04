@@ -116,7 +116,7 @@
 	stp	x0, x1, [sp, #16 * 0]
 	b 2f
 
-2:	kernel_exit \el
+2:  kernel_exit \el
 .endm
 
 .macro	ventry	label

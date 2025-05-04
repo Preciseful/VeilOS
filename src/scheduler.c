@@ -12,7 +12,10 @@
      0,                                       \
      0,                                       \
      0,                                       \
-     true}
+     KERNEL_FLAG,                             \
+     0,                                       \
+     1,                                       \
+     0}
 
 struct task high_task = INIT_TASK;
 struct task low_task = INIT_TASK;
@@ -61,18 +64,23 @@ void switch_to(struct task *next)
 
     moved_next = true;
     // printf("next: %lu \n", next->cpu_context.pc);
-    cpu_switch_task(prev, next, next->kernel);
+    cpu_switch_task(prev, next);
 }
 
-void add_task(struct task *task, bool high)
+unsigned long add_task(struct task *task, bool high)
 {
+    unsigned long i = 0;
     if (high)
     {
         struct task *c = &high_task;
         while (c->next && c->next != &low_task)
+        {
             c = c->next;
+            i++;
+        }
 
         c->next = task;
+        i++;
         task->next = &low_task;
 
         highs++;
@@ -81,13 +89,19 @@ void add_task(struct task *task, bool high)
     {
         struct task *c = &low_task;
         while (c->next && c->next != &high_task)
+        {
             c = c->next;
+            i++;
+        }
 
         c->next = task;
+        i++;
         task->next = &high_task;
 
         lows++;
     }
+
+    return i;
 }
 
 struct task *next_running_task(struct task *current)
@@ -132,17 +146,22 @@ void schedule()
             p->counter = QUANTUM;
     }
 
-    printf("\nSwitching to: %lu\n\n", p->cpu_context.x19);
+    PINFO("\n", "Switching to: %lu\n\n", p->cpu_context.x19);
+    if (p->flags & SHELL_FLAG)
+        p->io->status = ACTIVE;
+
     switch_to(p);
     preempt_enable();
 }
 
 void scheduler_tick(unsigned int counter, unsigned int multiplier)
 {
-    // printf(".");
+    printf(".");
     scheduler_current->counter--;
     if (scheduler_current->counter > 0 || scheduler_current->preempt_count > 0)
         return;
+
+    // printf("now");
 
     if (to_pc != 0)
     {

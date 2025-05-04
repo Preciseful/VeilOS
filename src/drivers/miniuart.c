@@ -1,6 +1,8 @@
 #include <drivers/miniuart.h>
 #include <drivers/gpio.h>
 #include <drivers/framebuffer.h>
+#include <mm.h>
+#include <scheduler.h>
 
 unsigned char uart_output_queue[UART_MAX_QUEUE];
 unsigned int uart_output_queue_write = 0;
@@ -74,7 +76,7 @@ void uart_writeNextByte(unsigned char character)
     uart_output_queue_write = next;
 }
 
-void uart_write(char *text)
+void uart_write(const char *text)
 {
     while (*text)
     {
@@ -84,11 +86,11 @@ void uart_write(char *text)
     }
 }
 
-void uart_put(unsigned char c)
+void uart_put(const char c)
 {
     if (c == '\n')
         uart_writeCurrentByte('\r');
-    uart_writeCurrentByte(c);
+    uart_writeCurrentByte((unsigned char)c);
 }
 
 void uart_drainOutputQueue()
@@ -118,6 +120,11 @@ unsigned char uart_update()
     }
 
     return '\0';
+}
+
+char uart_readchar()
+{
+    return uart_update();
 }
 
 void putc(void *p, char c)

@@ -137,7 +137,7 @@ namespace veil
     public:
         bool succeded;
         unsigned int root_cluster;
-        FAT32DirectoryEntry WriteNewEntry(City *parent_city, unsigned int parent_cluster, const char *name);
+        FAT32DirectoryEntry WriteNewEntry(City *parent_city, unsigned int parent_cluster, const char *name, unsigned char attrs);
         FAT32DirectoryEntry MoveEntry(City *parent_city, FAT32DirectoryEntry entry, const char *name);
         veil::std::List<FAT32DirectoryEntry> GetEntries(unsigned int cluster);
         FAT32DirectoryEntry GetEntry(unsigned int cluster);

@@ -1,6 +1,8 @@
 #include <lib/elf.hpp>
 #include <elf.h>
 #include <lib/string.h>
+#include <drivers/miniuart.h>
+#include <lib/fork.h>
 
 using namespace veil;
 
@@ -116,7 +118,7 @@ void apply_relocation(unsigned long *fixup_addr, unsigned long type,
     }
 
     default:
-        printf("Unhandled relocation type: %lu\n", type);
+        ERROR("Unhandled relocation type: %lu\n", type);
         break;
     }
 }
@@ -148,7 +150,7 @@ unsigned long find_patch(unsigned char *name)
             return patch.func;
     }
 
-    printf("No patch found for %s.\n", name);
+    ERROR("No patch found for %s.\n", name);
     return 0;
 }
 
@@ -156,18 +158,18 @@ unsigned long find_patch(unsigned char *name)
 // https://gist.github.com/x0nu11byt3/bcb35c3de461e5fb66173071a2379779
 bool ELF::Initialize()
 {
-    printf("Verifying ELF file...\n");
+    INFO("Verifying ELF file...\n");
     unsigned char *content = file->GetContent();
 
     if (content[0] != 0x7F)
     {
-        printf("File does not start with 0x7F!\n");
+        ERROR("File does not start with 0x7F!\n");
         return false;
     }
 
     if (!(content[1] == 'E' && content[2] == 'L' && content[3] == 'F'))
     {
-        printf("File does not continue with ELF!\n");
+        ERROR("File does not continue with ELF!\n");
         return false;
     }
 
@@ -176,13 +178,13 @@ bool ELF::Initialize()
 
     if (header->e_machine != EM_AARCH64)
     {
-        printf("ELF file is not of type AARCH64!\n");
+        ERROR("ELF file is not of type AARCH64!\n");
         return false;
     }
 
     if (header->e_type != ET_DYN)
     {
-        printf("DYN ELF files are the only supported format!\n");
+        ERROR("DYN ELF files are the only supported format!\n");
         return false;
     }
 
@@ -246,7 +248,7 @@ bool ELF::Initialize()
             unsigned char *strtab = (unsigned char *)(base + strtab_addr);
 
             if (needed != 0)
-                printf("Library '%s' required for %s!\n", strtab + needed, this->file->Name());
+                WARN("Library '%s' required for %s!\n", strtab + needed, this->file->Name());
 
             if (pltrel_addr && pltrel_size)
             {
@@ -268,7 +270,7 @@ bool ELF::Initialize()
                         const unsigned char *symbol_name = strtab + symtab[sym].st_name;
                         if (unsigned long addr = find_patch((unsigned char *)symbol_name))
                         {
-                            printf("Patched symbol '%s'!\n", symbol_name);
+                            INFO("Patched symbol '%s'!\n", symbol_name);
                             symtab[sym].st_value = addr;
                             S = symtab[sym].st_value;
                         }

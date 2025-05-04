@@ -30,7 +30,7 @@ void unveil()
 {
     uart_init();
     init_printf(0, putc);
-    printf("\n\n[INIT]\n");
+    PSUCCESS("\n\n", "[INIT]\n");
     framebuffer_init();
 
     interrupt_init_vectors();
@@ -50,47 +50,19 @@ void unveil()
     kmain();
 }
 
-void input_process(unsigned long args)
-{
-    int i = 0;
-    unsigned char read[6] = {'\0'};
-
-    while (true)
-    {
-        preempt_disable();
-
-        unsigned char current = uart_update();
-        if ((unsigned int)current == 0)
-            continue;
-
-        read[i] = current;
-
-        if (read[i] == unveil_phrase[i])
-            i++;
-        else
-            i = 0;
-
-        if (i == 6)
-            veil();
-
-        preempt_enable();
-        scheduler_move_next();
-    }
-}
-
 void kmain()
 {
-    printf("\n[KERNEL MAIN]\n");
+    PSUCCESS("\n", "[KERNEL MAIN]\n");
 
     unsigned int el = get_el();
-    printf("with exception level %d\n", el);
+    INFO("with exception level %d\n", el);
 
     breakpoint();
 
     set_timer_function(SYS_TIMER_IRQ_1, scheduler_tick);
     int res;
 
-    printf("Framebuffer: %lu\n", (unsigned long)framebuffer);
+    INFO("Framebuffer: %lu\n", (unsigned long)framebuffer);
 
     int *x = qalloc(int);
     *x = 100;
@@ -102,7 +74,7 @@ void kmain()
     printf("%d\n", *x);
     vfree(x);
 
-    printf("Scheduling is now taking place...\n");
+    INFO("Scheduling is now taking place...\n");
     while (true)
         schedule();
 }
