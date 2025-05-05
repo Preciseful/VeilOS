@@ -46,6 +46,8 @@ extern "C"
         while (true)
         {
             char x = read();
+            if (x == '\0')
+                continue;
             if (bufi + 1 >= capacity)
             {
                 capacity *= 2;
