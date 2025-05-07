@@ -45,7 +45,7 @@ unsigned long timer_get_ticks()
     unsigned int hi = TIMER->counter_high;
     unsigned int lo = TIMER->counter_low;
 
-    // double check hi value didn't change after setting it...
+    // double check hi value didn't change after setting it
     if (hi != TIMER->counter_high)
     {
         hi = TIMER->counter_high;
