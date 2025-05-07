@@ -31,6 +31,6 @@ void init_module(const char *dir, unsigned long flags)
 void modules_init()
 {
     INFO("Initializing modules..\n");
-    init_module("Vela", KERNEL_FLAG);
-    init_module("Luna", SHELL_FLAG | KERNEL_FLAG);
+    // Example:
+    // init_module("Luna", SHELL_FLAG | KERNEL_FLAG);
 }

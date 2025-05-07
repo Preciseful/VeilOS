@@ -1,3 +1,5 @@
+RPI_PATH=/media/$(USER)/bootfs
+
 ARMGNU ?= aarch64-none-elf
 
 COPS = -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Iinclude
@@ -17,6 +19,11 @@ all : clean kernel8.img
 
 dyn:
 	$(MAKE) -C stdlib
+
+setup:
+	rm -rf $(RPI_PATH)/kernel*
+	cp -rf config.txt $(RPI_PATH)
+	mkdir $(RPI_PATH)/modules
 
 dump:
 	$(ARMGNU)-objdump -D build/kernel8.elf > dump
@@ -49,4 +56,4 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 kernel8.img: linker.ld $(OBJ_FILES)
 	$(ARMGNU)-ld -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	./go_rpi.sh
+	./go_rpi.sh $(RPI_PATH)
