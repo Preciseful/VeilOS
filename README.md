@@ -46,3 +46,7 @@ To create a module that the kernel will run, you must first meet the following c
 - When you're done compiling, copy the new `.ELF` file you built to the `modules` folder found in the Raspberry Pi's `bootfs`.
 - Modify the kernel at [this line](https://github.com/Preciseful/VeilOS/blob/master/src/modules.cpp#L33) following the example in the comment. You just simply enter the module's name. (for example, a module named `Luna.elf`, will just be simply `Luna` in the `init_module`).
   - There is also 2 arguments you can add, `KERNEL_FLAG` and `SHELL_FLAG`. `KERNEL_FLAG` is for EL1 processes (i would advise using this, since EL0 might be wonky). The `SHELL_FLAG` is reserved for shells, ensuring that across context switches no other process accidentally steals I/O from the keyboard.
+
+## Future
+
+I'm pausing progress on this project for now so feel free to mess around with it and create pull requests if you want. (i honestly dont really care what you do with it)
