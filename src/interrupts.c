@@ -101,6 +101,7 @@ unsigned long interrupt_message(unsigned long type, unsigned long esr, unsigned 
     {
         unsigned long ret = handle_svc(svc, stack);
         // TODO: remove tasks that abuse svc for far too long because it seems it may kill the timer peripheral and idk how to fix that lol
+        // i assume its because too much memory eventually writes over interrupt stacks and stuff ????
         *addon = 2;
         printf_use_framebuffer = true;
         return ret;
