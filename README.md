@@ -6,7 +6,7 @@ VeilOS is a Raspberry Pi 4B OS with no virtual memory.
 
 For proper IO, you must use a [USB to TLL Serial cable](https://www.adafruit.com/product/954). Although screen printing is active, it's terribly implemented.
 
-1. Flash the Raspberry Pi's SD card with the normal Raspberry Pi OS image, then run `make setup` (make sure the RPI_PATH variable in the makefile is correct). <br/> RPIPATH is the path to your Raspberry Pi's `bootfs` location. Example: `/media/USER/bootfs`.
+1. Flash the Raspberry Pi's SD card with the normal Raspberry Pi OS image, then run `make setup` (make sure the `RPI_PATH` variable in the makefile is correct). <br/> `RPIPATH` is the path to your Raspberry Pi's `bootfs` location. Example: `/media/USER/bootfs`.
 2. The aarch64-none-elf compiler must be installed. You can find it [here](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads).
    - Make sure the compiler's bin path is an environment variable (example: `/PATH/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-elf/bin`)
    * OR modify the Makefile's `ARMGNU` variable to point to the installation's location.
@@ -25,7 +25,7 @@ For proper IO, you must use a [USB to TLL Serial cable](https://www.adafruit.com
 
 To create a module that the kernel will run, you must first meet the following conditions:
 
-- The compiler used must be the same aarch64-none-elf used for compiling.
+- The compiler used must be the same `aarch64-none-elf` used for compiling.
 - The language should probably be C++, as some of the stdlib is built around C++ rather than C. However, feel free to make the C variants of the stdlib since it should be simple.
 
 - The compile arguments must be as follow (gcc):
