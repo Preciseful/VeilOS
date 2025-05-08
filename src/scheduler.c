@@ -156,7 +156,7 @@ void schedule()
 
 void scheduler_tick(unsigned int counter, unsigned int multiplier)
 {
-    printf(".");
+    // printf(".");
     scheduler_current->counter--;
     if (scheduler_current->counter > 0 || scheduler_current->preempt_count > 0)
         return;
