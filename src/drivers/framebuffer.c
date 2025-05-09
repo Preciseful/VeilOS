@@ -78,24 +78,35 @@ void drawPixel(int x, int y, unsigned char attr)
     *((unsigned int *)(framebuffer + offs)) = vgapal[attr & 0x0f];
 }
 
-void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom)
+void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom, bool overlay)
 {
     unsigned char *glyph = (unsigned char *)&font + (ch < FONT_NUMGLYPHS ? ch : 0) * FONT_BPG;
 
-    for (int i = 0; i <= (FONT_HEIGHT * zoom); i++)
+    for (int i = 1; i <= (FONT_HEIGHT * zoom); i++)
     {
         for (int j = 0; j < (FONT_WIDTH * zoom); j++)
         {
             unsigned char mask = 1 << (j / zoom);
             unsigned char col = (*glyph & mask) ? attr & 0x0f : (attr & 0xf0) >> 4;
 
-            drawPixel(x + j, y + i, col);
+            if (overlay)
+            {
+                if (*glyph & mask)
+                {
+                    col = attr & 0x0f;
+                    drawPixel(x + j, y + i, col);
+                }
+            }
+            else
+            {
+                drawPixel(x + j, y + i, col);
+            }
         }
         glyph += (i % zoom) ? 0 : FONT_BPL;
     }
 }
 
-void drawString(int x, int y, char *s, unsigned char attr, int zoom)
+void drawString(int x, int y, char *s, unsigned char attr, int zoom, bool overlay)
 {
     while (*s)
     {
@@ -110,7 +121,7 @@ void drawString(int x, int y, char *s, unsigned char attr, int zoom)
         }
         else
         {
-            drawChar(*s, x, y, attr, zoom);
+            drawChar(*s, x, y, attr, zoom, overlay);
             x += (FONT_WIDTH * zoom);
         }
         s++;
@@ -134,7 +145,7 @@ void framebuffer_putc(char c, unsigned char attr)
     }
     else
     {
-        drawChar(c, xPosition, yPosition, attr, 3);
+        drawChar(c, xPosition, yPosition, attr, 3, false);
         xPosition += FONT_WIDTH * 3 + 3;
     }
 }

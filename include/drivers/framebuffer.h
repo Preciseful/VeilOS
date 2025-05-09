@@ -1,6 +1,8 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
+#include <stdbool.h>
+
 enum FRAMEBUFFER_TAGS
 {
     ALLOCATE_BUFFER = 0x40001,
@@ -39,8 +41,8 @@ enum FRAMEBUFFER_TAGS
 extern unsigned char *framebuffer;
 
 void framebuffer_init();
-void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom);
-void drawString(int x, int y, char *s, unsigned char attr, int zoom);
+void drawChar(unsigned char ch, int x, int y, unsigned char attr, int zoom, bool overlay);
+void drawString(int x, int y, char *s, unsigned char attr, int zoom, bool overlay);
 void framebuffer_putc(char c, unsigned char attr);
 
 #endif
