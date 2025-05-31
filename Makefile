@@ -2,7 +2,7 @@ RPI_PATH=/media/$(USER)/bootfs
 
 ARMGNU ?= aarch64-none-elf
 
-COPS = -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel
+COPS = -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
 ASMOPS = -Ikernel
 
