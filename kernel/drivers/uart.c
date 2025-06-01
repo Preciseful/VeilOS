@@ -2,13 +2,14 @@
 #include <drivers/gpio.h>
 #include <boot/base.h>
 
-#define UART0_DR (PERIPHERAL_BASE + 0x201000)
-#define UART0_FR (PERIPHERAL_BASE + 0x201018)
-#define UART0_IBRD (PERIPHERAL_BASE + 0x201024)
-#define UART0_FBRD (PERIPHERAL_BASE + 0x201028)
-#define UART0_LCRH (PERIPHERAL_BASE + 0x20102C)
-#define UART0_CR (PERIPHERAL_BASE + 0x201030)
-#define UART0_IMSC (PERIPHERAL_BASE + 0x201038)
+#define UART0_BASE (PERIPHERAL_BASE + 0x201000)
+#define UART0_DR (UART0_BASE + 0x00)
+#define UART0_FR (UART0_BASE + 0x18)
+#define UART0_IBRD (UART0_BASE + 0x24)
+#define UART0_FBRD (UART0_BASE + 0x28)
+#define UART0_LCRH (UART0_BASE + 0x2C)
+#define UART0_CR (UART0_BASE + 0x30)
+#define UART0_IMSC (UART0_BASE + 0x38)
 
 void uart_init()
 {
@@ -23,10 +24,13 @@ void uart_init()
     mmio_write(UART0_FBRD, 3);
     mmio_write(UART0_LCRH, 3 << 5);
     mmio_write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
+    mmio_write(UART0_IMSC, 1 << 4);
 }
 
 void uart_put(char c)
 {
+    if (c == '\n')
+        uart_put('\r');
     while (mmio_read(UART0_FR) & (1 << 5))
         ;
     mmio_write(UART0_DR, c);
@@ -40,6 +44,11 @@ void uart_puts(const char *str)
             uart_put('\r');
         uart_put(*str++);
     }
+}
+
+char uart_character()
+{
+    return (char)mmio_read(UART0_DR);
 }
 
 char uart_recv()
