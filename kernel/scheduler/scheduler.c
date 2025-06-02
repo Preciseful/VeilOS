@@ -42,14 +42,12 @@ void scheduler_init()
 
 task_t *get_next_task()
 {
-    printf("\nfinding task\n");
     task_t *start = scheduler_current;
     task_t *current = start;
 
     do
     {
         current = current->next ? current->next : default_task.next;
-        printf("found maybe: %lu\n", current->regs.x30);
         if (current->flags & ACTIVE_TASK)
             break;
     } while (current != start);
@@ -68,7 +66,6 @@ void scheduler_tick(unsigned long *stack)
     if (stop)
         return;
 
-    printf("\nticking at %lu with %ld\n", scheduler_current->regs.x30, scheduler_current->time);
     scheduler_current->time--;
     if (scheduler_current->time > 0)
         return;
