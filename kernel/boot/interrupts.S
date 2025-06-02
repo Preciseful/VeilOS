@@ -1,6 +1,6 @@
 #include "lib/utils.S"
 
-.macro enter_interrupt
+.macro enter_interrupt el
     pushp x0, x1
     pushp x2, x3
     pushp x4, x5
@@ -20,7 +20,7 @@
     pushp x30, x28
 .endm
 
-.macro exit_interrupt
+.macro exit_interrupt el
     popp x30, x28
     msr elr_el1, x28
     popp x28, x29
@@ -46,8 +46,8 @@
 invalid_hang:
     b invalid_hang
 
-.macro vinvalid type
-    enter_interrupt
+.macro vinvalid type, el
+    enter_interrupt \el
     mov x0, #\type
     mrs x1, esr_el1
     mrs x2, elr_el1
@@ -67,19 +67,19 @@ el1_vectors:
 
     .align 7
     sync_current_el_sp0:
-        vinvalid 0
+        vinvalid 0, 1
 
 	.align 7
     irq_current_el_sp0:
-        vinvalid 1
+        vinvalid 1, 1
 
     .align 7
     fiq_current_el_sp0:
-        vinvalid 2
+        vinvalid 2, 1
 
     .align 7
     serror_current_el_sp0:
-        vinvalid 3
+        vinvalid 3, 1
 
     // ------------------------------------------------------------
     // Current EL with SPx
@@ -87,7 +87,7 @@ el1_vectors:
 
     .align 7
     sync_current_el_spx:
-        vinvalid 4
+        vinvalid 4, 1
 
     .align 7
     irq_current_el_spx:
@@ -95,11 +95,11 @@ el1_vectors:
 
     .align 7
     fiq_current_el_spx:
-        vinvalid 6
+        vinvalid 6, 1
 
     .align 7
     serror_current_el_spx:
-        vinvalid 7
+        vinvalid 7, 1
 
     // ------------------------------------------------------------
     // Lower EL using AArch64
@@ -107,19 +107,19 @@ el1_vectors:
 
     .align 7
     sync_lower_el_aarch64:
-        vinvalid 8
+        vinvalid 8, 0
 
     .align 7
     irq_lower_el_aarch64:
-        vinvalid 9
+        b irq_el0x
 
     .align 7
     fiq_lower_el_aarch64:
-        vinvalid 10
+        vinvalid 10, 0
 
     .align 7
     serror_lower_el_aarch64:
-        vinvalid 11
+        vinvalid 11, 0
 
     // ------------------------------------------------------------
     // Lower EL using AArch32
@@ -127,25 +127,32 @@ el1_vectors:
 
     .align 7
     sync_lower_el_aarch32:
-        vinvalid 12
+        vinvalid 12, 0
 
     .align 7
     irq_lower_el_aarch32:
-        vinvalid 13
+        vinvalid 13, 0
 
     .align 7
     fiq_lower_el_aarch32:
-        vinvalid 14
+        vinvalid 14, 0
 
     .align 7
     serror_lower_el_aarch32:
-        vinvalid 15
+        vinvalid 15, 0
 
 
 irq_el1x:
-    enter_interrupt
+    enter_interrupt 1
+    mov x0, sp
     bl handle_irq
-    exit_interrupt
+    exit_interrupt 1
+
+irq_el0x:
+    enter_interrupt 0
+    mov x0, sp
+    bl handle_irq
+    exit_interrupt 0
 
 .global set_vtable
 set_vtable:
@@ -157,3 +164,13 @@ set_vtable:
 irq_enable:
     msr daifclr, #2
     ret
+
+.global irq_disable
+irq_disable:
+    msr daifset, #2
+    ret
+
+.global ret_to_user
+ret_to_user:
+	bl irq_disable
+	exit_interrupt 0

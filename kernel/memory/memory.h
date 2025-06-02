@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boot/base.h>
+#include <stdbool.h>
 
 #define PAGE_SHIFT 12
 #define TABLE_SHIFT 9
@@ -20,5 +21,20 @@
 #define TABLE_SHIFT 9
 
 #ifndef __ASSEMBLER__
+
+typedef struct mheader
+{
+    unsigned long size;
+    bool in_use;
+    bool extension;
+    struct mheader *next;
+    unsigned long data;
+    unsigned long pos;
+} mheader_t;
+
+void *malloc(unsigned int size);
+void free(void *data);
 void memset(void *dest, int value, unsigned long size);
+void memcpy(void *dst, const void *src, unsigned long size);
+
 #endif

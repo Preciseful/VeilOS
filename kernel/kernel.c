@@ -3,10 +3,27 @@
 #include <boot/interrupts.h>
 #include <lib/printf.h>
 #include <drivers/timer.h>
+#include <scheduler/process.h>
 
 void putc(void *p, char c)
 {
     uart_put(c);
+}
+
+void pr0()
+{
+    while (1)
+    {
+        printf("0");
+    }
+}
+
+void pr1()
+{
+    while (1)
+    {
+        printf("1");
+    }
 }
 
 void kmain()
@@ -25,7 +42,13 @@ void kmain()
     gic_allow(153, 0);
     irq_enable();
 
+    scheduler_init();
+
+    pcreate(&pr0);
+    pcreate(&pr1);
+
     while (1)
     {
+        schedule();
     }
 }
