@@ -50,15 +50,15 @@ master_core:
 	sub	x1, x1, x0
 	bl memzero
 
-    // bl mmu_init
+    bl mmu_init
 
-    // adrp x0, pgd
-    // msr ttbr0_el1, x0
+    adrp x0, pgd
+    msr ttbr0_el1, x0
 
-    // mrs x0, sctlr_el1
-    // mov x1, #SCTLR_MMU_ENABLED
-    // orr x0, x0, x1
-    // msr sctlr_el1, x0
+    mrs x0, sctlr_el1
+    mov x1, #SCTLR_MMU_ENABLED
+    orr x0, x0, x1
+    msr sctlr_el1, x0
 
     bl kmain
     b loop
