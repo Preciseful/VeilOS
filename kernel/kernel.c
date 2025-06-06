@@ -53,12 +53,9 @@ void kmain()
     pcreate(&pr1);
 
     emmc_init();
-    printf("b");
     fatfs_t *fatfs = fatfs_init();
-    printf("d");
     fatfs_node_t *nodes;
     unsigned long nodes_count = get_fatentries(fatfs, fatfs->root_cluster, &nodes);
-    printf("c");
 
     for (unsigned long i = 0; i < nodes_count; i++)
     {
