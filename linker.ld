@@ -11,4 +11,5 @@ SECTIONS
     . = ALIGN(0x00001000);
     pgd = .;
     .data.pgd : { . += (6 * (1 << 12)); }
+    .mmmap : { *(.mmmap) }
 }

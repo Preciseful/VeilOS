@@ -12,8 +12,8 @@ void handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr)
     printf("\ninterrupt encountered:"
            "\n\ttype: %lu"
            "\n\tesr: %lu"
-           "\n\telr: %lx",
-           type, esr, elr);
+           "\n\telr: %lx (%lx)",
+           type, esr, elr, elr - 0x80000);
 }
 
 void handle_irq(unsigned long *stack)

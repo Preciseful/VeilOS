@@ -5,6 +5,11 @@ refresh_cntp_tval:
     msr cntp_tval_el0, x0
     ret
 
+.global timer_ticks
+timer_ticks:
+    mrs x0, cntpct_el0
+    ret
+
 .global timer_init
 timer_init:
     movz x0, #(SYS_FREQ & 0xFFFF), lsl #0

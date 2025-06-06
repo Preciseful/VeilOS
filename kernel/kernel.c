@@ -4,6 +4,10 @@
 #include <lib/printf.h>
 #include <drivers/timer.h>
 #include <scheduler/process.h>
+#include <fs/fat32.h>
+#include <drivers/emmc.h>
+#include <memory/memory.h>
+#include <lib/string.h>
 
 void putc(void *p, char c)
 {
@@ -32,6 +36,7 @@ void kmain()
     init_printf(0, putc);
 
     uart_puts("health 2021\n");
+    mm_init();
 
     int x = 2021;
     printf("how to move on from %d;", x);
@@ -46,6 +51,24 @@ void kmain()
 
     pcreate(&pr0);
     pcreate(&pr1);
+
+    emmc_init();
+    printf("b");
+    fatfs_t *fatfs = fatfs_init();
+    printf("d");
+    fatfs_node_t *nodes;
+    unsigned long nodes_count = get_fatentries(fatfs, fatfs->root_cluster, &nodes);
+    printf("c");
+
+    for (unsigned long i = 0; i < nodes_count; i++)
+    {
+        printf("file: %s\n", nodes[i].name);
+        if (strcmp(nodes[i].name, "config.txt") == 0)
+        {
+            unsigned char *data = read_fatnode(nodes[i]);
+            printf("%s\n", data);
+        }
+    }
 
     while (1)
     {

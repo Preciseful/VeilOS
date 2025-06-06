@@ -14,7 +14,7 @@
 #define LOW_MEMORY (2 * SECTION_SIZE)
 #define HIGH_MEMORY PERIPHERAL_BASE
 
-#define PAGING_MEMORY (HIGH_MEMORY - LOW_MEMORY)
+#define PAGING_MEMORY (HIGH_MEMORY - LOW_MEMORY - 0x80000)
 #define PAGING_PAGES (PAGING_MEMORY / PAGE_SIZE)
 
 #define PAGE_SHIFT 12
@@ -27,14 +27,15 @@ typedef struct mheader
     unsigned long size;
     bool in_use;
     bool extension;
-    struct mheader *next;
-    unsigned long data;
-    unsigned long pos;
+    struct vheader *next;
+    void *data;
 } mheader_t;
 
+void mm_init();
 void *malloc(unsigned int size);
 void free(void *data);
 void memset(void *dest, int value, unsigned long size);
 void memcpy(void *dst, const void *src, unsigned long size);
+int memcmp(const void *m1, const void *m2, unsigned long n);
 
 #endif

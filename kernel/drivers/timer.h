@@ -6,5 +6,7 @@
 
 extern void timer_init();
 extern void refresh_cntp_tval(unsigned int val);
+extern unsigned long timer_ticks();
+void timer_sleep(unsigned int ms);
 
 #endif
