@@ -3,7 +3,7 @@
 #include <boot/base.h>
 #include <stdbool.h>
 
-enum GPIO_actions
+enum GPIO_Actions
 {
     GPFSEL0 = PERIPHERAL_BASE + 0x200000,
     GPSET0 = PERIPHERAL_BASE + 0x20001C,
@@ -11,7 +11,7 @@ enum GPIO_actions
     GPPUPPDN0 = PERIPHERAL_BASE + 0x2000E4
 };
 
-enum GPIO_pulls
+enum GPIO_Pulls
 {
     Pull_None = 0,
     Pull_Down = 2,
@@ -31,10 +31,10 @@ enum GPIO
 void mmio_write(long reg, unsigned int val);
 unsigned int mmio_read(long reg);
 
-bool gpio_call(unsigned int pin, unsigned int value, enum GPIO_actions base, unsigned int field_size, enum GPIO field_max);
+bool gpio_call(unsigned int pin, unsigned int value, enum GPIO_Actions base, unsigned int field_size, enum GPIO field_max);
 bool gpio_set(unsigned int pin, unsigned int value);
 bool gpio_clear(unsigned int pin, unsigned int value);
-bool gpio_pull(unsigned int pin, enum GPIO_pulls pull);
+bool gpio_pull(unsigned int pin, enum GPIO_Pulls pull);
 bool gpio_function(unsigned int pin, enum GPIO func);
 
 void gpio_setAlt0(unsigned int pin);

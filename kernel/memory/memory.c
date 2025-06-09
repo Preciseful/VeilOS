@@ -107,14 +107,16 @@ void memcpy(void *dst, const void *src, unsigned long size)
         ((char *)dst)[i] = ((char *)src)[i];
 }
 
-int memcmp(const void *m1, const void *m2, unsigned long n)
+int memcmp(const void *s1, const void *s2, unsigned long n)
 {
-    const unsigned char *s1 = m1, *s2 = m2;
-    for (unsigned long i = 0; i < n && *s1 == *s2; i++)
+    const unsigned char *p1 = s1;
+    const unsigned char *p2 = s2;
+
+    for (unsigned long i = 0; i < n; i++)
     {
-        ++s1;
-        ++s2;
+        if (p1[i] != p2[i])
+            return p1[i] - p2[i];
     }
 
-    return (*s1 > *s2) - (*s2 > *s1);
+    return 0;
 }

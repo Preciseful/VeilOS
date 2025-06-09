@@ -19,12 +19,12 @@
 #define MAILBOX_FULL 0x80000000
 #define MAILBOX_EMPTY 0x40000000
 
-enum MAILBOX_CLOCKS
+enum Mailbox_Clocks
 {
     EMMC_CLOCK = 1
 };
 
-enum MAILBOX_CHANNELS
+enum Mailbox_Channels
 {
     POWER_MANAGEMENT_CHANNEL,
     FRAMEBUFFER_CHANNEL,
@@ -39,7 +39,7 @@ enum MAILBOX_CHANNELS
 
 extern volatile unsigned int mailbox[36];
 
-unsigned int mailbox_clock(enum MAILBOX_CLOCKS clock);
+unsigned int mailbox_clock(enum Mailbox_Clocks clock);
 bool mailbox_call(unsigned char channel);
 
 #endif

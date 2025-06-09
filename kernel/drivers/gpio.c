@@ -10,7 +10,7 @@ unsigned int mmio_read(long reg)
     return *((volatile unsigned int *)reg);
 }
 
-bool gpio_call(unsigned int pin, unsigned int value, enum GPIO_actions base, unsigned int field_size, enum GPIO field_max)
+bool gpio_call(unsigned int pin, unsigned int value, enum GPIO_Actions base, unsigned int field_size, enum GPIO field_max)
 {
     unsigned int field_mask = (1 << field_size) - 1;
 
@@ -40,7 +40,7 @@ bool gpio_clear(unsigned int pin, unsigned int value)
     return gpio_call(pin, value, GPCLR0, 1, MAX_PIN);
 }
 
-bool gpio_pull(unsigned int pin, enum GPIO_pulls pull)
+bool gpio_pull(unsigned int pin, enum GPIO_Pulls pull)
 {
     return gpio_call(pin, pull, GPPUPPDN0, 2, MAX_PIN);
 }

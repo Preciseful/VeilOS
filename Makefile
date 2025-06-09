@@ -20,19 +20,19 @@ dump:
 	$(ARMGNU)-objdump -D $(BUILD_DIR)/kernel8.elf > dump
 
 clean :
-	rm -rf $(BUILD_DIR) *.img dump
+	@rm -rf $(BUILD_DIR) *.img dump
 
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
+	@mkdir -p $(@D)
+	@$(ARMGNU)-gcc $(COPS) -MMD -c $< -o $@
 
 $(BUILD_DIR)/%_cpp.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(@D)
-	$(ARMGNU)-g++ $(CPPOPS) -MMD -c $< -o $@
+	@mkdir -p $(@D)
+	@$(ARMGNU)-g++ $(CPPOPS) -MMD -c $< -o $@
 
 $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
-	mkdir -p $(@D)
-	$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
+	@mkdir -p $(@D)
+	@$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
 
 C_FILES = $(shell find . -type f -name "*.c" | cut -d'/' -f2-)
@@ -47,6 +47,6 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
 kernel8.img: linker.ld $(OBJ_FILES)
-	$(ARMGNU)-ld -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
-	$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
+	@$(ARMGNU)-ld -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 	./go_rpi.sh $(RPI_PATH)

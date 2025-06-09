@@ -7,7 +7,7 @@
 volatile unsigned int __attribute__((aligned(16))) mailbox[36]; // -> 36 is a safe default
                                                                 // free to change
 
-unsigned int mailbox_clock(enum MAILBOX_CLOCKS clock)
+unsigned int mailbox_clock(enum Mailbox_Clocks clock)
 {
     mailbox[0] = 0;
     mailbox[1] = MAILBOX_REQUEST;

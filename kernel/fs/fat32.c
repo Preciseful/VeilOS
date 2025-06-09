@@ -117,7 +117,7 @@ void set_filename(fatfs_t *fs, fatfs_node_t *node)
     }
 }
 
-fat32_bs_t *get_fat(unsigned int offset)
+fat32_bs_t *get_fat(unsigned long offset)
 {
     emmc_seek(offset);
     unsigned char *buf = malloc(512);
@@ -157,6 +157,7 @@ fatfs_t *fatfs_init()
     fatfs_t *fs = malloc(sizeof(fatfs_t));
     fat32_bs_t *bs;
     mbr_t mbr;
+    emmc_seek(0);
     emmc_read((unsigned char *)&mbr, sizeof(mbr));
 
     if (mbr.bootSignature != BOOT_SIGNATURE)
@@ -167,9 +168,12 @@ fatfs_t *fatfs_init()
 
     for (int i = 0; mbr.partitions[i].type != 0; i++)
     {
-        bs = get_fat(mbr.partitions[i].first_lba_sector * 512);
+        bs = get_fat((unsigned long)mbr.partitions[i].first_lba_sector * 512);
         if (bs)
+        {
+            printf("Found FAT32 on partition %d.\n", i + 1);
             break;
+        }
     }
 
     if (!bs)

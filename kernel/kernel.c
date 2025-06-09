@@ -5,9 +5,12 @@
 #include <drivers/timer.h>
 #include <scheduler/process.h>
 #include <fs/fat32.h>
+#include <fs/voidelle.h>
 #include <drivers/emmc.h>
 #include <memory/memory.h>
 #include <lib/string.h>
+#include <vfs/vfs.h>
+#include <vfs/vnode.h>
 
 void putc(void *p, char c)
 {
@@ -39,7 +42,7 @@ void kmain()
     mm_init();
 
     int x = 2021;
-    printf("how to move on from %d;", x);
+    printf("how to move on from %d;\n", x);
 
     set_vtable();
     timer_init();
@@ -66,6 +69,14 @@ void kmain()
             printf("%s\n", data);
         }
     }
+
+    vfs_init();
+    add_root(fatfs, FAT32, '/');
+    vnode_t *vnode = fopen("/modules/Luna.elf");
+    printf("opened: %s\n", ((fatfs_node_t *)vnode->data)->name);
+
+    voidlet_t *vlet = voidelle_init();
+    voidelle_t *root = voidelle_root(vlet);
 
     while (1)
     {
