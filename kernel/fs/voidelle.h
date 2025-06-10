@@ -39,8 +39,19 @@ typedef struct voidelle
     unsigned char create_date[5];
     unsigned long modify_year;
     unsigned char modify_date[5];
+    unsigned long owner_id;
+    unsigned char others_permission[3];
+    unsigned char owner_permission[3];
 } __attribute__((packed)) voidelle_t;
 
-voidlet_t *voidelle_init();
-voidelle_t *voidelle_root(voidlet_t *vlet);
-voidelle_t *create_voidelle(voidlet_t *vlet, unsigned long parent_pos, unsigned long flags, char *name);
+typedef struct voidom
+{
+    voidelle_t *root;
+    voidlet_t *voidlet;
+    unsigned long partition_seek;
+} __attribute__((packed)) voidom_t;
+
+voidom_t *voidelle_init();
+voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned long flags, char *name);
+unsigned long get_voidelle_entries(voidom_t *vdom, unsigned long parent_pos, voidelle_t **bnodes);
+char *get_voidelle_name(voidom_t *vdom, unsigned long name_pos);
