@@ -307,7 +307,7 @@ unsigned long fread(void *buf, unsigned long size, vnode_t *node)
         unsigned long end = size % clsize;
         for (unsigned long section = section_start; section <= section_end; section++)
         {
-            char *read = read_fatnode_at(*entry, section);
+            unsigned char *read = read_fatnode_at(*entry, section);
             if (section == section_end)
             {
                 memcpy(buf, read, end);
@@ -337,7 +337,7 @@ unsigned long fread(void *buf, unsigned long size, vnode_t *node)
 void fwrite(void *buf, unsigned long size, vnode_t *node)
 {
     if (is_directory(node, node->root->fs_type))
-        return 0;
+        return;
 
     if (node->root->fs_type == VOIDELLE)
     {

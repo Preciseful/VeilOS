@@ -311,7 +311,7 @@ void voidelle_write(voidom_t *vdom, voidelle_t *velle, char *write_buf, unsigned
         {
             voidite_t voidite;
             emmc_seek(vdom->partition_seek + content);
-            emmc_read(&voidite, 512);
+            emmc_read((unsigned char *)&voidite, 512);
 
             content = voidite.next;
             free_void(vdom, voidite.pos);
