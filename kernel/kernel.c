@@ -76,24 +76,34 @@ void kmain()
     printf("opened: %s\n", ((fatfs_node_t *)vnode->data)->name);
 
     voidom_t *vdom = voidelle_init();
-    voidelle_t *pony = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, "pony");
-    create_voidelle(vdom, pony->pos, 0, "yeah");
+    voidelle_t *pony = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, 0, "pony");
+    create_voidelle(vdom, pony->pos, 0, 0, "yeah");
 
-    create_voidelle(vdom, vdom->root->pos, 0, "lunar");
-    create_voidelle(vdom, vdom->root->pos, 0, "orbit");
+    create_voidelle(vdom, vdom->root->pos, 0, 0, "lunar");
+    create_voidelle(vdom, vdom->root->pos, 0, 0, "orbit");
 
-    voidelle_t *forest = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, "forest");
-    voidelle_t *_27 = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, "27");
-    voidelle_t *promise = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, "promise");
-    create_voidelle(vdom, _27->pos, 0, "honesty");
-    create_voidelle(vdom, _27->pos, 0, "twilight");
-    create_voidelle(vdom, forest->pos, 0, "chasing");
-    create_voidelle(vdom, promise->pos, 0, "hiii");
-
+    voidelle_t *forest = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, 0, "forest");
+    voidelle_t *_27 = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, 0, "27");
+    voidelle_t *promise = create_voidelle(vdom, vdom->root->pos, VOIDELLE_DIRECTORY, 0, "promise");
+    create_voidelle(vdom, _27->pos, 0, 0, "honesty");
+    create_voidelle(vdom, _27->pos, 0, 0, "twilight");
+    create_voidelle(vdom, forest->pos, 0, 0, "chasing");
+    create_voidelle(vdom, promise->pos, 0, 0, "hiii");
+    voidelle_t *radiohead = create_voidelle(vdom, vdom->root->pos, 0, 0, "radiohead");
+    printf("contest: %lu\n", radiohead->content);
     add_root(vdom, VOIDELLE, '>');
 
-    create_voidelle(vdom, vdom->root->pos, 0, "radiohead");
     vnode = fopen(">radiohead");
+    fseek(vnode, 0, SEEK_SET);
+
+    char buf[2096];
+    unsigned long read = fread(buf, 2096, vnode);
+    for (unsigned long i = 0; i < read; i++)
+    {
+        printf("%c", buf[i]);
+    }
+
+    printf("\n");
 
     while (1)
     {

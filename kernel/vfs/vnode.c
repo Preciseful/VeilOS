@@ -4,6 +4,7 @@
 #include <vfs/vfs.h>
 #include <fs/fat32.h>
 #include <fs/voidelle.h>
+#include <drivers/emmc.h>
 #include <lib/printf.h>
 
 vfs_root_t *get_root(const char *path)
@@ -215,7 +216,7 @@ vnode_t *fopen(char *path)
 
     vnode_t *node = malloc(sizeof(vnode_t));
     node->path = path;
-    node->fs_type = root->fs_type;
+    node->root = root;
     if (check_open_vnode(root, node))
     {
         printf("File is already open.\n");
@@ -224,11 +225,130 @@ vnode_t *fopen(char *path)
 
     void *entry = entry_from_path(path, root);
     node->data = entry;
-    if (is_directory(node, node->fs_type))
+    if (is_directory(node, node->root->fs_type))
         node->type = VNODE_DIRECTORY;
     else
         node->type = VNODE_FILE;
 
     open_vnode(root, node);
     return node;
+}
+
+void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type)
+{
+    switch (type)
+    {
+    case SEEK_SET:
+        node->seek = seek;
+        break;
+
+    case SEEK_CUR:
+        node->seek += seek;
+        break;
+
+    default:
+        break;
+    }
+}
+
+unsigned long fread(void *buf, unsigned long size, vnode_t *node)
+{
+    if (is_directory(node, node->root->fs_type))
+        return 0;
+
+    if (node->root->fs_type == VOIDELLE)
+    {
+        voidelle_t *voidelle = (voidelle_t *)node->data;
+        voidom_t *vdom = (voidom_t *)node->root->fs;
+        if (size > voidelle->content_size)
+            size = voidelle->content_size;
+
+        unsigned long section_start = node->seek / VOIDITE_CONTENT_SIZE + 1;
+        unsigned long start = node->seek % VOIDITE_CONTENT_SIZE;
+        unsigned long section_end = section_start + size / VOIDITE_CONTENT_SIZE;
+        unsigned long end = size % VOIDITE_CONTENT_SIZE;
+        for (unsigned long section = section_start; section <= section_end; section++)
+        {
+            char *read = voidelle_read_at(vdom, *voidelle, section);
+
+            if (section == section_end)
+            {
+                memcpy(buf, read, end);
+                free(read);
+                return size;
+            }
+
+            if (section == section_start)
+            {
+                memcpy(buf, read + start, VOIDITE_CONTENT_SIZE - start);
+                free(read);
+                buf += VOIDITE_CONTENT_SIZE - start;
+                continue;
+            }
+
+            memcpy(buf, read, VOIDITE_CONTENT_SIZE);
+            free(read);
+            buf += VOIDITE_CONTENT_SIZE;
+        }
+
+        return 0;
+    }
+    else if (node->root->fs_type == FAT32)
+    {
+        fatfs_node_t *entry = (fatfs_node_t *)node->data;
+        fatfs_t *fs = (fatfs_t *)node->root->fs;
+        if (size > entry->entry.size)
+            size = entry->entry.size;
+
+        unsigned long clsize = fat_cluster_size(fs);
+        unsigned long section_start = node->seek / clsize + 1;
+        unsigned long start = node->seek % clsize;
+        unsigned long section_end = section_start + size / clsize;
+        unsigned long end = size % clsize;
+        for (unsigned long section = section_start; section <= section_end; section++)
+        {
+            char *read = read_fatnode_at(*entry, section);
+            if (section == section_end)
+            {
+                memcpy(buf, read, end);
+                free(read);
+                return size;
+            }
+
+            if (section == section_start)
+            {
+                memcpy(buf, read + start, VOIDITE_CONTENT_SIZE - start);
+                free(read);
+                buf += VOIDITE_CONTENT_SIZE - start;
+                continue;
+            }
+
+            memcpy(buf, read, VOIDITE_CONTENT_SIZE);
+            free(read);
+            buf += VOIDITE_CONTENT_SIZE;
+        }
+
+        return 0;
+    }
+
+    return 0;
+}
+
+void fwrite(void *buf, unsigned long size, vnode_t *node)
+{
+    if (is_directory(node, node->root->fs_type))
+        return 0;
+
+    if (node->root->fs_type == VOIDELLE)
+    {
+        voidelle_t *voidelle = (voidelle_t *)node->data;
+        voidom_t *vdom = (voidom_t *)node->root->fs;
+        voidelle_write(vdom, voidelle, buf, size);
+    }
+
+    else if (node->root->fs_type == FAT32)
+    {
+        fatfs_node_t *entry = (fatfs_node_t *)node->data;
+        write_to_fatnode(entry, buf, size);
+    }
 }

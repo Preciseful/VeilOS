@@ -170,21 +170,21 @@ voidite_t *create_voidite(voidom_t *vdom, char *write_buf, unsigned long write_b
     return voidite;
 }
 
-voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned long flags, char *name)
+voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned long flags, unsigned int *exit_code, char *name)
 {
     voidelle_t *parent = malloc(sizeof(voidelle_t));
     emmc_seek(vdom->partition_seek + parent_pos);
     emmc_read((unsigned char *)parent, 512);
 
     if (!(parent->flags & VOIDELLE_DIRECTORY))
+    {
+        if (exit_code != 0)
+            *exit_code = 2;
         return 0;
-
-    unsigned long voidelle_free;
-    allocate_void(vdom, &voidelle_free);
+    }
 
     voidelle_t *voidelle = malloc(sizeof(voidelle_t));
     memcpy(voidelle->velle, "VELLE", 5);
-    voidelle->pos = voidelle_free;
     voidelle->content = 0;
     voidelle->content_size = 0;
     for (int i = 0; i < 5; i++)
@@ -197,19 +197,22 @@ voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned l
     voidelle->modify_year = 0;
     voidelle->flags = flags;
     voidelle->owner_id = 0;
+    voidelle->next = 0;
     for (int i = 0; i < 3; i++)
     {
         voidelle->owner_permission[i] = 0;
         voidelle->others_permission[i] = 0;
     }
 
-    voidite_t *voidite = create_voidite(vdom, name, strlen(name));
-
-    voidelle->name = voidite->pos;
-    voidelle->next = 0;
-
     if (parent->content == 0)
     {
+        voidite_t *voidite = create_voidite(vdom, name, strlen(name));
+        unsigned long voidelle_free;
+        allocate_void(vdom, &voidelle_free);
+
+        voidelle->name = voidite->pos;
+        voidelle->pos = voidelle_free;
+
         parent->content = voidelle->pos;
         emmc_seek(vdom->partition_seek + parent->pos);
         emmc_write((unsigned char *)parent, 512);
@@ -219,6 +222,8 @@ voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned l
 
         free(voidite);
         free(parent);
+        if (exit_code != 0)
+            *exit_code = 0;
         return voidelle;
     }
 
@@ -230,11 +235,30 @@ voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned l
         emmc_seek(vdom->partition_seek + neighbour_pos);
         emmc_read((unsigned char *)neighbour, 512);
 
+        char *neighbour_name = get_voidelle_name(vdom, neighbour->name);
+        if (strcmp(neighbour_name, name) == 0)
+        {
+            printf("File %s already exists.\n", name);
+
+            free(parent);
+            free(voidelle);
+
+            *exit_code = 1;
+            return neighbour;
+        }
+
         if (neighbour->next == 0)
             break;
 
         neighbour_pos = neighbour->next;
     }
+
+    voidite_t *voidite = create_voidite(vdom, name, strlen(name));
+    unsigned long voidelle_free;
+    allocate_void(vdom, &voidelle_free);
+
+    voidelle->name = voidite->pos;
+    voidelle->pos = voidelle_free;
 
     neighbour->next = voidelle->pos;
     emmc_seek(vdom->partition_seek + neighbour_pos);
@@ -246,17 +270,19 @@ voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned l
     free(voidite);
     free(parent);
     free(neighbour);
+    if (exit_code != 0)
+        *exit_code = 0;
     return voidelle;
 }
 
-unsigned char *voidelle_read_at(voidom_t *vdom, voidelle_t *velle, unsigned long pos)
+char *voidelle_read_at(voidom_t *vdom, voidelle_t velle, unsigned long pos)
 {
-    if (velle->content == 0)
+    if (velle.content == 0)
         return 0;
-    if (velle->flags & VOIDELLE_DIRECTORY)
+    if (velle.flags & VOIDELLE_DIRECTORY)
         return 0;
 
-    unsigned long voidite_pos = velle->content;
+    unsigned long voidite_pos = velle.content;
     voidite_t *last = malloc(sizeof(voidite_t));
 
     for (unsigned long i = 0; i < pos; i++)
@@ -270,7 +296,7 @@ unsigned char *voidelle_read_at(voidom_t *vdom, voidelle_t *velle, unsigned long
         memcpy(last, buf, 512);
     }
 
-    return last->data;
+    return (char *)last->data;
 }
 
 void voidelle_write(voidom_t *vdom, voidelle_t *velle, char *write_buf, unsigned long write_buf_size)
@@ -278,17 +304,40 @@ void voidelle_write(voidom_t *vdom, voidelle_t *velle, char *write_buf, unsigned
     velle->content_size = write_buf_size;
     voidite_t *last = 0;
 
+    if (velle->content != 0)
+    {
+        unsigned long content = velle->content;
+        while (content)
+        {
+            voidite_t voidite;
+            emmc_seek(vdom->partition_seek + content);
+            emmc_read(&voidite, 512);
+
+            content = voidite.next;
+            free_void(vdom, voidite.pos);
+        }
+    }
+
     while (write_buf_size)
     {
         voidite_t *voidite = create_voidite(vdom, write_buf, write_buf_size);
         if (last != 0)
+        {
             last->next = voidite->pos;
+            emmc_seek(vdom->partition_seek + last->pos);
+            emmc_write((unsigned char *)last, 512);
+        }
         else
             velle->content = voidite->pos;
 
-        write_buf_size -= VOIDITE_CONTENT_SIZE;
+        unsigned long amount = write_buf_size < VOIDITE_CONTENT_SIZE ? write_buf_size : VOIDITE_CONTENT_SIZE;
+        write_buf_size -= amount;
+        write_buf += amount;
         last = voidite;
     }
+
+    emmc_seek(vdom->partition_seek + velle->pos);
+    emmc_write((unsigned char *)velle, 512);
 }
 
 unsigned long get_voidelle_entries(voidom_t *vdom, unsigned long parent_pos, voidelle_t **bnodes)

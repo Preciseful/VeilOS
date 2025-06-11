@@ -52,6 +52,8 @@ typedef struct voidom
 } __attribute__((packed)) voidom_t;
 
 voidom_t *voidelle_init();
-voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned long flags, char *name);
+voidelle_t *create_voidelle(voidom_t *vdom, unsigned long parent_pos, unsigned long flags, unsigned int *exit_code, char *name);
+char *voidelle_read_at(voidom_t *vdom, voidelle_t velle, unsigned long pos);
+void voidelle_write(voidom_t *vdom, voidelle_t *velle, char *write_buf, unsigned long write_buf_size);
 unsigned long get_voidelle_entries(voidom_t *vdom, unsigned long parent_pos, voidelle_t **bnodes);
 char *get_voidelle_name(voidom_t *vdom, unsigned long name_pos);
