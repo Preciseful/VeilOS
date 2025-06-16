@@ -39,17 +39,17 @@ void make_entry(unsigned long table, unsigned long entry, unsigned long va, unsi
     *((unsigned long *)(table + (index << 3))) = desc;
 }
 
-void make_block(unsigned long pmd, unsigned long vstart, unsigned long vend, unsigned long pa)
+void make_block(unsigned long pmd, unsigned long vstart, unsigned long vend, unsigned long pa, unsigned long shift)
 {
-    vstart >>= SECTION_SHIFT;
-    vend >>= SECTION_SHIFT;
+    vstart >>= shift;
+    vend >>= shift;
     vend--;
 
     vstart &= (TABLE_ENTRIES - 1);
     vend &= (TABLE_ENTRIES - 1);
 
-    pa >>= SECTION_SHIFT;
-    pa <<= SECTION_SHIFT;
+    pa >>= shift;
+    pa <<= shift;
 
     do
     {
@@ -62,7 +62,7 @@ void make_block(unsigned long pmd, unsigned long vstart, unsigned long vend, uns
         unsigned long *table_ptr = (unsigned long *)(pmd + (vstart << 3));
         *table_ptr = temp_pa;
 
-        pa += SECTION_SIZE;
+        pa += (1 << shift);
         vstart++;
     } while (vstart <= vend);
 }
@@ -72,25 +72,16 @@ void mmu_init()
     unsigned long pgd = pgd_address();
     memset((void *)pgd, 0, PGD_SIZE);
 
-    unsigned long base = 0;
-    unsigned long table = pgd;
-    unsigned long entry = table + PAGE_SIZE;
+    unsigned long pud = pgd + PAGE_SIZE;
+    unsigned long pmd = pud + PAGE_SIZE;
 
-    make_entry(table, entry, base, PGD_SHIFT, TD_KERNEL_TABLE_FLAGS);
-
-    table += PAGE_SIZE;
-    entry += PAGE_SIZE;
-
-    unsigned long block = table;
+    make_entry(pgd, pud, 0, PGD_SHIFT, TD_KERNEL_TABLE_FLAGS);
 
     for (unsigned long i = 0; i < 4; i++)
     {
-        make_entry(table, entry, base, PUD_SHIFT, TD_KERNEL_TABLE_FLAGS);
-        entry += PAGE_SIZE;
-        base += PUD_ENTRY_MAP_SIZE;
-
-        block += PAGE_SIZE;
-        unsigned long offset = BLOCK_SIZE * i;
-        make_block(block, offset, offset + BLOCK_SIZE, offset);
+        unsigned long va = i * BLOCK_SIZE;
+        make_entry(pud, pmd, va, PUD_SHIFT, TD_KERNEL_TABLE_FLAGS);
+        make_block(pmd, va, va + BLOCK_SIZE, va, PMD_SHIFT);
+        pmd += PAGE_SIZE;
     }
 }
