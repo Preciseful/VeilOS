@@ -1,9 +1,6 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
 
-#define HEADERS_BYTES (sizeof(mheader_t) * PAGING_PAGES)
-#define HEADERS_PAGES ((HEADERS_BYTES + PAGE_SIZE - 1) / PAGE_SIZE)
-
 __attribute__((section(".mmmap"))) static mheader_t headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 

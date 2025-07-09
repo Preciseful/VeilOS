@@ -20,6 +20,16 @@ cpu_switch_task:
 	ldp	x29, x30, [x8], #16
 	ldr	x9, [x8]
 	mov	sp, x9
+
+	msr ttbr0_el1, x2
+	dsb ishst
+	tlbi vmalle1is
+	dsb ish
+	isb
+
+	mov x0, x30
+	bl printx
+
     ret
 
 .global cpu_switch_from_tick

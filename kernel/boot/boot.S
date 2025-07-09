@@ -27,15 +27,10 @@ drop_el1:
 
 	ldr	x0, =SPSR_VALUE
 	msr	spsr_el3, x0
-
-    ldr x0, =CPACR_VALUE
-    msr cpacr_el1, x0
-
-    ldr x0, =TCR_VALUE
-    msr tcr_el1, x0
-
-    ldr x0, =MAIR_VALUE
-    msr mair_el1, x0
+    
+    mrs x0, CPACR_EL1
+    orr x0, x0, #(3 << 20)
+    msr CPACR_EL1, x0
 
 	adr	x0, master_core
 	msr	elr_el3, x0
@@ -49,16 +44,6 @@ master_core:
 	adr	x1, bss_end
 	sub	x1, x1, x0
 	bl memzero
-
-    bl mmu_init
-
-    adrp x0, pgd
-    msr ttbr0_el1, x0
-
-    mrs x0, sctlr_el1
-    mov x1, #SCTLR_MMU_ENABLED
-    orr x0, x0, x1
-    msr sctlr_el1, x0
 
     bl kmain
     b loop

@@ -1,6 +1,7 @@
 #include <drivers/uart.h>
 #include <drivers/gpio.h>
 #include <boot/base.h>
+#include <lib/printf.h>
 
 #define UART0_BASE (PERIPHERAL_BASE + 0x201000)
 #define UART0_DR (UART0_BASE + 0x00)
@@ -10,6 +11,11 @@
 #define UART0_LCRH (UART0_BASE + 0x2C)
 #define UART0_CR (UART0_BASE + 0x30)
 #define UART0_IMSC (UART0_BASE + 0x38)
+
+void putc(void *p, char c)
+{
+    uart_put(c);
+}
 
 void uart_init()
 {
@@ -25,6 +31,8 @@ void uart_init()
     mmio_write(UART0_LCRH, 3 << 5);
     mmio_write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
     mmio_write(UART0_IMSC, 1 << 4);
+
+    init_printf(0, putc);
 }
 
 void uart_put(char c)

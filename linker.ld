@@ -1,5 +1,6 @@
 SECTIONS
 {
+    . = 0x80000;
     .text.boot : { *(.text.boot) }
     .text : { *(.text) }
     .rodata : { *(.rodata) }
@@ -8,8 +9,5 @@ SECTIONS
     bss_begin = .;
     .bss : { *(.bss*) }
     bss_end = .;
-    . = ALIGN(0x00001000);
-    pgd = .;
-    .data.pgd : { . += (6 * (1 << 12)); }
     .mmmap : { *(.mmmap) }
 }

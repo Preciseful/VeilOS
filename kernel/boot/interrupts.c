@@ -7,13 +7,14 @@
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
 
-void handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr)
+void handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr, unsigned long far)
 {
     printf("\ninterrupt encountered:"
            "\n\ttype: %lu"
            "\n\tesr: %lu"
-           "\n\telr: %lx (%lx)",
-           type, esr, elr, elr - 0x80000);
+           "\n\telr: %lx (%lx)"
+           "\n\tfar: %lx (%lx)",
+           type, esr, elr, elr - 0x80000, far, far - 0x80000);
 }
 
 void handle_irq(unsigned long *stack)
