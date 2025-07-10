@@ -17,76 +17,76 @@
 
 void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index)
 {
-    unsigned long l0_index = (va >> 39) & 0x1FF;
-    unsigned long l1_index = (va >> 30) & 0x1FF;
-    unsigned long l2_index = (va >> 21) & 0x1FF;
-    unsigned long l3_index = (va >> 12) & 0x1FF;
+    unsigned long l1_index = (va >> 39) & 0x1FF;
+    unsigned long l2_index = (va >> 30) & 0x1FF;
+    unsigned long l3_index = (va >> 21) & 0x1FF;
+    unsigned long pte_index = (va >> 12) & 0x1FF;
 
-    if (!(table[l0_index] & 1))
+    if (!(table[l1_index] & 1))
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        table[l0_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
+        table[l1_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l1 = (unsigned long *)(table[l0_index] & PAGE_MASK);
+    unsigned long *l1 = (unsigned long *)(table[l1_index] & PAGE_MASK);
 
-    if (!(l1[l1_index] & 1))
+    if (!(l1[l2_index] & 1))
     {
         unsigned long *l2 = malloc(PAGE_SIZE);
         memset(l2, 0, PAGE_SIZE);
-        l1[l1_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
+        l1[l2_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l2 = (unsigned long *)(l1[l1_index] & PAGE_MASK);
+    unsigned long *l2 = (unsigned long *)(l1[l2_index] & PAGE_MASK);
 
-    if (!(l2[l2_index] & 1))
+    if (!(l2[l3_index] & 1))
     {
         unsigned long *l3 = malloc(PAGE_SIZE);
         memset(l3, 0, PAGE_SIZE);
-        l2[l2_index] = ((unsigned long)l3 & PAGE_MASK) | PD_TABLE;
+        l2[l3_index] = ((unsigned long)l3 & PAGE_MASK) | PD_TABLE;
     }
-    else if ((l2[l2_index] & 0b11) == PD_BLOCK)
+    else if ((l2[l3_index] & 0b11) == PD_BLOCK)
     {
         printf("Page occupied by a block.\n");
         return;
     }
 
-    unsigned long *l3 = (unsigned long *)(l2[l2_index] & PAGE_MASK);
+    unsigned long *l3 = (unsigned long *)(l2[l3_index] & PAGE_MASK);
     unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (0b00 << 6) | (index << 2) | 0b11;
-    if (l3[l3_index] & 1)
+    if (l3[pte_index] & 1)
     {
         printf("[MMU warning]: Section already mapped %x", va);
         return;
     }
-    l3[l3_index] = (pa & PAGE_MASK) | attr;
+    l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
 void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index)
 {
-    unsigned long l0_index = (va >> 39) & 0x1FF;
-    unsigned long l1_index = (va >> 30) & 0x1FF;
-    unsigned long l2_index = (va >> 21) & 0x1FF;
+    unsigned long l1_index = (va >> 39) & 0x1FF;
+    unsigned long l2_index = (va >> 30) & 0x1FF;
+    unsigned long l3_index = (va >> 21) & 0x1FF;
 
-    if (!(pgd[l0_index] & 1))
+    if (!(pgd[l1_index] & 1))
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        pgd[l0_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
+        pgd[l1_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l1 = (unsigned long *)(pgd[l0_index] & PAGE_MASK);
+    unsigned long *l1 = (unsigned long *)(pgd[l1_index] & PAGE_MASK);
 
-    if (!(l1[l1_index] & 1))
+    if (!(l1[l2_index] & 1))
     {
         unsigned long *l2 = malloc(PAGE_SIZE);
         memset(l2, 0, PAGE_SIZE);
-        l1[l1_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
+        l1[l2_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l2 = (unsigned long *)(l1[l1_index] & PAGE_MASK);
+    unsigned long *l2 = (unsigned long *)(l1[l2_index] & PAGE_MASK);
     unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (0b00 << 6) | (index << 2) | PD_BLOCK;
-    l2[l2_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
+    l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
 }
 
 void mmu_init()
