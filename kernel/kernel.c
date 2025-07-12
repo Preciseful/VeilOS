@@ -19,7 +19,11 @@ __attribute__((aligned(4096))) void pr0()
     while (1)
     {
         i++;
-        printf("0");
+        long fr = (PERIPHERAL_BASE + 0x201000 + 0x18);
+        while ((*((volatile unsigned int *)fr)) & (1 << 5))
+            ;
+        long dr = (PERIPHERAL_BASE + 0x201000);
+        *((volatile unsigned int *)dr) = '!';
     }
 }
 

@@ -21,14 +21,20 @@ cpu_switch_task:
 	ldr	x9, [x8]
 	mov	sp, x9
 
+	dsb sy
+	mrs x0, sctlr_el1
+	bic x0, x0, #(1 << 0)
+	msr sctlr_el1, x0
+	isb
+
 	msr ttbr0_el1, x2
-	dsb ishst
-	tlbi vmalle1is
+    tlbi vmalle1is
 	dsb ish
 	isb
 
-	mov x0, x30
-	bl printx
+	orr x0, x0, #(1 << 0)
+    msr sctlr_el1, x0
+    isb
 
     ret
 

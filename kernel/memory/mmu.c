@@ -6,7 +6,7 @@
 #define PAGE_ENTRIES 512
 
 #define MAIR_DEVICE_nGnRnE 0b00000000
-#define MAIR_NORMAL_NOCACHE 0b01000100
+#define MAIR_NORMAL_NOCACHE 0b00000000
 
 #define PD_TABLE 0b11
 #define PD_BLOCK 0b01
@@ -95,10 +95,7 @@ void mmu_init()
 
     for (unsigned long addr = 0; addr <= GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
-        if (addr < DEVICE_START)
-            mmu_map_block(pgd, addr, addr, MAIR_IDX_NORMAL);
-        else
-            mmu_map_block(pgd, addr, addr, MAIR_IDX_DEVICE);
+        mmu_map_block(pgd, addr, addr, MAIR_IDX_DEVICE);
     }
 
     unsigned long mair = (MAIR_DEVICE_nGnRnE << (MAIR_IDX_DEVICE * 8)) | (MAIR_NORMAL_NOCACHE << (MAIR_IDX_NORMAL * 8));
@@ -112,6 +109,7 @@ void mmu_init()
     asm volatile("isb");
 
     asm volatile("msr ttbr0_el1, %0" ::"r"(pgd));
+    printf("OG PGD: %lu\n", pgd);
 
     asm volatile(
         "mrs x0, sctlr_el1\n"
