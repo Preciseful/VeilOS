@@ -38,4 +38,3 @@ void schedule();
 void add_task(task_t *task);
 void scheduler_tick(unsigned long *stack);
 extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *table);
-extern void cpu_switch_from_tick(task_t *prev, task_t *next, unsigned long *table);

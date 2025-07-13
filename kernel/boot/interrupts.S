@@ -63,7 +63,7 @@ invalid_hang:
     b invalid_hang
 .endm
 
-.align 11
+.align 12
 .global el1_vectors
 el1_vectors:
 

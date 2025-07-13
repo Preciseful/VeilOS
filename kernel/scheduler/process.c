@@ -2,9 +2,12 @@
 #include <memory/memory.h>
 #include <memory/mmu.h>
 #include <lib/printf.h>
+#include <syscall/syscall.h>
 
 #define EL1H_M 0b0101
 #define EL0T_M 0b0000
+
+extern unsigned long *el1_vectors;
 
 task_t *pcreate(unsigned long pa, unsigned long va, bool kernel)
 {
@@ -20,10 +23,8 @@ task_t *pcreate(unsigned long pa, unsigned long va, bool kernel)
     mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, kernel);
     mmu_map_page(task->pgd, (unsigned long)task, (unsigned long)task, MAIR_IDX_NORMAL, kernel);
     mmu_map_page(task->pgd, (unsigned long)&cpu_switch_task, (unsigned long)&cpu_switch_task, MAIR_IDX_NORMAL, true);
-
-    for (unsigned long addr = GRANULE_1GB * 3; addr < GRANULE_1GB * 4; addr += GRANULE_2MB)
-        // todo: remove this bc we will just use svc anyways
-        mmu_map_block(task->pgd, addr, addr, MAIR_IDX_DEVICE, kernel);
+    mmu_map_page(task->pgd, (unsigned long)el1_vectors, (unsigned long)el1_vectors, MAIR_IDX_NORMAL, kernel);
+    mmu_map_page(task->pgd, (unsigned long)&sys_printf, (unsigned long)&sys_printf, MAIR_IDX_NORMAL, kernel);
 
     add_task(task);
     return task;

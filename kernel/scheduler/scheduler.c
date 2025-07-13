@@ -76,5 +76,5 @@ void scheduler_tick(unsigned long *stack)
     task_t *last = scheduler_current;
     scheduler_current = next;
 
-    cpu_switch_from_tick(last, next, next->pgd);
+    cpu_switch_task(last, next, next->pgd);
 }
