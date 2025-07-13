@@ -53,8 +53,8 @@ void kmain()
 
     scheduler_init();
 
-    pcreate(&pr0);
-    pcreate(&pr1);
+    pcreate((unsigned long)&pr0, 0x0, false);
+    pcreate((unsigned long)&pr1, 0x0, false);
 
     emmc_init();
     fatfs_t *fatfs = fatfs_init();

@@ -64,7 +64,7 @@ void debug_mmu_address(unsigned long *pgd, unsigned long va)
     return;
 }
 
-void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index)
+void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, bool kernel)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -102,7 +102,10 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     }
 
     unsigned long *l3 = (unsigned long *)(l2[l3_index] & PAGE_MASK);
-    unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (0b00 << 6) | (index << 2) | 0b11;
+    unsigned char perm = kernel ? 0b00 : 0b01;
+    unsigned char uxn = kernel ? 1 : 0;
+
+    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)
     {
         printf("[MMU warning]: Section already mapped (%x).", va);
@@ -112,7 +115,7 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
-void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index)
+void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, bool kernel)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -135,7 +138,9 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
     }
 
     unsigned long *l2 = (unsigned long *)(l1[l2_index] & PAGE_MASK);
-    unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (0b00 << 6) | (index << 2) | PD_BLOCK;
+    unsigned char perm = kernel ? 0b00 : 0b01;
+
+    unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
 
     l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
 }
@@ -145,7 +150,12 @@ void mmu_init()
     unsigned long *pgd = malloc(PAGE_SIZE);
 
     for (unsigned long addr = 0; addr <= GRANULE_1GB * 4; addr += GRANULE_2MB)
-        mmu_map_block(pgd, addr, addr, MAIR_IDX_DEVICE);
+    {
+        if (addr < DEVICE_START)
+            mmu_map_block(pgd, addr, addr, MAIR_IDX_NORMAL, true);
+        else
+            mmu_map_block(pgd, addr, addr, MAIR_IDX_DEVICE, true);
+    }
 
     mmu_init_regs((unsigned long)pgd);
 }

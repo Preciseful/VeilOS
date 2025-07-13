@@ -21,6 +21,7 @@ typedef struct task_regs
     unsigned long x29;
     unsigned long x30;
     unsigned long sp;
+    unsigned long spsr;
 } task_regs_t;
 
 typedef struct task

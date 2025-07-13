@@ -2,4 +2,4 @@
 
 #include <scheduler/scheduler.h>
 
-task_t *pcreate(void *pc);
+task_t *pcreate(unsigned long pa, unsigned long va, bool kernel);
