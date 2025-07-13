@@ -2,7 +2,7 @@
 
 .global cpu_switch_task
 cpu_switch_task:
-	msr x10, spsr_el1
+	mrs x10, spsr_el1
     mov x9, sp
 	mov x8, x0
     stp x19, x20, [x8], #16
