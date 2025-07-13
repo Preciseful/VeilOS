@@ -2,16 +2,18 @@
 
 .global cpu_switch_task
 cpu_switch_task:
-	mrs x10, spsr_el1
-    mov x9, sp
+	mrs x11, spsr_el1
+	mov x10, sp
+	mrs x9, sp_el0
 	mov x8, x0
-    stp x19, x20, [x8], #16
-    stp	x21, x22, [x8], #16
+        stp     x19, x20, [x8], #16
+        stp	x21, x22, [x8], #16
 	stp	x23, x24, [x8], #16
 	stp	x25, x26, [x8], #16
 	stp	x27, x28, [x8], #16
 	stp	x29, x30, [x8], #16
-	stp	x9, x10, [x8]
+	stp	x9, x10, [x8], #16
+	str     x11, [x8]
 	mov x8, x1
 	ldp	x19, x20, [x8], #16
 	ldp	x21, x22, [x8], #16
@@ -19,10 +21,11 @@ cpu_switch_task:
 	ldp	x25, x26, [x8], #16
 	ldp	x27, x28, [x8], #16
 	ldp	x29, x30, [x8], #16
-	ldp	x9, x10, [x8]
-	mov	sp, x9
+	ldp	x9, x10, [x8], #16
+	ldr     x11, [x8]
 	msr sp_el0, x9
-	msr spsr_el1, x10
+	mov sp, x10
+	msr spsr_el1, x11
 	msr elr_el1, x30
 
 	dsb sy

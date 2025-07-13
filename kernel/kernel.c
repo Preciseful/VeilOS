@@ -20,7 +20,7 @@ __attribute__((aligned(4096))) void pr0()
     while (1)
     {
         i++;
-        sys_printf("narcissist.\n");
+        sys_printf("gnarly\n");
     }
 }
 
