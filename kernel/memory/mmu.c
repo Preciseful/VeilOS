@@ -108,7 +108,7 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)
     {
-        printf("[MMU warning]: Section already mapped (%x).", va);
+        printf("[MMU warning]: Section already mapped (%x).\n", va);
         return;
     }
 

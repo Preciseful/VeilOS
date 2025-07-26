@@ -1,6 +1,11 @@
 #include "lib/utils.S"
 
 .macro enter_interrupt el
+    mrs x0, sctlr_el1
+	bic x0, x0, #(1 << 0)
+	msr sctlr_el1, x0
+	isb
+
     pushp x0, x1
     pushp x2, x3
     pushp x4, x5
@@ -38,6 +43,10 @@
     popp x4, x5
     popp x2, x3
     popp x0, x1
+
+    orr x0, x0, #(1 << 0)
+    msr sctlr_el1, x0
+    isb
 
     eret
 .endm

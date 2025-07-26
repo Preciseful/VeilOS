@@ -6,8 +6,8 @@ cpu_switch_task:
 	mov x10, sp
 	mrs x9, sp_el0
 	mov x8, x0
-        stp     x19, x20, [x8], #16
-        stp	x21, x22, [x8], #16
+    stp     x19, x20, [x8], #16
+    stp	x21, x22, [x8], #16
 	stp	x23, x24, [x8], #16
 	stp	x25, x26, [x8], #16
 	stp	x27, x28, [x8], #16
