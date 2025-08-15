@@ -189,12 +189,14 @@ unsigned long memory_i;
 
 void mmu_init()
 {
+    // retain the amount of memory allocated in total
     memory_i = 0;
     unsigned long *pgd = temp_malloc(memory_i);
     memory_i++;
     unsigned long *high_pgd = temp_malloc(memory_i);
     memory_i++;
 
+    // make 2 maps: a lower half and a higher half
     for (unsigned long addr = 0; addr <= GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
         if (addr < DEVICE_START)
@@ -209,6 +211,7 @@ void mmu_init()
         }
     }
 
+    // init the regs with both halves
     mmu_init_regs((unsigned long)pgd, (unsigned long)high_pgd);
 }
 
@@ -220,6 +223,8 @@ void finish_higher()
 
     unsigned long *pgd = malloc(PAGE_SIZE);
 
+    // redo ttbr1 with the new persistent memory allocation
+    // rather than the temporary one
     for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
         if (addr < HIGH_VA + DEVICE_START)
@@ -228,6 +233,7 @@ void finish_higher()
             mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_DEVICE, true);
     }
 
+    // make ttbr0 invalid, use only ttbr1
     refresh_ttbr(pgd);
 
     kmain();

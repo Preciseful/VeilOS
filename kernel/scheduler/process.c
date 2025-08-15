@@ -23,6 +23,8 @@ task_t *pcreate(unsigned long pa, unsigned long va)
 
     memset(task->pgd, 0, PAGE_SIZE);
     mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, false);
+    // map as such for lower half
+    // (temporary fix, sys_printf should be implemented into the executable itself)
     mmu_map_page(task->pgd, VIRT_TO_PHYS((unsigned long)&sys_printf), VIRT_TO_PHYS((unsigned long)&sys_printf), MAIR_IDX_NORMAL, false);
 
     add_task(task);

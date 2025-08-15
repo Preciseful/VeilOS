@@ -40,10 +40,12 @@ drop_el1:
 master_core:
     mov	sp, #LOW_MEMORY
 
+    // clear out bss
     adr	x0, bss_begin
 	adr	x1, bss_end
 	sub	x1, x1, x0
 	bl memzero
 
+    // go to boot for MMU
     bl kboot
     b loop

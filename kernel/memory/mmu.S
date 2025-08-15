@@ -28,12 +28,15 @@ mmu_init_regs:
 
     ldr x1, =HIGH_VA
 
+    // set all these variables to higher half
     mrs x0, vbar_el1
     add x0, x0, x1
     msr vbar_el1, x0
 
     mov sp, #LOW_MEMORY
     add sp, sp, x1
+    // x30 = finish_higher address
+    // go to higher half
     add x30, x30, x1
 
     br x30

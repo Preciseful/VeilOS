@@ -53,6 +53,9 @@ void kmain()
 
     scheduler_init();
 
+    // set them to lower half using this hacky technique
+    // (since they are linked as higher half)
+    // (temporary fix, should be linked as lower half and in a separate executable)
     pcreate(VIRT_TO_PHYS((unsigned long)&pr0), VIRT_TO_PHYS((unsigned long)&pr0));
     pcreate(VIRT_TO_PHYS((unsigned long)&pr1), VIRT_TO_PHYS((unsigned long)&pr1));
 
