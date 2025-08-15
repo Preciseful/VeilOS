@@ -4,12 +4,15 @@
 __attribute__((section(".mmmap"))) static mheader_t headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
+extern char bss_begin[];
+extern char bss_end[];
+
 void mm_init()
 {
-    printf("Zeroing the memory...\n");
+    // printf("Zeroing the memory...\n");
     memset(mem_map, 0, PAGING_PAGES);
     memset(headers, 0, PAGING_PAGES);
-    printf("Finished zeroing the memory!\n");
+    // printf("Finished zeroing the memory!\n");
 }
 
 void *get_free_page()
@@ -19,7 +22,7 @@ void *get_free_page()
         if (mem_map[i] == 0)
         {
             mem_map[i] = 1;
-            unsigned long adr = LOW_MEMORY + i * PAGE_SIZE;
+            unsigned long adr = HIGH_VA + LOW_MEMORY + i * PAGE_SIZE;
             return (void *)adr;
         }
     }
@@ -29,7 +32,7 @@ void *get_free_page()
 
 void free_page(unsigned long p)
 {
-    mem_map[(p - LOW_MEMORY) / PAGE_SIZE] = 0;
+    mem_map[(p - LOW_MEMORY - HIGH_VA) / PAGE_SIZE] = 0;
 }
 
 int get_free_header()
@@ -71,7 +74,7 @@ void *malloc(unsigned int size)
 
 void free(void *data)
 {
-    unsigned long adr = ((unsigned long)data - LOW_MEMORY) / PAGE_SIZE;
+    unsigned long adr = ((unsigned long)data - LOW_MEMORY - HIGH_VA) / PAGE_SIZE;
     headers[adr].in_use = false;
 
     for (int i = adr; i < PAGING_PAGES; i++)

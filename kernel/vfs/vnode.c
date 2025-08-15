@@ -9,10 +9,10 @@
 
 vfs_root_t *get_root(const char *path)
 {
-    for (unsigned long i = 0; i < vfs->roots_count; i++)
+    for (unsigned long i = 0; i < get_vfs()->roots_count; i++)
     {
-        if (path[0] == vfs->roots[i].id)
-            return &vfs->roots[i];
+        if (path[0] == get_vfs()->roots[i].id)
+            return &get_vfs()->roots[i];
     }
 
     return 0;

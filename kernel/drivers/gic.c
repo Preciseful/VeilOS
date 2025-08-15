@@ -6,7 +6,7 @@ void gic_allow(unsigned int interrupt, unsigned int core)
 {
     unsigned int regi = interrupt / 32;
     unsigned int shift = interrupt % 32;
-    unsigned int addr = GICD_ENABLE_IRQ_BASE + regi * 4;
+    unsigned long addr = GICD_ENABLE_IRQ_BASE + regi * 4;
     unsigned int val = mmio_read(addr);
     mmio_write(addr, val | (1 << shift));
 

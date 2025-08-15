@@ -6,6 +6,11 @@ task_t default_task = {0};
 task_t *scheduler_current;
 bool stop = true;
 
+void printx(unsigned long x)
+{
+    printf("x: %lu\n", x);
+}
+
 void add_task(task_t *task)
 {
     if (!default_task.next)
@@ -33,7 +38,7 @@ void switch_task(task_t *next)
     scheduler_current = next;
 
     stop = false;
-    cpu_switch_task(last, next, next->pgd);
+    cpu_switch_task(last, next, next->pgd, 0);
 }
 
 void scheduler_init()
@@ -76,5 +81,5 @@ void scheduler_tick(unsigned long *stack)
     task_t *last = scheduler_current;
     scheduler_current = next;
 
-    cpu_switch_task(last, next, next->pgd);
+    cpu_switch_task(last, next, next->pgd, stack);
 }

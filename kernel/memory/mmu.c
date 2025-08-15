@@ -2,6 +2,7 @@
 #include <memory/memory.h>
 #include <boot/base.h>
 #include <lib/printf.h>
+#include <drivers/uart.h>
 
 #define PAGE_ENTRIES 512
 
@@ -75,25 +76,25 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        table[l1_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
+        table[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l1 = (unsigned long *)(table[l1_index] & PAGE_MASK);
+    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((table[l1_index] & PAGE_MASK));
 
     if (!(l1[l2_index] & 1))
     {
         unsigned long *l2 = malloc(PAGE_SIZE);
         memset(l2, 0, PAGE_SIZE);
-        l1[l2_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
+        l1[l2_index] = (VIRT_TO_PHYS((unsigned long)l2) & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l2 = (unsigned long *)(l1[l2_index] & PAGE_MASK);
+    unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
 
     if (!(l2[l3_index] & 1))
     {
         unsigned long *l3 = malloc(PAGE_SIZE);
         memset(l3, 0, PAGE_SIZE);
-        l2[l3_index] = ((unsigned long)l3 & PAGE_MASK) | PD_TABLE;
+        l2[l3_index] = (VIRT_TO_PHYS((unsigned long)l3) & PAGE_MASK) | PD_TABLE;
     }
     else if ((l2[l3_index] & 0b11) == PD_BLOCK)
     {
@@ -101,7 +102,7 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
         return;
     }
 
-    unsigned long *l3 = (unsigned long *)(l2[l3_index] & PAGE_MASK);
+    unsigned long *l3 = (unsigned long *)PHYS_TO_VIRT((l2[l3_index] & PAGE_MASK));
     unsigned char perm = kernel ? 0b00 : 0b01;
     unsigned char uxn = kernel ? 1 : 0;
 
@@ -125,6 +126,43 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
+        pgd[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
+    }
+
+    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
+
+    if (!(l1[l2_index] & 1))
+    {
+        unsigned long *l2 = malloc(PAGE_SIZE);
+        memset(l2, 0, PAGE_SIZE);
+        l1[l2_index] = (VIRT_TO_PHYS((unsigned long)l2) & PAGE_MASK) | PD_TABLE;
+    }
+
+    unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
+    unsigned char perm = kernel ? 0b00 : 0b01;
+
+    unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
+
+    l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
+}
+
+void *temp_malloc(unsigned long i)
+{
+    unsigned long adr = LOW_MEMORY + i * PAGE_SIZE;
+    return (void *)adr;
+}
+
+unsigned long mmu_map_temp_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, bool kernel, unsigned long malloc_i)
+{
+    unsigned long l1_index = (va >> 39) & 0x1FF;
+    unsigned long l2_index = (va >> 30) & 0x1FF;
+    unsigned long l3_index = (va >> 21) & 0x1FF;
+
+    if (!(pgd[l1_index] & 1))
+    {
+        unsigned long *l1 = temp_malloc(malloc_i);
+        malloc_i++;
+        memset(l1, 0, PAGE_SIZE);
         pgd[l1_index] = ((unsigned long)l1 & PAGE_MASK) | PD_TABLE;
     }
 
@@ -132,7 +170,8 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
 
     if (!(l1[l2_index] & 1))
     {
-        unsigned long *l2 = malloc(PAGE_SIZE);
+        unsigned long *l2 = temp_malloc(malloc_i);
+        malloc_i++;
         memset(l2, 0, PAGE_SIZE);
         l1[l2_index] = ((unsigned long)l2 & PAGE_MASK) | PD_TABLE;
     }
@@ -143,19 +182,53 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
     unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
 
     l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
+    return malloc_i;
 }
+
+unsigned long memory_i;
 
 void mmu_init()
 {
-    unsigned long *pgd = malloc(PAGE_SIZE);
+    memory_i = 0;
+    unsigned long *pgd = temp_malloc(memory_i);
+    memory_i++;
+    unsigned long *high_pgd = temp_malloc(memory_i);
+    memory_i++;
 
     for (unsigned long addr = 0; addr <= GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
         if (addr < DEVICE_START)
-            mmu_map_block(pgd, addr, addr, MAIR_IDX_NORMAL, true);
+        {
+            memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_NORMAL, true, memory_i);
+            memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_NORMAL, true, memory_i);
+        }
         else
-            mmu_map_block(pgd, addr, addr, MAIR_IDX_DEVICE, true);
+        {
+            memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_DEVICE, true, memory_i);
+            memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_DEVICE, true, memory_i);
+        }
     }
 
-    mmu_init_regs((unsigned long)pgd);
+    mmu_init_regs((unsigned long)pgd, (unsigned long)high_pgd);
+}
+
+extern void kmain();
+
+void finish_higher()
+{
+    mm_init();
+
+    unsigned long *pgd = malloc(PAGE_SIZE);
+
+    for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + GRANULE_1GB * 4; addr += GRANULE_2MB)
+    {
+        if (addr < HIGH_VA + DEVICE_START)
+            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_NORMAL, true);
+        else
+            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_DEVICE, true);
+    }
+
+    refresh_ttbr(pgd);
+
+    kmain();
 }

@@ -23,6 +23,7 @@ typedef struct task_regs
     unsigned long sp;
     unsigned long sp_el1;
     unsigned long spsr;
+    unsigned long elr;
 } task_regs_t;
 
 typedef struct task
@@ -38,4 +39,4 @@ void scheduler_init();
 void schedule();
 void add_task(task_t *task);
 void scheduler_tick(unsigned long *stack);
-extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *table);
+extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *table, unsigned long *sp);

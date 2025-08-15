@@ -2,9 +2,9 @@ RPI_PATH=/media/$(USER)/bootfs
 
 ARMGNU ?= aarch64-none-elf
 
-COPS = -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
+COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
-ASMOPS = -Ikernel
+ASMOPS = -Ikernel -fPIE
 
 BUILD_DIR = build/bin
 SRC_DIR = kernel
@@ -47,6 +47,6 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
 kernel8.img: linker.ld $(OBJ_FILES)
-	@$(ARMGNU)-ld -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 	./go_rpi.sh $(RPI_PATH)

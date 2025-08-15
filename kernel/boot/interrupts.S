@@ -1,62 +1,53 @@
 #include "lib/utils.S"
 
 .macro enter_interrupt el
-    mrs x0, sctlr_el1
-	bic x0, x0, #(1 << 0)
-	msr sctlr_el1, x0
-	isb
-
-    pushp x0, x1
-    pushp x2, x3
-    pushp x4, x5
-    pushp x6, x7
-    pushp x8, x9
-    pushp x10, x11
-    pushp x12, x13
-    pushp x14, x15
-    pushp x16, x17
-    pushp x18, x19
-    pushp x20, x21
-    pushp x22, x23
-    pushp x24, x25
-    pushp x26, x27
-    pushp x28, x29
-    mrs x28, elr_el1
     pushp x30, x28
+    mrs x28, elr_el1
+    pushp x28, x29
+    pushp x26, x27
+    pushp x24, x25
+    pushp x22, x23
+    pushp x20, x21
+    pushp x18, x19
+    pushp x16, x17
+    pushp x14, x15
+    pushp x12, x13
+    pushp x10, x11
+    pushp x8, x9
+    pushp x6, x7
+    pushp x4, x5
+    pushp x2, x3
+    pushp x0, x1
 .endm
 
 .macro exit_interrupt el
-    popp x30, x28
-    msr elr_el1, x28
-    popp x28, x29
-    popp x26, x27
-    popp x24, x25
-    popp x22, x23
-    popp x20, x21
-    popp x18, x19
-    popp x16, x17
-    popp x14, x15
-    popp x12, x13
-    popp x10, x11
-    popp x8, x9
-    popp x6, x7
-    popp x4, x5
-    popp x2, x3
     popp x0, x1
-
-    orr x0, x0, #(1 << 0)
-    msr sctlr_el1, x0
-    isb
+    popp x2, x3
+    popp x4, x5
+    popp x6, x7
+    popp x8, x9
+    popp x10, x11
+    popp x12, x13
+    popp x14, x15
+    popp x16, x17
+    popp x18, x19
+    popp x20, x21
+    popp x22, x23
+    popp x24, x25
+    popp x26, x27
+    popp x28, x29
+    msr elr_el1, x28
+    popp x30, x28
 
     eret
 .endm
-
 
 invalid_hang:
     b invalid_hang
 
 .macro vinvalid type, el
     enter_interrupt \el
+    mov x4, sp
     mov x0, #\type
     mrs x1, esr_el1
     mrs x2, elr_el1
@@ -64,7 +55,9 @@ invalid_hang:
 
     bl handle_vinvalid
 
-    b invalid_hang
+    cmp x0, #0
+    beq invalid_hang
+    exit_interrupt \el
 .endm
 
 .align 12
@@ -76,80 +69,97 @@ el1_vectors:
 // ------------------------------------------------------------
 
     .align 7
-    sync_current_el_sp0:
-        vinvalid 0, 1
+    b sync_current_el_sp0
 
 	.align 7
-    irq_current_el_sp0:
-        vinvalid 1, 1
+    b irq_current_el_sp0
 
     .align 7
-    fiq_current_el_sp0:
-        vinvalid 2, 1
+    b fiq_current_el_sp0
 
     .align 7
-    serror_current_el_sp0:
-        vinvalid 3, 1
+    b serror_current_el_sp0
 
     // ------------------------------------------------------------
     // Current EL with SPx
     // ------------------------------------------------------------
 
     .align 7
-    sync_current_el_spx:
-        vinvalid 4, 1
+    b sync_current_el_spx
 
     .align 7
-    irq_current_el_spx:
-        b irq_el1x
+    b irq_current_el_spx
 
     .align 7
-    fiq_current_el_spx:
-        vinvalid 6, 1
+    b fiq_current_el_spx
 
     .align 7
-    serror_current_el_spx:
-        vinvalid 7, 1
+    b serror_current_el_spx
 
     // ------------------------------------------------------------
     // Lower EL using AArch64
     // ------------------------------------------------------------
 
     .align 7
-    sync_lower_el_aarch64:
-        vinvalid 8, 0
+    b sync_lower_el_aarch64
 
     .align 7
-    irq_lower_el_aarch64:
-        b irq_el0x
+    b irq_lower_el_aarch64
 
     .align 7
-    fiq_lower_el_aarch64:
-        vinvalid 10, 0
+    b fiq_lower_el_aarch64
 
     .align 7
-    serror_lower_el_aarch64:
-        vinvalid 11, 0
+    b serror_lower_el_aarch64
 
     // ------------------------------------------------------------
     // Lower EL using AArch32
     // ------------------------------------------------------------
 
     .align 7
-    sync_lower_el_aarch32:
-        vinvalid 12, 0
+    b sync_lower_el_aarch32
 
     .align 7
-    irq_lower_el_aarch32:
-        vinvalid 13, 0
+    b irq_lower_el_aarch32
 
     .align 7
-    fiq_lower_el_aarch32:
-        vinvalid 14, 0
+    b fiq_lower_el_aarch32
 
     .align 7
-    serror_lower_el_aarch32:
-        vinvalid 15, 0
+    b serror_lower_el_aarch32
+
+sync_current_el_sp0:
+    vinvalid 0, 1
+irq_current_el_sp0:
+    vinvalid 1, 1
+fiq_current_el_sp0:
+    vinvalid 2, 1
+serror_current_el_sp0:
+    vinvalid 3, 1
+sync_current_el_spx:
+    vinvalid 4, 1
+irq_current_el_spx:
+    b irq_el1x
+fiq_current_el_spx:
+    vinvalid 6, 1
+serror_current_el_spx:
+    vinvalid 7, 1
+sync_lower_el_aarch64:
+    vinvalid 8, 0
+irq_lower_el_aarch64:
+    b irq_el0x
+fiq_lower_el_aarch64:
+    vinvalid 10, 0
+serror_lower_el_aarch64:
+    vinvalid 11, 0
+sync_lower_el_aarch32:
+    vinvalid 12, 0
+irq_lower_el_aarch32:
+    vinvalid 13, 0
+fiq_lower_el_aarch32:
+    vinvalid 14, 0
+serror_lower_el_aarch32:
+    vinvalid 15, 0
 
 
 irq_el1x:
@@ -179,8 +189,3 @@ irq_enable:
 irq_disable:
     msr daifset, #2
     ret
-
-.global ret_to_user
-ret_to_user:
-	bl irq_disable
-	exit_interrupt 0

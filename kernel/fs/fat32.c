@@ -587,6 +587,7 @@ unsigned long get_fatentries(fatfs_t *fs, unsigned int cluster, fatfs_node_t **b
 
         free(buf);
         cluster = next_cluster(fs, cluster);
+
         if (cluster == 0)
         {
             *bnodes = nodes;

@@ -27,7 +27,7 @@ drop_el1:
 
 	ldr	x0, =SPSR_VALUE
 	msr	spsr_el3, x0
-    
+
     mrs x0, CPACR_EL1
     orr x0, x0, #(3 << 20)
     msr CPACR_EL1, x0
@@ -45,5 +45,5 @@ master_core:
 	sub	x1, x1, x0
 	bl memzero
 
-    bl kmain
+    bl kboot
     b loop

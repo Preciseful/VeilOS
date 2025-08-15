@@ -20,7 +20,7 @@ __attribute__((aligned(4096))) void pr0()
     while (1)
     {
         i++;
-        sys_printf("gnarly\n");
+        sys_printf("0");
     }
 }
 
@@ -28,21 +28,24 @@ __attribute__((aligned(4096))) void pr1()
 {
     while (1)
     {
-        printf("1");
+        sys_printf("1");
     }
+}
+
+void kboot()
+{
+    mmu_init();
 }
 
 void kmain()
 {
     uart_init();
-    uart_puts("health 2021\n");
-    mm_init();
-    mmu_init();
 
     int x = 2021;
     printf("how to move on from %d;\n", x);
 
     set_vtable();
+
     timer_init();
     gic_allow(30, 0);
     gic_allow(153, 0);
@@ -50,10 +53,11 @@ void kmain()
 
     scheduler_init();
 
-    pcreate((unsigned long)&pr0, 0x0, false);
-    pcreate((unsigned long)&pr1, 0x0, false);
+    pcreate(VIRT_TO_PHYS((unsigned long)&pr0), VIRT_TO_PHYS((unsigned long)&pr0));
+    pcreate(VIRT_TO_PHYS((unsigned long)&pr1), VIRT_TO_PHYS((unsigned long)&pr1));
 
     emmc_init();
+
     fatfs_t *fatfs = fatfs_init();
     fatfs_node_t *nodes;
     unsigned long nodes_count = get_fatentries(fatfs, fatfs->root_cluster, &nodes);
@@ -68,8 +72,11 @@ void kmain()
         }
     }
 
+    printf("read all fat32\n");
     vfs_init();
+    printf("vfs init\n");
     add_root(fatfs, FAT32, '/');
+    printf("root\n");
     vnode_t *vnode = fopen("/modules/Luna.elf");
     printf("opened: %s\n", ((fatfs_node_t *)vnode->data)->name);
 

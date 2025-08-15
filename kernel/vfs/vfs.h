@@ -16,17 +16,12 @@ typedef struct vfs_root
     vnode_t **open_nodes;
 } vfs_root_t;
 
-// we do the later include and the early typedef to avoid circular dependency errors
-// this sucks
-#include <vfs/vnode.h>
-
 typedef struct virtual_fs
 {
     unsigned long roots_count, roots_capacity;
     vfs_root_t *roots;
 } virtual_fs_t;
 
-extern virtual_fs_t *vfs;
-
 void vfs_init();
 vfs_root_t *add_root(void *fs, unsigned int fs_type, char id);
+virtual_fs_t *get_vfs();

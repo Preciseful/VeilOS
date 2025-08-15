@@ -1,8 +1,15 @@
 #include <vfs/vfs.h>
 #include <memory/memory.h>
 #include <fs/fat32.h>
+#include <lib/printf.h>
+#include <vfs/vnode.h>
 
-virtual_fs_t *vfs;
+static virtual_fs_t *vfs = 0;
+
+virtual_fs_t *get_vfs()
+{
+    return vfs;
+}
 
 void vfs_init()
 {

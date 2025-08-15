@@ -1,6 +1,5 @@
 #include <drivers/uart.h>
 #include <drivers/gpio.h>
-#include <boot/base.h>
 #include <lib/printf.h>
 
 #define UART0_BASE (PERIPHERAL_BASE + 0x201000)
