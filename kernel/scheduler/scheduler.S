@@ -1,13 +1,21 @@
 #include "lib/utils.S"
 
+.global set_task_ttbr
+set_task_ttbr:
+	msr ttbr0_el1, x0
+    tlbi vmalle1is
+	dsb ish
+	isb
+	ret
+
 .global cpu_switch_task
 cpu_switch_task:
 	// check stack and if interrupt should be restored
-	cmp x3, #0
+	cmp x2, #0
 	beq 1f
 
-	ldp	x12, x29, [x3, #224]
-	ldp x30, x28, [x3, #240]
+	ldp	x12, x29, [x2, #224]
+	ldp x30, x28, [x2, #240]
 
 1:	mov x8, x0
 
@@ -34,11 +42,6 @@ cpu_switch_task:
 	ldp	x29, x30, [x8], #16
 	ldp	x9, x10, [x8], #16
 	ldp x11, x12, [x8]
-
-	msr ttbr0_el1, x2
-    tlbi vmalle1is
-	dsb ish
-	isb
 
 	msr sp_el0, x9
 	mov x0, x9

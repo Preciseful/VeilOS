@@ -33,10 +33,12 @@ typedef struct task
     long time;
     struct task *next;
     unsigned long *pgd;
+    unsigned long phys_sp;
 } task_t;
 
 void scheduler_init();
 void schedule();
 void add_task(task_t *task);
 void scheduler_tick(unsigned long *stack);
-extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *table, unsigned long *sp);
+extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *sp);
+extern void set_task_ttbr(unsigned long *pgd);

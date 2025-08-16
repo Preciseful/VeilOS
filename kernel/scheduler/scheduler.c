@@ -29,7 +29,7 @@ void add_task(task_t *task)
     }
 }
 
-void switch_task(task_t *next)
+void switch_task(task_t *next, unsigned long *stack)
 {
     if (scheduler_current == next)
         return;
@@ -37,8 +37,9 @@ void switch_task(task_t *next)
     task_t *last = scheduler_current;
     scheduler_current = next;
 
+    set_task_ttbr(next->pgd);
     stop = false;
-    cpu_switch_task(last, next, next->pgd, 0);
+    cpu_switch_task(last, next, stack);
 }
 
 void scheduler_init()
@@ -54,6 +55,9 @@ task_t *get_next_task()
     do
     {
         current = current->next ? current->next : default_task.next;
+        if (current == 0)
+            return 0;
+
         if (current->flags & ACTIVE_TASK)
             break;
     } while (current != start);
@@ -64,7 +68,8 @@ task_t *get_next_task()
 void schedule()
 {
     task_t *current = get_next_task();
-    switch_task(current);
+    if (current)
+        switch_task(current, 0);
 }
 
 void scheduler_tick(unsigned long *stack)
@@ -78,8 +83,5 @@ void scheduler_tick(unsigned long *stack)
 
     scheduler_current->time = DEFAULT_TIME;
     task_t *next = get_next_task();
-    task_t *last = scheduler_current;
-    scheduler_current = next;
-
-    cpu_switch_task(last, next, next->pgd, stack);
+    switch_task(next, stack);
 }

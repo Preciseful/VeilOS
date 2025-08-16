@@ -17,15 +17,17 @@ task_t *pcreate(unsigned long pa, unsigned long va)
     task->regs.x30 = va;
     task->regs.elr = va;
     task->regs.spsr = EL0T_M;
-    task->regs.sp = va + PAGE_SIZE;
+    task->regs.sp = GRANULE_1GB * 2 + PAGE_SIZE;
     task->regs.sp_el1 = (unsigned long)malloc(PAGE_SIZE_BYTES) + PAGE_SIZE;
     task->pgd = (unsigned long *)malloc(PAGE_SIZE);
+    task->phys_sp = (unsigned long)malloc(PAGE_SIZE_BYTES);
 
     memset(task->pgd, 0, PAGE_SIZE);
     mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, false);
     // map as such for lower half
     // (temporary fix, sys_printf should be implemented into the executable itself)
     mmu_map_page(task->pgd, VIRT_TO_PHYS((unsigned long)&sys_printf), VIRT_TO_PHYS((unsigned long)&sys_printf), MAIR_IDX_NORMAL, false);
+    mmu_map_page(task->pgd, task->regs.sp - PAGE_SIZE, VIRT_TO_PHYS(task->phys_sp), MAIR_IDX_NORMAL, false);
 
     add_task(task);
     return task;
