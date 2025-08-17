@@ -13,22 +13,15 @@ void make_elf_process(const char *path)
     fseek(vnode, 0, SEEK_SET);
     fread(&eheader, sizeof(eheader), vnode);
 
-    for (unsigned long i = 0; i < sizeof(Elf64_Ehdr); i++)
-    {
-        printf("%lx ", ((unsigned char *)&eheader)[i]);
-    }
-
-    printf("\n");
-
     if (memcmp(eheader.e_ident, ELFMAG, 4) != 0)
     {
-        printf("ELF file provided is not of the corresponding type.\n");
+        LOG("ELF file provided is not of the corresponding type.\n");
         return;
     }
 
     if (eheader.e_machine != EM_AARCH64)
     {
-        printf("ELF file is not of type AARCH64.\n");
+        LOG("ELF file is not of type AARCH64.\n");
         return;
     }
 

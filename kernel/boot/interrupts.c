@@ -17,7 +17,7 @@ void handle_svc(unsigned long *sp)
         break;
 
     default:
-        printf("SVC code #%lu does not exist.\n", code);
+        LOG("SVC code #%lu does not exist.\n", code);
         break;
     }
 }
@@ -32,12 +32,12 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
         return 1;
     }
 
-    printf("\ninterrupt encountered:"
-           "\n\ttype: %lu"
-           "\n\tesr: %lu"
-           "\n\telr: %lx (%lx)"
-           "\n\tfar: %lx (%lx)",
-           type, esr, elr, elr - 0x80000, far, far - 0x80000);
+    LOG("\ninterrupt encountered:"
+        "\n\ttype: %lu"
+        "\n\tesr: %lu"
+        "\n\telr: %lx (%lx)"
+        "\n\tfar: %lx (%lx)",
+        type, esr, elr, elr - 0x80000, far, far - 0x80000);
     return 0;
 }
 
@@ -50,7 +50,7 @@ void handle_irq(unsigned long *stack)
     {
     // generic timer
     case 30:
-        printf(".");
+        // printf(".");
         refresh_cntp_tval(SYS_FREQ);
         mmio_write(GICC_EOIR, iar);
         scheduler_tick(stack);
@@ -58,12 +58,12 @@ void handle_irq(unsigned long *stack)
 
     // uart0
     case 153:
-        printf("got: %c\n", uart_character());
+        LOG("got: %c\n", uart_character());
         mmio_write(GICC_EOIR, iar);
         break;
 
     default:
-        printf("Unknown IRQ %u\n", id);
+        LOG("Unknown IRQ %u\n", id);
         mmio_write(GICC_EOIR, iar);
         break;
     }

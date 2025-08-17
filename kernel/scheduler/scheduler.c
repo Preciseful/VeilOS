@@ -9,7 +9,7 @@ bool stop = true;
 
 void printx(unsigned long x)
 {
-    printf("x: %lu\n", x);
+    LOG("x: %lu\n", x);
 }
 
 void add_task(task_t *task)

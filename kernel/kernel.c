@@ -23,9 +23,6 @@ void kmain()
 {
     uart_init();
 
-    int x = 2021;
-    printf("how to move on from %d;\n", x);
-
     set_vtable();
 
     timer_init();
@@ -43,19 +40,19 @@ void kmain()
 
     for (unsigned long i = 0; i < nodes_count; i++)
     {
-        printf("file: %s\n", nodes[i].name);
+        LOG("file: %s\n", nodes[i].name);
         if (strcmp(nodes[i].name, "config.txt") == 0)
         {
             unsigned char *data = read_fatnode(nodes[i]);
-            printf("%s\n", data);
+            LOG("%s\n", data);
         }
     }
 
-    printf("read all fat32\n");
+    LOG("read all fat32\n");
     vfs_init();
-    printf("vfs init\n");
+    LOG("vfs init\n");
     add_root(fatfs, FAT32, '/');
-    printf("root\n");
+    LOG("root\n");
 
     make_elf_process("/modules/Luna.elf");
 

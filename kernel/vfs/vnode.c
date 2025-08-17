@@ -103,19 +103,19 @@ void *entry_from_path(const char *path, vfs_root_t *root)
 
     if (path_size == 0)
     {
-        printf("Path not specified.\n");
+        LOG("Path not specified.\n");
         return 0;
     }
 
     if (path_size == 1)
     {
-        printf("Cannot open root.\n");
+        LOG("Cannot open root.\n");
         return 0;
     }
 
     if (path[path_size - 1] == '/')
     {
-        printf("Cannot open directories.\n");
+        LOG("Cannot open directories.\n");
         return 0;
     }
 
@@ -139,23 +139,23 @@ void *entry_from_path(const char *path, vfs_root_t *root)
 
         if (!found_node)
         {
-            printf("Cannot find: \"");
+            LOG("Cannot find: \"");
             for (unsigned long i = 0; i < entry_path_size; i++)
-                printf("%c", path[start + i]);
-            printf("\"\n");
+                LOG("%c", path[start + i]);
+            LOG("\"\n");
             free(node);
             return 0;
         }
 
         if (!finishing && !is_directory(node, root->fs_type))
         {
-            printf("File used as a directory.\n");
+            LOG("File used as a directory.\n");
             return 0;
         }
 
         if (finishing && is_directory(node, root->fs_type))
         {
-            printf("Cannot open directories.\n");
+            LOG("Cannot open directories.\n");
             return 0;
         }
 
@@ -183,7 +183,7 @@ vnode_t *fopen(const char *path)
     node->root = root;
     if (check_open_vnode(root, node))
     {
-        printf("File is already open.\n");
+        LOG("File is already open.\n");
         return 0;
     }
 

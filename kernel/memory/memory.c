@@ -9,10 +9,10 @@ extern char bss_end[];
 
 void mm_init()
 {
-    // printf("Zeroing the memory...\n");
+    // LOG("Zeroing the memory...\n");
     memset(mem_map, 0, PAGING_PAGES);
     memset(headers, 0, PAGING_PAGES);
-    // printf("Finished zeroing the memory!\n");
+    // LOG("Finished zeroing the memory!\n");
 }
 
 void *get_free_page()
@@ -51,7 +51,7 @@ void *malloc(unsigned int size)
     int headerI = get_free_header();
     if (headerI == -1)
     {
-        printf("No available headers.\n");
+        LOG("No available headers.\n");
         return 0;
     }
 

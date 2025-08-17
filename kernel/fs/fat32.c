@@ -125,27 +125,27 @@ fat32_bs_t *get_fat(unsigned long offset)
 
     if (read < 0)
     {
-        printf("Read failed.\n");
+        LOG("Read failed.\n");
         return 0;
     }
 
     if (read != 512)
     {
-        printf("Read only %d bytes.\n", read);
+        LOG("Read only %d bytes.\n", read);
         return 0;
     }
 
     fat32_bs_t *bs = (fat32_bs_t *)buf;
     if (bs->bootjmp[0] != 0xeb)
     {
-        printf("Not a valid FAT filesystem.\n", bs->bootjmp[0]);
+        LOG("Not a valid FAT filesystem.\n", bs->bootjmp[0]);
         return 0;
     }
 
     unsigned int root_dir_sectors = (bs->root_entry_count * 32 + bs->bytes_per_sector - 1) / bs->bytes_per_sector;
     if (root_dir_sectors != 0)
     {
-        printf("Root dir sectors isnt 0. FAT32 requires this to be 0.\n");
+        LOG("Root dir sectors isnt 0. FAT32 requires this to be 0.\n");
         return 0;
     }
 
@@ -162,7 +162,7 @@ fatfs_t *fatfs_init()
 
     if (mbr.bootSignature != BOOT_SIGNATURE)
     {
-        printf("Bad MBR signature.\n");
+        LOG("Bad MBR signature.\n");
         return 0;
     }
 
@@ -171,7 +171,7 @@ fatfs_t *fatfs_init()
         bs = get_fat((unsigned long)mbr.partitions[i].first_lba_sector * 512);
         if (bs)
         {
-            printf("Found FAT32 on partition %d.\n", i + 1);
+            LOG("Found FAT32 on partition %d.\n", i + 1);
             break;
         }
     }
@@ -493,7 +493,7 @@ fatfs_node_t create_fatnode(fatfs_t *fs, unsigned int parent_cluster, const char
 
             emmc_seek(cluster_sector * 512);
             emmc_write(buf, entries_bytes);
-            printf("Created file %s.\n", name);
+            LOG("Created file %s.\n", name);
 
             fatfs_node_t node;
             node.cluster = cluster;
