@@ -35,9 +35,9 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
     LOG("\ninterrupt encountered:"
         "\n\ttype: %lu"
         "\n\tesr: %lu"
-        "\n\telr: %lx (%lx)"
-        "\n\tfar: %lx (%lx)",
-        type, esr, elr, elr - 0x80000, far, far - 0x80000);
+        "\n\telr: 0x%lx"
+        "\n\tfar: 0x%lx",
+        type, esr, elr, far);
     return 0;
 }
 

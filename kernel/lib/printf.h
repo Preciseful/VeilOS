@@ -90,7 +90,12 @@ regs Kusti, 23.10.2004
 #ifndef __TFP_PRINTF__
 #define __TFP_PRINTF__
 
-#define LOG(x, ...) tfp_printf("[%s] " x, __func__, ##__VA_ARGS__)
+#pragma GCC diagnostic ignored "-Wmultistatement-macros"
+
+#define PRINTF_MAGIC_PADDING "                 "
+#define LOG(x, ...)                                                                                 \
+    tfp_printf("[%s]%s" x, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1), ##__VA_ARGS__); \
+    _Static_assert(sizeof(__func__) - 1 <= sizeof(PRINTF_MAGIC_PADDING), "Function name too long for printing.");
 
 #include <stdarg.h>
 

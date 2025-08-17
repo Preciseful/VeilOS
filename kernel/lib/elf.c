@@ -25,7 +25,7 @@ void make_elf_process(const char *path)
         return;
     }
 
-    task_t *task = pcreate(eheader.e_entry, 0);
+    task_t *task = pcreate(path, eheader.e_entry, 0);
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {

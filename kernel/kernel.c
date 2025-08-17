@@ -22,6 +22,8 @@ void kboot()
 void kmain()
 {
     uart_init();
+    printf("\n----- VeilOS -----\n");
+    LOG("UART initialized.\n");
 
     set_vtable();
 
@@ -30,29 +32,18 @@ void kmain()
     gic_allow(153, 0);
     irq_enable();
 
+    LOG("Timer enabled.\n");
+
     scheduler_init();
+    LOG("Scheduler initialized.\n");
 
     emmc_init();
 
     fatfs_t *fatfs = fatfs_init();
-    fatfs_node_t *nodes;
-    unsigned long nodes_count = get_fatentries(fatfs, fatfs->root_cluster, &nodes);
-
-    for (unsigned long i = 0; i < nodes_count; i++)
-    {
-        LOG("file: %s\n", nodes[i].name);
-        if (strcmp(nodes[i].name, "config.txt") == 0)
-        {
-            unsigned char *data = read_fatnode(nodes[i]);
-            LOG("%s\n", data);
-        }
-    }
-
-    LOG("read all fat32\n");
     vfs_init();
-    LOG("vfs init\n");
     add_root(fatfs, FAT32, '/');
-    LOG("root\n");
+
+    LOG("VFS initialized with root FAT32.\n");
 
     make_elf_process("/modules/Luna.elf");
 

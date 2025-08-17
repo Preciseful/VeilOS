@@ -40,7 +40,7 @@ void switch_task(task_t *next, unsigned long *stack)
 
     set_task_ttbr(next->pgd);
     stop = false;
-
+    LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->va);
     cpu_switch_task(last, next, stack);
 }
 

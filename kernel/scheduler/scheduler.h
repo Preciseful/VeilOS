@@ -36,15 +36,16 @@ typedef struct task_mapping
 typedef struct task
 {
     task_regs_t regs;
+    const char *name;
     unsigned long flags;
-    long time;
-    struct task *next;
     unsigned long *pgd;
     unsigned long phys_sp;
     unsigned long va;
     unsigned long pa;
     task_mapping_t *mappings;
     unsigned long mappings_length;
+    long time;
+    struct task *next;
 } task_t;
 
 void scheduler_init();

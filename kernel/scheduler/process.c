@@ -30,9 +30,10 @@ void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *c
         free(old_mappings);
 }
 
-task_t *pcreate(unsigned long va, void *code)
+task_t *pcreate(const char *name, unsigned long va, void *code)
 {
     task_t *task = malloc(sizeof(task_t));
+    task->name = name;
     task->flags = ACTIVE_TASK;
     task->time = DEFAULT_TIME;
     task->va = va;
