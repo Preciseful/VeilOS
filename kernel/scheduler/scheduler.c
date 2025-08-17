@@ -1,6 +1,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/printf.h>
 #include <memory/mmu.h>
+#include <scheduler/process.h>
 
 task_t default_task = {0};
 task_t *scheduler_current;
@@ -39,6 +40,7 @@ void switch_task(task_t *next, unsigned long *stack)
 
     set_task_ttbr(next->pgd);
     stop = false;
+
     cpu_switch_task(last, next, stack);
 }
 

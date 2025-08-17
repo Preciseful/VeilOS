@@ -17,14 +17,15 @@ enum FSeek_Types
 
 typedef struct vnode
 {
-    char *path;
+    const char *path;
     vfs_root_t *root;
     enum VNode_Types type;
     unsigned long seek;
     void *data;
 } vnode_t;
 
-vnode_t *fopen(char *path);
+vnode_t *fopen(const char *path);
+void fclose(vnode_t *node);
 void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type);
 unsigned long fread(void *buf, unsigned long size, vnode_t *node);
 void fwrite(void *buf, unsigned long size, vnode_t *node);

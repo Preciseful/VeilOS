@@ -65,7 +65,7 @@ void debug_mmu_address(unsigned long *pgd, unsigned long va)
     return;
 }
 
-void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, bool kernel)
+void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -103,10 +103,14 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     }
 
     unsigned long *l3 = (unsigned long *)PHYS_TO_VIRT((l2[l3_index] & PAGE_MASK));
-    unsigned char perm = kernel ? 0b00 : 0b01;
-    unsigned char uxn = kernel ? 1 : 0;
 
-    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
+    bool uxn = !((flags & MMU_USER_EXEC) >> 2);
+    bool pxn = !uxn;
+    unsigned long perm = flags & 0b11;
+
+    printf("perm: %lx\n", perm);
+
+    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)
     {
         printf("[MMU warning]: Section already mapped (%x).\n", va);
@@ -116,7 +120,7 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
-void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, bool kernel)
+void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -139,9 +143,12 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
     }
 
     unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
-    unsigned char perm = kernel ? 0b00 : 0b01;
 
-    unsigned long attr = ((unsigned long)1 << 54) | ((unsigned long)0 << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
+    bool uxn = !((flags & MMU_USER_EXEC) >> 2);
+    bool pxn = !uxn;
+    unsigned long perm = flags & 0b11;
+
+    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
 
     l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
 }
@@ -228,9 +235,9 @@ void finish_higher()
     for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
         if (addr < HIGH_VA + DEVICE_START)
-            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_NORMAL, true);
+            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_NORMAL, MMU_NORW);
         else
-            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_DEVICE, true);
+            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_DEVICE, MMU_NORW);
     }
 
     // make ttbr0 invalid, use only ttbr1

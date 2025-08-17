@@ -26,6 +26,13 @@ typedef struct task_regs
     unsigned long elr;
 } task_regs_t;
 
+typedef struct task_mapping
+{
+    void *code;
+    unsigned long va;
+    unsigned long pa;
+} task_mapping_t;
+
 typedef struct task
 {
     task_regs_t regs;
@@ -34,6 +41,10 @@ typedef struct task
     struct task *next;
     unsigned long *pgd;
     unsigned long phys_sp;
+    unsigned long va;
+    unsigned long pa;
+    task_mapping_t *mappings;
+    unsigned long mappings_length;
 } task_t;
 
 void scheduler_init();

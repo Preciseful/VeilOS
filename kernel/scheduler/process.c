@@ -1,6 +1,5 @@
 #include <scheduler/process.h>
 #include <memory/memory.h>
-#include <memory/mmu.h>
 #include <lib/printf.h>
 #include <syscall/syscall.h>
 
@@ -9,11 +8,34 @@
 
 extern unsigned char el1_vectors[];
 
-task_t *pcreate(unsigned long pa, unsigned long va)
+void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *code, unsigned long code_len)
+{
+    unsigned long pa = VIRT_TO_PHYS((unsigned long)code);
+
+    mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, flags);
+
+    task_mapping_t map;
+    map.code = code;
+    map.va = va;
+    map.pa = pa;
+
+    task_mapping_t *old_mappings = task->mappings;
+    task->mappings = malloc(sizeof(task_mapping_t) * (task->mappings_length + 1));
+    memcpy(task->mappings, old_mappings, sizeof(task_mapping_t) * task->mappings_length);
+
+    task->mappings[task->mappings_length] = map;
+    task->mappings_length++;
+
+    if (old_mappings != 0)
+        free(old_mappings);
+}
+
+task_t *pcreate(unsigned long va, void *code)
 {
     task_t *task = malloc(sizeof(task_t));
     task->flags = ACTIVE_TASK;
     task->time = DEFAULT_TIME;
+    task->va = va;
     task->regs.x30 = va;
     task->regs.elr = va;
     task->regs.spsr = EL0T_M;
@@ -21,13 +43,16 @@ task_t *pcreate(unsigned long pa, unsigned long va)
     task->regs.sp_el1 = (unsigned long)malloc(PAGE_SIZE_BYTES) + PAGE_SIZE;
     task->pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->phys_sp = (unsigned long)malloc(PAGE_SIZE_BYTES);
+    task->pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE_BYTES));
+    task->mappings = 0;
+    task->mappings_length = 0;
 
     memset(task->pgd, 0, PAGE_SIZE);
-    mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, false);
-    // map as such for lower half
-    // (temporary fix, sys_printf should be implemented into the executable itself)
-    mmu_map_page(task->pgd, VIRT_TO_PHYS((unsigned long)&sys_printf), VIRT_TO_PHYS((unsigned long)&sys_printf), MAIR_IDX_NORMAL, false);
-    mmu_map_page(task->pgd, task->regs.sp - PAGE_SIZE, VIRT_TO_PHYS(task->phys_sp), MAIR_IDX_NORMAL, false);
+
+    if (code != 0)
+        map_task_page(task, task->va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE_BYTES);
+    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, (void *)task->phys_sp, 0);
+    map_task_page(task, VIRT_TO_PHYS((unsigned long)&sys_printf), MMU_USER_EXEC | MMU_RWRW, &sys_printf, PAGE_SIZE_BYTES);
 
     add_task(task);
     return task;

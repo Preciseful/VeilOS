@@ -3,7 +3,6 @@
 #include <memory/memory.h>
 #include <vfs/vfs.h>
 #include <fs/fat32.h>
-#include <fs/voidelle.h>
 #include <drivers/emmc.h>
 #include <lib/printf.h>
 
@@ -61,7 +60,7 @@ void open_vnode(vfs_root_t *root, vnode_t *node)
     }
 }
 
-bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_node, char *path, unsigned long entry_path_size, unsigned long start)
+bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_node, const char *path, unsigned long entry_path_size, unsigned long start)
 {
     fatfs_node_t *nodes = 0;
     fatfs_t *fatfs = (fatfs_t *)root->fs;
@@ -84,43 +83,10 @@ bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_nod
     return false;
 }
 
-bool get_voidelle_node_from_path(vfs_root_t *root, voidelle_t *node, bool found_node, char *path, unsigned long entry_path_size, unsigned long start)
-{
-    voidelle_t *nodes = 0;
-    voidom_t *vdom = root->fs;
-    unsigned long nodes_count = get_voidelle_entries(root->fs, !found_node ? vdom->root->pos : node->pos, &nodes);
-
-    for (unsigned long i = 0; i < nodes_count; i++)
-    {
-        char *node_name = get_voidelle_name(vdom, nodes[i].name);
-        if (strlen(node_name) != entry_path_size)
-        {
-            free(node_name);
-            continue;
-        }
-        if (memcmp(node_name, &path[start], entry_path_size) != 0)
-        {
-            free(node_name);
-            continue;
-        }
-
-        memcpy(node, &nodes[i], sizeof(voidelle_t));
-        free(nodes);
-        free(node_name);
-        return true;
-    }
-
-    if (nodes != 0)
-        free(nodes);
-    return false;
-}
-
 bool is_directory(void *node, enum FileSystems fs)
 {
     switch (fs)
     {
-    case VOIDELLE:
-        return ((voidelle_t *)node)->flags & VOIDELLE_DIRECTORY;
     case FAT32:
         return ((fatfs_node_t *)node)->entry.attrs & 0x10;
     default:
@@ -128,11 +94,11 @@ bool is_directory(void *node, enum FileSystems fs)
     }
 }
 
-void *entry_from_path(char *path, vfs_root_t *root)
+void *entry_from_path(const char *path, vfs_root_t *root)
 {
     bool found_node = false;
     bool finishing = false;
-    void *node = malloc(sizeof(fatfs_node_t) > sizeof(voidelle_t) ? sizeof(fatfs_node_t) : sizeof(voidelle_t));
+    void *node = malloc(sizeof(fatfs_node_t));
     unsigned long path_size = strlen(path);
 
     if (path_size == 0)
@@ -170,8 +136,6 @@ void *entry_from_path(char *path, vfs_root_t *root)
 
         if (root->fs_type == FAT32)
             found_node = get_fat_node_from_path(root, node, found_node, path, entry_path_size, start);
-        else if (root->fs_type == VOIDELLE)
-            found_node = get_voidelle_node_from_path(root, node, found_node, path, entry_path_size, start);
 
         if (!found_node)
         {
@@ -204,7 +168,7 @@ void *entry_from_path(char *path, vfs_root_t *root)
     return node;
 }
 
-vnode_t *fopen(char *path)
+vnode_t *fopen(const char *path)
 {
     unsigned long len = strlen(path);
     if (len == 0)
@@ -234,6 +198,22 @@ vnode_t *fopen(char *path)
     return node;
 }
 
+void fclose(vnode_t *node)
+{
+    vfs_root_t *root = get_root(node->path);
+    if (!root)
+        return;
+
+    for (unsigned long i = 0; i < root->nodes_count; i++)
+    {
+        if (strcmp(root->open_nodes[i]->path, node->path) == 0)
+        {
+            root->open_nodes[i] = 0;
+            return;
+        }
+    }
+}
+
 void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type)
 {
     switch (type)
@@ -256,79 +236,42 @@ unsigned long fread(void *buf, unsigned long size, vnode_t *node)
     if (is_directory(node, node->root->fs_type))
         return 0;
 
-    if (node->root->fs_type == VOIDELLE)
-    {
-        voidelle_t *voidelle = (voidelle_t *)node->data;
-        voidom_t *vdom = (voidom_t *)node->root->fs;
-        if (size > voidelle->content_size)
-            size = voidelle->content_size;
-
-        unsigned long section_start = node->seek / VOIDITE_CONTENT_SIZE + 1;
-        unsigned long start = node->seek % VOIDITE_CONTENT_SIZE;
-        unsigned long section_end = section_start + size / VOIDITE_CONTENT_SIZE;
-        unsigned long end = size % VOIDITE_CONTENT_SIZE;
-        for (unsigned long section = section_start; section <= section_end; section++)
-        {
-            char *read = voidelle_read_at(vdom, *voidelle, section);
-
-            if (section == section_end)
-            {
-                memcpy(buf, read, end);
-                free(read);
-                return size;
-            }
-
-            if (section == section_start)
-            {
-                memcpy(buf, read + start, VOIDITE_CONTENT_SIZE - start);
-                free(read);
-                buf += VOIDITE_CONTENT_SIZE - start;
-                continue;
-            }
-
-            memcpy(buf, read, VOIDITE_CONTENT_SIZE);
-            free(read);
-            buf += VOIDITE_CONTENT_SIZE;
-        }
-
-        return 0;
-    }
-    else if (node->root->fs_type == FAT32)
+    if (node->root->fs_type == FAT32)
     {
         fatfs_node_t *entry = (fatfs_node_t *)node->data;
         fatfs_t *fs = (fatfs_t *)node->root->fs;
         if (size > entry->entry.size)
             size = entry->entry.size;
 
-        unsigned long clsize = fat_cluster_size(fs);
-        unsigned long section_start = node->seek / clsize + 1;
-        unsigned long start = node->seek % clsize;
-        unsigned long section_end = section_start + size / clsize;
-        unsigned long end = size % clsize;
-        for (unsigned long section = section_start; section <= section_end; section++)
+        void *init_buf = buf;
+        unsigned long cl_size = fat_cluster_size(fs);
+        unsigned long first_cluster = node->seek / cl_size;
+        unsigned long last_cluster = (node->seek + size - 1) / cl_size;
+        unsigned long start = node->seek % cl_size;
+        unsigned long end = (node->seek + size) % cl_size;
+
+        for (unsigned long cluster = first_cluster; cluster <= last_cluster; cluster++)
         {
-            unsigned char *read = read_fatnode_at(*entry, section);
-            if (section == section_end)
+            unsigned char *read = read_fatnode_at(*entry, cluster);
+            unsigned char *cpy_start = read;
+            unsigned long cpy_len = cl_size;
+
+            if (cluster == first_cluster)
             {
-                memcpy(buf, read, end);
-                free(read);
-                return size;
+                cpy_start += start;
+                cpy_len -= start;
             }
 
-            if (section == section_start)
-            {
-                memcpy(buf, read + start, VOIDITE_CONTENT_SIZE - start);
-                free(read);
-                buf += VOIDITE_CONTENT_SIZE - start;
-                continue;
-            }
+            if (cluster == last_cluster)
+                // edge case
+                cpy_len = end ? end : cl_size;
 
-            memcpy(buf, read, VOIDITE_CONTENT_SIZE);
+            memcpy(buf, cpy_start, cpy_len);
             free(read);
-            buf += VOIDITE_CONTENT_SIZE;
+            buf += cpy_len;
         }
 
-        return 0;
+        return buf - init_buf;
     }
 
     return 0;
@@ -339,14 +282,7 @@ void fwrite(void *buf, unsigned long size, vnode_t *node)
     if (is_directory(node, node->root->fs_type))
         return;
 
-    if (node->root->fs_type == VOIDELLE)
-    {
-        voidelle_t *voidelle = (voidelle_t *)node->data;
-        voidom_t *vdom = (voidom_t *)node->root->fs;
-        voidelle_write(vdom, voidelle, buf, size);
-    }
-
-    else if (node->root->fs_type == FAT32)
+    if (node->root->fs_type == FAT32)
     {
         fatfs_node_t *entry = (fatfs_node_t *)node->data;
         write_to_fatnode(entry, buf, size);

@@ -16,8 +16,17 @@
 #define GRANULE_2MB 0x200000
 #define GRANULE_1GB 0x40000000UL
 
-void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, bool kernel);
-void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, bool kernel);
+enum MMU_Flags
+{
+    MMU_USER_EXEC = 0b100,
+    MMU_NORW = 0b00,
+    MMU_RWRW = 0b01,
+    MMU_NOR = 0b10,
+    MMU_RR = 0b11
+};
+
+void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
+void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
 void mmu_init();
 void debug_mmu_address(unsigned long *pgd, unsigned long va);
 
