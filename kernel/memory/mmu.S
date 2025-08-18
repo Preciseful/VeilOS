@@ -3,6 +3,7 @@
 
 .global mmu_init_regs
 mmu_init_regs:
+    mov x3, x2
     mov x2, x1
     mov x1, x0
 
@@ -39,6 +40,7 @@ mmu_init_regs:
     // go to higher half
     add x30, x30, x1
 
+    mov x0, x3
     br x30
 
 .global refresh_ttbr

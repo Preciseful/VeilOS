@@ -15,13 +15,26 @@ void mm_init()
     // LOG("Finished zeroing the memory!\n");
 }
 
-void *get_free_page()
+bool check_memory(unsigned long index, unsigned int size)
+{
+    for (unsigned long i = 0; i < size / PAGE_SIZE; i++)
+    {
+        if (mem_map[index + i])
+            return false;
+    }
+
+    return true;
+}
+
+void *get_free_page(unsigned int size)
 {
     for (int i = 0; i < PAGING_PAGES; i++)
     {
-        if (mem_map[i] == 0)
+        if (check_memory(i, size))
         {
-            mem_map[i] = 1;
+            for (unsigned long j = 0; j < size / PAGE_SIZE; j++)
+                mem_map[i + j] = 1;
+
             unsigned long adr = HIGH_VA + LOW_MEMORY + i * PAGE_SIZE;
             return (void *)adr;
         }
@@ -30,66 +43,24 @@ void *get_free_page()
     return 0;
 }
 
-void free_page(unsigned long p)
-{
-    mem_map[(p - LOW_MEMORY - HIGH_VA) / PAGE_SIZE] = 0;
-}
-
-int get_free_header()
-{
-    for (int i = 0; i < PAGING_PAGES; i++)
-    {
-        if (!headers[i].in_use)
-            return i;
-    }
-
-    return -1;
-}
-
 void *malloc(unsigned int size)
 {
-    int headerI = get_free_header();
-    if (headerI == -1)
-    {
-        LOG("No available headers.\n");
-        return 0;
-    }
+    size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
-    headers[headerI].in_use = true;
-    headers[headerI].extension = false;
+    void *page = get_free_page(size);
+    unsigned long index = ((unsigned long)page - LOW_MEMORY - HIGH_VA) / PAGE_SIZE;
 
-    headers[headerI].data = get_free_page();
-    size -= PAGE_SIZE_BYTES > size ? size : PAGE_SIZE_BYTES;
+    headers[index].data = page;
+    headers[index].size = size;
 
-    for (int i = 1; size; i++)
-    {
-        headers[headerI + i].in_use = true;
-        headers[headerI].extension = true;
-        get_free_page();
-        size -= PAGE_SIZE_BYTES > size ? size : PAGE_SIZE_BYTES;
-    }
-
-    return headers[headerI].data;
+    return headers[index].data;
 }
 
 void free(void *data)
 {
-    unsigned long adr = ((unsigned long)data - LOW_MEMORY - HIGH_VA) / PAGE_SIZE;
-    headers[adr].in_use = false;
-
-    for (int i = adr; i < PAGING_PAGES; i++)
-    {
-        if (headers[i].extension)
-        {
-            headers[i].in_use = false;
-            headers[i].extension = false;
-        }
-
-        else
-            break;
-    }
-
-    mem_map[adr] = 0;
+    unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+    for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
+        mem_map[index + i] = 0;
 }
 
 void memset(void *dest, int value, unsigned long size)

@@ -8,7 +8,6 @@
 #define SECTION_SHIFT (PAGE_SHIFT + TABLE_SHIFT)
 
 #define PAGE_SIZE (1 << PAGE_SHIFT)
-#define PAGE_SIZE_BYTES (PAGE_SIZE / 8)
 #define SECTION_SIZE (1 << SECTION_SHIFT)
 
 #define HIGH_VA 0xFFFF000000000000ULL
@@ -29,8 +28,6 @@
 typedef struct mheader
 {
     unsigned long size;
-    bool in_use;
-    bool extension;
     struct vheader *next;
     void *data;
 } mheader_t;

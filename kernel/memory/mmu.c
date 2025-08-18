@@ -190,56 +190,45 @@ unsigned long mmu_map_temp_block(unsigned long *pgd, unsigned long va, unsigned 
     return malloc_i;
 }
 
-unsigned long memory_i;
-
 void mmu_init()
 {
     // retain the amount of memory allocated in total
-    memory_i = 0;
-    unsigned long *pgd = temp_malloc(memory_i);
-    memory_i++;
-    unsigned long *high_pgd = temp_malloc(memory_i);
-    memory_i++;
+    unsigned long high_memory_i = 0;
+    // 20 is just random, hopefully no way high_memory_i reaches it
+    unsigned long low_memory_i = 20;
+    unsigned long *pgd = temp_malloc(low_memory_i);
+    low_memory_i++;
+    unsigned long *high_pgd = temp_malloc(high_memory_i);
+    high_memory_i++;
 
     // make 2 maps: a lower half and a higher half
     for (unsigned long addr = 0; addr <= GRANULE_1GB * 4; addr += GRANULE_2MB)
     {
         if (addr < DEVICE_START)
         {
-            memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_NORMAL, true, memory_i);
-            memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_NORMAL, true, memory_i);
+            high_memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_NORMAL, true, high_memory_i);
+            low_memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_NORMAL, true, low_memory_i);
         }
         else
         {
-            memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_DEVICE, true, memory_i);
-            memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_DEVICE, true, memory_i);
+            high_memory_i = mmu_map_temp_block(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_DEVICE, true, high_memory_i);
+            low_memory_i = mmu_map_temp_block(pgd, addr, addr, MAIR_IDX_DEVICE, true, low_memory_i);
         }
     }
 
     // init the regs with both halves
-    mmu_init_regs((unsigned long)pgd, (unsigned long)high_pgd);
+    mmu_init_regs((unsigned long)pgd, (unsigned long)high_pgd, high_memory_i);
 }
 
 extern void kmain();
 
-void finish_higher()
+void finish_higher(unsigned long high_memory_i)
 {
     mm_init();
-
-    unsigned long *pgd = malloc(PAGE_SIZE);
-
-    // redo ttbr1 with the new persistent memory allocation
-    // rather than the temporary one
-    for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + GRANULE_1GB * 4; addr += GRANULE_2MB)
-    {
-        if (addr < HIGH_VA + DEVICE_START)
-            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_NORMAL, MMU_NORW);
-        else
-            mmu_map_block(pgd, addr, addr - HIGH_VA, MAIR_IDX_DEVICE, MMU_NORW);
-    }
+    malloc(PAGE_SIZE * high_memory_i);
 
     // make ttbr0 invalid, use only ttbr1
-    refresh_ttbr(pgd);
+    refresh_ttbr((unsigned long)temp_malloc(0));
 
     kmain();
 }

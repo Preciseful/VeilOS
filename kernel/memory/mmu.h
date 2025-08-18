@@ -30,7 +30,7 @@ void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsig
 void mmu_init();
 void debug_mmu_address(unsigned long *pgd, unsigned long va);
 
-extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd);
+extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);
 extern void refresh_ttbr(unsigned long pgd);
 
 #endif
