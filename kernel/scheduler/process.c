@@ -8,6 +8,17 @@
 
 extern unsigned char el1_vectors[];
 
+bool task_contains_va(task_t *task, unsigned long va)
+{
+    for (unsigned long i = 0; i < task->mappings_length; i++)
+    {
+        if (task->mappings[i].va == va)
+            return true;
+    }
+
+    return false;
+}
+
 void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *code, unsigned long code_len)
 {
     unsigned long pa = VIRT_TO_PHYS((unsigned long)code);
@@ -33,6 +44,19 @@ void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *c
 
     if (old_mappings != 0)
         free(old_mappings);
+}
+
+void unmap_task_page(task_t *task, unsigned long va, unsigned long length)
+{
+    if (!task_contains_va(task, va))
+        return;
+
+    unsigned long num_pages = (length + PAGE_SIZE - 1) / PAGE_SIZE;
+    for (unsigned long i = 0; i < num_pages; i++)
+    {
+        unsigned long offset = i * PAGE_SIZE;
+        mmu_unmap_page(task->pgd, va + offset);
+    }
 }
 
 task_t *pcreate(const char *name, unsigned long va, void *code)

@@ -5,7 +5,7 @@ all: build
 OBJS = $(FILES:.c=.o)
 
 %.o: %.c
-	$(ARMGNU)-gcc -c -ffreestanding -nostdlib -fno-exceptions -fno-unwind-tables -fno-rtti -o $@ $<
+	$(ARMGNU)-gcc -c -ffreestanding -nostdlib -o $@ $<
 
 build: $(OBJS)
 	ar rcs libveil.a $(OBJS)

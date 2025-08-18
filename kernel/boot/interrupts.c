@@ -22,6 +22,14 @@ void handle_svc(unsigned long *sp)
         map_task_page(get_running_task(), sp[0], MMU_RWRW, (void *)sp[0], PAGE_SIZE);
         break;
 
+    case 2:
+        if (!task_contains_va(get_running_task(), sp[0]))
+            break;
+
+        unsigned long len = free(PHYS_TO_VIRT((void *)sp[0]));
+        unmap_task_page(get_running_task(), sp[0], len);
+        break;
+
     default:
         LOG("SVC code #%lu does not exist.\n", code);
         break;

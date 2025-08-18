@@ -65,21 +65,21 @@ void debug_mmu_address(unsigned long *pgd, unsigned long va)
     return;
 }
 
-void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
+void mmu_map_page(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
     unsigned long l3_index = (va >> 21) & 0x1FF;
     unsigned long pte_index = (va >> 12) & 0x1FF;
 
-    if (!(table[l1_index] & 1))
+    if (!(pgd[l1_index] & 1))
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        table[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
+        pgd[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
     }
 
-    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((table[l1_index] & PAGE_MASK));
+    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
 
     if (!(l1[l2_index] & 1))
     {
@@ -116,6 +116,31 @@ void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsi
     }
 
     l3[pte_index] = (pa & PAGE_MASK) | attr;
+}
+
+void mmu_unmap_page(unsigned long *pgd, unsigned long va)
+{
+    unsigned long l1_index = (va >> 39) & 0x1FF;
+    unsigned long l2_index = (va >> 30) & 0x1FF;
+    unsigned long l3_index = (va >> 21) & 0x1FF;
+    unsigned long pte_index = (va >> 12) & 0x1FF;
+
+    if (!(pgd[l1_index] & 1))
+        return;
+
+    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
+    if (!(l1[l2_index] & 1))
+        return;
+
+    unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
+    if (!(l2[l3_index] & 1))
+        return;
+
+    unsigned long *l3 = (unsigned long *)PHYS_TO_VIRT((l2[l3_index] & PAGE_MASK));
+    if (!(l3[pte_index] & 1))
+        return;
+
+    l3[pte_index] = 0;
 }
 
 void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)

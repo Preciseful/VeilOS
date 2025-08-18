@@ -26,6 +26,7 @@ enum MMU_Flags
 };
 
 void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
+void mmu_unmap_page(unsigned long *pgd, unsigned long va);
 void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
 void mmu_init();
 void debug_mmu_address(unsigned long *pgd, unsigned long va);

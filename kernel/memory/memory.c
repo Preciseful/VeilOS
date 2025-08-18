@@ -56,11 +56,12 @@ void *malloc(unsigned int size)
     return headers[index].data;
 }
 
-void free(void *data)
+unsigned long free(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
         mem_map[index + i] = 0;
+    return headers[index].size;
 }
 
 void memset(void *dest, int value, unsigned long size)
