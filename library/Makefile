@@ -1,6 +1,11 @@
-FILES=stdio.c
+FILES=stdio.c stdlib.c svc.c
 
 all: build
 
-build:
-	$(ARMGNU)-gcc -ffreestanding -c $(FILES) -o library.o
+OBJS = $(FILES:.c=.o)
+
+%.o: %.c
+	$(ARMGNU)-gcc -c -ffreestanding -o $@ $<
+
+build: $(OBJS)
+	ar rcs library $(OBJS)

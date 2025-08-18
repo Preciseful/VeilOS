@@ -20,16 +20,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "stdio.h"
+#include "svc.h"
 
 void stdputf(void *v, char x)
 {
-    asm volatile(
-        "mov x8, #0\n"
-        "mov x0, %0\n"
-        "svc #8\n"
-        :
-        : "r"(x)
-        : "x0", "x8", "memory", "cc");
+    svc_call(x, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
 typedef void (*putcf)(void *, char);

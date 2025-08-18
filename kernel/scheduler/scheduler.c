@@ -87,3 +87,8 @@ void scheduler_tick(unsigned long *stack)
     task_t *next = get_next_task();
     switch_task(next, stack);
 }
+
+task_t *get_running_task()
+{
+    return scheduler_current;
+}

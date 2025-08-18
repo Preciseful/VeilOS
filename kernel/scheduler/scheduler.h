@@ -52,5 +52,6 @@ void scheduler_init();
 void schedule();
 void add_task(task_t *task);
 void scheduler_tick(unsigned long *stack);
+task_t *get_running_task();
 extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *sp);
 extern void set_task_ttbr(unsigned long *pgd);

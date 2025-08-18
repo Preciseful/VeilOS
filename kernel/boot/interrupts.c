@@ -6,6 +6,7 @@
 #include <drivers/timer.h>
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
+#include <scheduler/process.h>
 
 void handle_svc(unsigned long *sp)
 {
@@ -14,6 +15,11 @@ void handle_svc(unsigned long *sp)
     {
     case 0:
         printf("%c", sp[0]);
+        break;
+
+    case 1:
+        sp[0] = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
+        map_task_page(get_running_task(), sp[0], MMU_RWRW, (void *)sp[0], PAGE_SIZE);
         break;
 
     default:

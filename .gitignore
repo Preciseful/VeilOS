@@ -2,3 +2,5 @@ bin
 .vscode
 *.img
 dump
+library/*.o
+library/library
