@@ -11,9 +11,13 @@ extern unsigned char el1_vectors[];
 void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *code, unsigned long code_len)
 {
     unsigned long pa = VIRT_TO_PHYS((unsigned long)code);
+    unsigned long num_pages = (code_len + PAGE_SIZE - 1) / PAGE_SIZE;
 
-    printf("va %lx pa %lx\n", va, pa);
-    mmu_map_page(task->pgd, va, pa, MAIR_IDX_NORMAL, flags);
+    for (unsigned long i = 0; i < num_pages; i++)
+    {
+        unsigned long offset = i * PAGE_SIZE;
+        mmu_map_page(task->pgd, va + offset, pa + offset, MAIR_IDX_NORMAL, flags);
+    }
 
     task_mapping_t map;
     map.code = code;
@@ -54,7 +58,7 @@ task_t *pcreate(const char *name, unsigned long va, void *code)
 
     if (code != 0)
         map_task_page(task, task->va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
-    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, (void *)task->phys_sp, 0);
+    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, (void *)task->phys_sp, 1);
 
     add_task(task);
     return task;

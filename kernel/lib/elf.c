@@ -36,11 +36,20 @@ void make_elf_process(const char *path)
         if (phdr.p_type != PT_LOAD)
             continue;
 
-        unsigned char *read = malloc(phdr.p_memsz);
-        memset(read, 0, phdr.p_memsz);
-        fseek(vnode, phdr.p_offset, SEEK_SET);
-        fread(read, phdr.p_filesz, vnode);
+        // align down both of these to page
+        unsigned long phdr_offset = (phdr.p_offset / PAGE_SIZE) * PAGE_SIZE;
+        unsigned long phdr_vaddr = (phdr.p_vaddr / PAGE_SIZE) * PAGE_SIZE;
 
-        map_task_page(task, phdr.p_vaddr, MMU_USER_EXEC | MMU_RWRW, read, phdr.p_memsz);
+        // pad the two
+        unsigned long pad_front = phdr.p_offset - phdr_offset;
+        unsigned long phdr_filesz = phdr.p_filesz + pad_front;
+        unsigned long phdr_memsz = phdr.p_memsz + pad_front;
+
+        unsigned char *read = malloc(phdr.p_memsz);
+        memset(read, 0, phdr_memsz);
+        fseek(vnode, phdr_offset, SEEK_SET);
+        fread(read, phdr_filesz, vnode);
+
+        map_task_page(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, read, phdr_memsz);
     }
 }
