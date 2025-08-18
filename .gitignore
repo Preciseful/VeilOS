@@ -3,4 +3,4 @@ bin
 *.img
 dump
 library/*.o
-library/library
+library/libveil.a
