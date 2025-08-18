@@ -231,11 +231,12 @@ void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type)
     }
 }
 
-unsigned long fread(void *buf, unsigned long size, vnode_t *node)
+unsigned long fread(void *write_buf, unsigned long size, vnode_t *node)
 {
     if (is_directory(node, node->root->fs_type))
         return 0;
 
+    void *buf = write_buf;
     if (node->root->fs_type == FAT32)
     {
         fatfs_node_t *entry = (fatfs_node_t *)node->data;
@@ -250,6 +251,8 @@ unsigned long fread(void *buf, unsigned long size, vnode_t *node)
         unsigned long start = node->seek % cl_size;
         unsigned long end = (node->seek + size) % cl_size;
 
+        unsigned long bytes_left = size;
+
         for (unsigned long cluster = first_cluster; cluster <= last_cluster; cluster++)
         {
             unsigned char *read = read_fatnode_at(*entry, cluster);
@@ -262,13 +265,18 @@ unsigned long fread(void *buf, unsigned long size, vnode_t *node)
                 cpy_len -= start;
             }
 
-            if (cluster == last_cluster)
+            if (cluster == last_cluster && end != 0)
                 // edge case
-                cpy_len = end ? end : cl_size;
+                cpy_len = end;
+
+            if (cpy_len > bytes_left)
+                cpy_len = bytes_left;
 
             memcpy(buf, cpy_start, cpy_len);
             free(read);
+
             buf += cpy_len;
+            bytes_left -= cpy_len;
         }
 
         return buf - init_buf;

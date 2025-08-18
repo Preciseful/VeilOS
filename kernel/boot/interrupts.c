@@ -13,7 +13,7 @@ void handle_svc(unsigned long *sp)
     switch (code)
     {
     case 0:
-        printf("%s", sp[0]);
+        printf("%c", sp[0]);
         break;
 
     default:
