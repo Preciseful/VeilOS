@@ -16,39 +16,39 @@
 
 void kboot()
 {
-    mmu_init();
+    MMUInit();
 }
 
 void kmain()
 {
-    uart_init();
-    printf("\n----- VeilOS -----\n");
+    UartInit();
+    Printf("\n----- VeilOS -----\n");
     LOG("UART initialized.\n");
 
     set_vtable();
 
     timer_init();
-    gic_allow(30, 0);
-    gic_allow(153, 0);
+    AllowInterruptInGIC(30, 0);
+    AllowInterruptInGIC(153, 0);
     irq_enable();
 
     LOG("Timer enabled.\n");
 
-    scheduler_init();
+    SchedulerInit();
     LOG("Scheduler initialized.\n");
 
-    emmc_init();
+    EmmcInit();
 
-    fatfs_t *fatfs = fatfs_init();
+    FatFS *fatfs = FatFSInit();
     vfs_init();
     add_root(fatfs, FAT32, '/');
 
     LOG("VFS initialized with root FAT32.\n");
 
-    make_elf_process("/modules/Luna.elf");
+    MakeELFProcess("/modules/Luna.elf");
 
     while (1)
     {
-        schedule();
+        Schedule();
     }
 }

@@ -1,13 +1,13 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
 
-__attribute__((section(".mmmap"))) static mheader_t headers[PAGING_PAGES];
+__attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
 extern char bss_begin[];
 extern char bss_end[];
 
-void mm_init()
+void MMInit()
 {
     // LOG("Zeroing the memory...\n");
     memset(mem_map, 0, PAGING_PAGES);

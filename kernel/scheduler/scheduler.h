@@ -7,7 +7,7 @@
 #define ACTIVE_TASK 0b10
 #define DEFAULT_TIME 5
 
-typedef struct task_regs
+typedef struct TaskRegs
 {
     unsigned long x19;
     unsigned long x20;
@@ -25,40 +25,40 @@ typedef struct task_regs
     unsigned long sp_el1;
     unsigned long spsr;
     unsigned long elr;
-} task_regs_t;
+} TaskRegs;
 
-typedef struct task_mapping
+typedef struct TaskMapping
 {
     VirtualAddr code;
     VirtualAddr va;
     PhysicalAddr pa;
-} task_mapping_t;
+} TaskMapping;
 
-typedef struct task_mmu_ctx
+typedef struct TaskMMUCtx
 {
     unsigned long *pgd;
     VirtualAddr sp_alloc;
     VirtualAddr va;
     PhysicalAddr pa;
-} task_mmu_ctx_t;
+} TaskMMUCtx;
 
-typedef struct task
+typedef struct Task
 {
-    task_regs_t regs;
-    task_mmu_ctx_t mmu_ctx;
-    task_mapping_t *mappings;
+    TaskRegs regs;
+    TaskMMUCtx mmu_ctx;
+    TaskMapping *mappings;
     unsigned long mappings_length;
-    struct task *next;
+    struct Task *next;
 
     const char *name;
     unsigned long flags;
     long time;
-} task_t;
+} Task;
 
-void scheduler_init();
-void schedule();
-void add_task(task_t *task);
-void scheduler_tick(unsigned long *stack);
-task_t *get_running_task();
-extern void cpu_switch_task(task_t *prev, task_t *next, unsigned long *sp);
+void SchedulerInit();
+void Schedule();
+void AddTask(Task *task);
+void SchedulerTick(unsigned long *stack);
+Task *GetRunningTask();
+extern void cpu_switch_task(Task *prev, Task *next, unsigned long *sp);
 extern void set_task_ttbr(unsigned long *pgd);

@@ -25,14 +25,14 @@
 
 #ifndef __ASSEMBLER__
 
-typedef struct mheader
+typedef struct MHeader
 {
     unsigned long size;
     struct vheader *next;
     void *data;
-} mheader_t;
+} MHeader;
 
-void mm_init();
+void MMInit();
 void *malloc(unsigned int size);
 unsigned long free(void *data);
 void memset(void *dest, int value, unsigned long size);

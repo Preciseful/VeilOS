@@ -28,17 +28,17 @@ enum GPIO
     GPIO_FUNCTION_ALT0 = 4
 };
 
-void mmio_write(unsigned long reg, unsigned int val);
-unsigned int mmio_read(unsigned long reg);
+void WriteToMMIO(unsigned long reg, unsigned int val);
+unsigned int ReadMMIO(unsigned long reg);
 
-bool gpio_call(unsigned long pin, unsigned long value, enum GPIO_Actions base, unsigned long field_size, enum GPIO field_max);
-bool gpio_set(unsigned long pin, unsigned long value);
-bool gpio_clear(unsigned long pin, unsigned long value);
-bool gpio_pull(unsigned long pin, enum GPIO_Pulls pull);
-bool gpio_function(unsigned long pin, enum GPIO func);
+bool CallGPIO(unsigned long pin, unsigned long value, enum GPIO_Actions base, unsigned long field_size, enum GPIO field_max);
+bool SetGPIO(unsigned long pin, unsigned long value);
+bool ClearGPIO(unsigned long pin, unsigned long value);
+bool PullGPIO(unsigned long pin, enum GPIO_Pulls pull);
+bool SetGPIOFunction(unsigned long pin, enum GPIO func);
 
-void gpio_setAlt0(unsigned long pin);
-void gpio_setAlt3(unsigned long pin);
-void gpio_setAlt5(unsigned long pin);
-void gpio_initOutputPinWithPullNone(unsigned long pin_number);
-void gpio_setPinOutputBool(unsigned long pin, bool value);
+void SetAlt0(unsigned long pin);
+void SetAlt3(unsigned long pin);
+void SetAlt5(unsigned long pin);
+void InitOutputPinWithPullNone(unsigned long pin_number);
+void SetPinOutputBool(unsigned long pin, bool value);

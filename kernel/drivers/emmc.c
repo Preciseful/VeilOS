@@ -18,7 +18,7 @@ bool wait_reg_mask(volatile unsigned int *reg, unsigned int mask, bool set, unsi
             return true;
         }
 
-        timer_sleep(1);
+        TimerSleep(1);
     }
 
     return false;
@@ -90,22 +90,22 @@ bool switch_clock_rate(unsigned int base_clock, unsigned int target_rate)
 
     while ((EMMC->status & (EMMC_STATUS_CMD_INHIBIT | EMMC_STATUS_DAT_INHIBIT)))
     {
-        timer_sleep(1);
+        TimerSleep(1);
     }
 
     unsigned int c1 = EMMC->control[1] & ~EMMC_CTRL1_CLK_ENABLE;
 
     EMMC->control[1] = c1;
 
-    timer_sleep(3);
+    TimerSleep(3);
 
     EMMC->control[1] = (c1 | divider) & ~0xFFE0;
 
-    timer_sleep(3);
+    TimerSleep(3);
 
     EMMC->control[1] = c1 | EMMC_CTRL1_CLK_ENABLE;
 
-    timer_sleep(3);
+    TimerSleep(3);
 
     return true;
 }
@@ -114,7 +114,7 @@ bool emmc_setup_clock()
 {
     EMMC->control2 = 0;
 
-    unsigned int rate = mailbox_clock(EMMC_CLOCK);
+    unsigned int rate = GetMailboxClock(EMMC_CLOCK);
 
     unsigned int n = EMMC->control[1];
     n |= EMMC_CTRL1_CLK_INT_EN;
@@ -130,12 +130,12 @@ bool emmc_setup_clock()
         return false;
     }
 
-    timer_sleep(30);
+    TimerSleep(30);
 
     // enabling the clock
     EMMC->control[1] |= 4;
 
-    timer_sleep(30);
+    TimerSleep(30);
 
     return true;
 }
@@ -275,7 +275,7 @@ static bool emmc_issue_command(emmc_cmd cmd, unsigned int arg, unsigned int time
     EMMC->arg1 = arg;
     EMMC->cmd_xfer_mode = command_reg;
 
-    timer_sleep(10);
+    TimerSleep(10);
 
     int times = 0;
 
@@ -288,7 +288,7 @@ static bool emmc_issue_command(emmc_cmd cmd, unsigned int arg, unsigned int time
             break;
         }
 
-        timer_sleep(1);
+        TimerSleep(1);
         times++;
     }
 
@@ -360,7 +360,7 @@ static bool emmc_issue_command(emmc_cmd cmd, unsigned int arg, unsigned int time
     return true;
 }
 
-bool emmc_command(unsigned int command, unsigned int arg, unsigned int timeout)
+bool CommandEMMC(unsigned int command, unsigned int arg, unsigned int timeout)
 {
     if (command & 0x80000000)
     {
@@ -391,7 +391,7 @@ static bool reset_command()
             return true;
         }
 
-        timer_sleep(1);
+        TimerSleep(1);
     }
 
     LOG("Command line failed to reset properly: %X\n", EMMC->control[1]);
@@ -431,7 +431,7 @@ static bool check_v2_card()
 {
     bool v2Card = false;
 
-    if (!emmc_command(CTSendIfCond, 0x1AA, 200))
+    if (!CommandEMMC(CTSendIfCond, 0x1AA, 200))
     {
         if (device.last_error == 0)
         {
@@ -471,7 +471,7 @@ static bool check_v2_card()
 
 static bool check_usable_card()
 {
-    if (!emmc_command(CTIOSetOpCond, 0, 1000))
+    if (!CommandEMMC(CTIOSetOpCond, 0, 1000))
     {
         if (device.last_error == 0)
         {
@@ -528,7 +528,7 @@ static bool check_sdhc_support(bool v2_card)
         {
             if (EMMC_DEBUG)
                 LOG("Sleeping: %X\n", device.last_response[0]);
-            timer_sleep(500);
+            TimerSleep(500);
         }
     }
 
@@ -575,7 +575,7 @@ static bool check_ocr()
 
 static bool check_rca()
 {
-    if (!emmc_command(CTSendCide, 0, 2000))
+    if (!CommandEMMC(CTSendCide, 0, 2000))
     {
         LOG("Failed to send CID\n");
 
@@ -585,7 +585,7 @@ static bool check_rca()
     if (EMMC_DEBUG)
         LOG("CARD ID: %X.%X.%X.%X\n", device.last_response[0], device.last_response[1], device.last_response[2], device.last_response[3]);
 
-    if (!emmc_command(CTSendRelativeAddr, 0, 2000))
+    if (!CommandEMMC(CTSendRelativeAddr, 0, 2000))
     {
         LOG("Failed to send Relative Addr\n");
 
@@ -616,7 +616,7 @@ static bool check_rca()
 
 static bool select_card()
 {
-    if (!emmc_command(CTSelectCard, device.rca << 16, 2000))
+    if (!CommandEMMC(CTSelectCard, device.rca << 16, 2000))
     {
         LOG("Failed to select card\n");
         return false;
@@ -643,7 +643,7 @@ static bool set_scr()
 {
     if (!device.sdhc)
     {
-        if (!emmc_command(CTSetBlockLen, 512, 2000))
+        if (!CommandEMMC(CTSetBlockLen, 512, 2000))
         {
             LOG("Failed to set block len\n");
             return false;
@@ -727,7 +727,7 @@ static bool emmc_card_reset()
     unsigned int c0 = EMMC->control[0];
     c0 |= 0x0F << 8;
     EMMC->control[0] = c0;
-    timer_sleep(3);
+    TimerSleep(3);
 
     if (!emmc_setup_clock())
     {
@@ -739,14 +739,14 @@ static bool emmc_card_reset()
     EMMC->int_flags = 0xFFFFFFFF;
     EMMC->int_mask = 0xFFFFFFFF;
 
-    timer_sleep(203);
+    TimerSleep(203);
 
     device.transfer_blocks = 0;
     device.last_command_value = 0;
     device.last_success = false;
     device.block_size = 0;
 
-    if (!emmc_command(CTGoIdle, 0, 2000))
+    if (!CommandEMMC(CTGoIdle, 0, 2000))
     {
         LOG("NO GO_IDLE RESPONSE\n");
         return false;
@@ -771,7 +771,7 @@ static bool emmc_card_reset()
 
     switch_clock_rate(device.base_clock, SD_CLOCK_NORMAL);
 
-    timer_sleep(10);
+    TimerSleep(10);
 
     if (!check_rca())
     {
@@ -799,12 +799,12 @@ static bool emmc_card_reset()
 
 int emmc_io_read(void *b, unsigned int size)
 {
-    return emmc_read((unsigned char *)b, size);
+    return ReadFromEMMC((unsigned char *)b, size);
 }
 
 void emmc_io_seek(unsigned long offset)
 {
-    return emmc_seek(offset);
+    return SeekInEMMC(offset);
 }
 
 bool do_data_command(bool write, unsigned char *b, unsigned int bsize, unsigned int block_no)
@@ -853,7 +853,7 @@ bool do_data_command(bool write, unsigned char *b, unsigned int bsize, unsigned 
 
     while (retry_count < max_retries)
     {
-        if (emmc_command(command, block_no, 5000))
+        if (CommandEMMC(command, block_no, 5000))
         {
             break;
         }
@@ -896,7 +896,7 @@ int do_write(unsigned char *b, unsigned int bsize, unsigned int block_no)
     return bsize;
 }
 
-int emmc_read(unsigned char *buffer, unsigned int size)
+int ReadFromEMMC(unsigned char *buffer, unsigned int size)
 {
     if (device.offset % 512 != 0)
     {
@@ -917,7 +917,7 @@ int emmc_read(unsigned char *buffer, unsigned int size)
     return size;
 }
 
-int emmc_write(unsigned char *buffer, unsigned int size)
+int WriteToEMMC(unsigned char *buffer, unsigned int size)
 {
     if (device.offset % 512 != 0)
     {
@@ -938,17 +938,17 @@ int emmc_write(unsigned char *buffer, unsigned int size)
     return size;
 }
 
-void emmc_seek(unsigned long _offset)
+void SeekInEMMC(unsigned long _offset)
 {
     device.offset = _offset;
 }
 
-bool emmc_init()
+bool EmmcInit()
 {
     for (int i = 34; i <= 39; i++)
-        gpio_set(i, GPIO_FUNCTION_IN);
+        SetGPIO(i, GPIO_FUNCTION_IN);
     for (int i = 48; i <= 52; i++)
-        gpio_setAlt3(i);
+        SetAlt3(i);
 
     device.transfer_blocks = 0;
     device.last_command_value = 0;
@@ -970,7 +970,7 @@ bool emmc_init()
             break;
         }
 
-        timer_sleep(100);
+        TimerSleep(100);
         LOG("Failed to reset card, trying again...\n");
     }
 

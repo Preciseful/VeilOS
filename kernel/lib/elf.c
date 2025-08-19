@@ -5,13 +5,13 @@
 #include <lib/printf.h>
 #include <scheduler/process.h>
 
-void make_elf_process(const char *path)
+void MakeELFProcess(const char *path)
 {
-    vnode_t *vnode = fopen(path);
+    VNode *vnode = OpenFile(path);
 
     Elf64_Ehdr eheader;
-    fseek(vnode, 0, SEEK_SET);
-    fread(&eheader, sizeof(eheader), vnode);
+    SeekInFile(vnode, 0, SEEK_SET);
+    ReadFile(&eheader, sizeof(eheader), vnode);
 
     if (memcmp(eheader.e_ident, ELFMAG, 4) != 0)
     {
@@ -25,13 +25,13 @@ void make_elf_process(const char *path)
         return;
     }
 
-    task_t *task = pcreate(path, eheader.e_entry, 0);
+    Task *task = PCreate(path, eheader.e_entry, 0);
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
         Elf64_Phdr phdr;
-        fseek(vnode, eheader.e_phoff + i * eheader.e_phentsize, SEEK_SET);
-        fread(&phdr, sizeof(phdr), vnode);
+        SeekInFile(vnode, eheader.e_phoff + i * eheader.e_phentsize, SEEK_SET);
+        ReadFile(&phdr, sizeof(phdr), vnode);
 
         if (phdr.p_type != PT_LOAD)
             continue;
@@ -47,9 +47,9 @@ void make_elf_process(const char *path)
 
         unsigned char *read = malloc(phdr.p_memsz);
         memset(read, 0, phdr_memsz);
-        fseek(vnode, phdr_offset, SEEK_SET);
-        fread(read, phdr_filesz, vnode);
+        SeekInFile(vnode, phdr_offset, SEEK_SET);
+        ReadFile(read, phdr_filesz, vnode);
 
-        map_task_page(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz);
+        MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz);
     }
 }

@@ -3,8 +3,8 @@
 #include <memory/mmu.h>
 #include <scheduler/process.h>
 
-task_t default_task = {0};
-task_t *scheduler_current;
+Task default_task = {0};
+Task *scheduler_current;
 bool stop = true;
 
 void printx(unsigned long x)
@@ -12,7 +12,7 @@ void printx(unsigned long x)
     LOG("x: %lu\n", x);
 }
 
-void add_task(task_t *task)
+void AddTask(Task *task)
 {
     if (!default_task.next)
     {
@@ -21,7 +21,7 @@ void add_task(task_t *task)
     }
     else
     {
-        task_t *last = default_task.next;
+        Task *last = default_task.next;
         while (last->next && last->next != default_task.next)
             last = last->next;
 
@@ -30,12 +30,12 @@ void add_task(task_t *task)
     }
 }
 
-void switch_task(task_t *next, unsigned long *stack)
+void switch_task(Task *next, unsigned long *stack)
 {
     if (scheduler_current == next)
         return;
 
-    task_t *last = scheduler_current;
+    Task *last = scheduler_current;
     scheduler_current = next;
 
     set_task_ttbr(next->mmu_ctx.pgd);
@@ -44,15 +44,15 @@ void switch_task(task_t *next, unsigned long *stack)
     cpu_switch_task(last, next, stack);
 }
 
-void scheduler_init()
+void SchedulerInit()
 {
     scheduler_current = &default_task;
 }
 
-task_t *get_next_task()
+Task *get_next_task()
 {
-    task_t *start = scheduler_current;
-    task_t *current = start;
+    Task *start = scheduler_current;
+    Task *current = start;
 
     do
     {
@@ -67,14 +67,14 @@ task_t *get_next_task()
     return current;
 }
 
-void schedule()
+void Schedule()
 {
-    task_t *current = get_next_task();
+    Task *current = get_next_task();
     if (current)
         switch_task(current, 0);
 }
 
-void scheduler_tick(unsigned long *stack)
+void SchedulerTick(unsigned long *stack)
 {
     if (stop)
         return;
@@ -84,11 +84,11 @@ void scheduler_tick(unsigned long *stack)
         return;
 
     scheduler_current->time = DEFAULT_TIME;
-    task_t *next = get_next_task();
+    Task *next = get_next_task();
     switch_task(next, stack);
 }
 
-task_t *get_running_task()
+Task *GetRunningTask()
 {
     return scheduler_current;
 }

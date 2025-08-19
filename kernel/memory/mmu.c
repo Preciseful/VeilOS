@@ -13,7 +13,7 @@
 #define PAGE_TABLE_ENTRIES 512
 #define PAGE_MASK 0xFFFFFFFFF000ULL
 
-void mmu_map_page(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
+void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -66,7 +66,7 @@ void mmu_map_page(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
-void mmu_unmap_page(unsigned long *pgd, VirtualAddr va)
+void UnmapTablePage(unsigned long *pgd, VirtualAddr va)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -91,7 +91,7 @@ void mmu_unmap_page(unsigned long *pgd, VirtualAddr va)
     l3[pte_index] = 0;
 }
 
-void mmu_map_block(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
+void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -163,7 +163,7 @@ unsigned long mmu_map_temp_block(unsigned long *pgd, unsigned long va, unsigned 
     return malloc_i;
 }
 
-void mmu_init()
+void MMUInit()
 {
     // retain the amount of memory allocated in total
     unsigned long high_memory_i = 0;
@@ -197,7 +197,7 @@ extern void kmain();
 
 void finish_higher(unsigned long high_memory_i)
 {
-    mm_init();
+    MMInit();
     malloc(PAGE_SIZE * high_memory_i);
 
     // make ttbr0 invalid, use only ttbr1

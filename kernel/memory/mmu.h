@@ -28,10 +28,10 @@ enum MMU_Flags
 typedef unsigned long VirtualAddr;
 typedef unsigned long PhysicalAddr;
 
-void mmu_map_page(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
-void mmu_unmap_page(unsigned long *pgd, VirtualAddr va);
-void mmu_map_block(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
-void mmu_init();
+void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
+void UnmapTablePage(unsigned long *pgd, VirtualAddr va);
+void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
+void MMUInit();
 
 extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);
 extern void refresh_ttbr(unsigned long pgd);

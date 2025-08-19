@@ -6,7 +6,7 @@
 #include <drivers/emmc.h>
 #include <lib/printf.h>
 
-vfs_root_t *get_root(const char *path)
+VfsRoot *get_root(const char *path)
 {
     for (unsigned long i = 0; i < get_vfs()->roots_count; i++)
     {
@@ -17,7 +17,7 @@ vfs_root_t *get_root(const char *path)
     return 0;
 }
 
-bool check_open_vnode(vfs_root_t *root, vnode_t *node)
+bool check_open_vnode(VfsRoot *root, VNode *node)
 {
     for (unsigned long i = 0; i < root->nodes_count; i++)
     {
@@ -28,9 +28,9 @@ bool check_open_vnode(vfs_root_t *root, vnode_t *node)
     return false;
 }
 
-void open_vnode(vfs_root_t *root, vnode_t *node)
+void open_vnode(VfsRoot *root, VNode *node)
 {
-    vnode_t **found = 0;
+    VNode **found = 0;
     for (unsigned long i = 0; i < root->nodes_count; i++)
     {
         if (root->open_nodes[i] == 0)
@@ -44,7 +44,7 @@ void open_vnode(vfs_root_t *root, vnode_t *node)
     {
         root->nodes_capacity *= 2;
 
-        vnode_t **new_nodes = malloc(root->nodes_capacity * sizeof(vnode_t));
+        VNode **new_nodes = malloc(root->nodes_capacity * sizeof(VNode));
         memcpy(new_nodes, root->open_nodes, root->nodes_count);
 
         free(root->open_nodes);
@@ -60,11 +60,11 @@ void open_vnode(vfs_root_t *root, vnode_t *node)
     }
 }
 
-bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_node, const char *path, unsigned long entry_path_size, unsigned long start)
+bool get_fat_node_from_path(VfsRoot *root, FatFSNode *node, bool found_node, const char *path, unsigned long entry_path_size, unsigned long start)
 {
-    fatfs_node_t *nodes = 0;
-    fatfs_t *fatfs = (fatfs_t *)root->fs;
-    unsigned long nodes_count = get_fatentries(root->fs, !found_node ? fatfs->root_cluster : node->content_cluster, &nodes);
+    FatFSNode *nodes = 0;
+    FatFS *fatfs = (FatFS *)root->fs;
+    unsigned long nodes_count = GetFatEntries(root->fs, !found_node ? fatfs->root_cluster : node->content_cluster, &nodes);
 
     for (unsigned long i = 0; i < nodes_count; i++)
     {
@@ -73,7 +73,7 @@ bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_nod
         if (memcmp(nodes[i].name, &path[start], entry_path_size) != 0)
             continue;
 
-        memcpy(node, &nodes[i], sizeof(fatfs_node_t));
+        memcpy(node, &nodes[i], sizeof(FatFSNode));
         free(nodes);
         return true;
     }
@@ -83,22 +83,22 @@ bool get_fat_node_from_path(vfs_root_t *root, fatfs_node_t *node, bool found_nod
     return false;
 }
 
-bool is_directory(void *node, enum FileSystems fs)
+bool is_directory(void *node, enum Filesystems fs)
 {
     switch (fs)
     {
     case FAT32:
-        return ((fatfs_node_t *)node)->entry.attrs & 0x10;
+        return ((FatFSNode *)node)->entry.attrs & 0x10;
     default:
         return false;
     }
 }
 
-void *entry_from_path(const char *path, vfs_root_t *root)
+void *entry_from_path(const char *path, VfsRoot *root)
 {
     bool found_node = false;
     bool finishing = false;
-    void *node = malloc(sizeof(fatfs_node_t));
+    void *node = malloc(sizeof(FatFSNode));
     unsigned long path_size = strlen(path);
 
     if (path_size == 0)
@@ -168,17 +168,17 @@ void *entry_from_path(const char *path, vfs_root_t *root)
     return node;
 }
 
-vnode_t *fopen(const char *path)
+VNode *OpenFile(const char *path)
 {
     unsigned long len = strlen(path);
     if (len == 0)
         return 0;
 
-    vfs_root_t *root = get_root(path);
+    VfsRoot *root = get_root(path);
     if (!root)
         return 0;
 
-    vnode_t *node = malloc(sizeof(vnode_t));
+    VNode *node = malloc(sizeof(VNode));
     node->path = path;
     node->root = root;
     if (check_open_vnode(root, node))
@@ -198,9 +198,9 @@ vnode_t *fopen(const char *path)
     return node;
 }
 
-void fclose(vnode_t *node)
+void CloseFile(VNode *node)
 {
-    vfs_root_t *root = get_root(node->path);
+    VfsRoot *root = get_root(node->path);
     if (!root)
         return;
 
@@ -214,7 +214,7 @@ void fclose(vnode_t *node)
     }
 }
 
-void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type)
+void SeekInFile(VNode *node, unsigned long seek, enum FSeek_Types type)
 {
     switch (type)
     {
@@ -231,7 +231,7 @@ void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type)
     }
 }
 
-unsigned long fread(void *write_buf, unsigned long size, vnode_t *node)
+unsigned long ReadFile(void *write_buf, unsigned long size, VNode *node)
 {
     if (is_directory(node, node->root->fs_type))
         return 0;
@@ -239,13 +239,13 @@ unsigned long fread(void *write_buf, unsigned long size, vnode_t *node)
     void *buf = write_buf;
     if (node->root->fs_type == FAT32)
     {
-        fatfs_node_t *entry = (fatfs_node_t *)node->data;
-        fatfs_t *fs = (fatfs_t *)node->root->fs;
+        FatFSNode *entry = (FatFSNode *)node->data;
+        FatFS *fs = (FatFS *)node->root->fs;
         if (size > entry->entry.size)
             size = entry->entry.size;
 
         void *init_buf = buf;
-        unsigned long cl_size = fat_cluster_size(fs);
+        unsigned long cl_size = FatClusterSize(fs);
         unsigned long first_cluster = node->seek / cl_size;
         unsigned long last_cluster = (node->seek + size - 1) / cl_size;
         unsigned long start = node->seek % cl_size;
@@ -255,7 +255,7 @@ unsigned long fread(void *write_buf, unsigned long size, vnode_t *node)
 
         for (unsigned long cluster = first_cluster; cluster <= last_cluster; cluster++)
         {
-            unsigned char *read = read_fatnode_at(*entry, cluster);
+            unsigned char *read = ReadFatNodeAt(*entry, cluster);
             unsigned char *cpy_start = read;
             unsigned long cpy_len = cl_size;
 
@@ -285,14 +285,14 @@ unsigned long fread(void *write_buf, unsigned long size, vnode_t *node)
     return 0;
 }
 
-void fwrite(void *buf, unsigned long size, vnode_t *node)
+void WriteToFile(void *buf, unsigned long size, VNode *node)
 {
     if (is_directory(node, node->root->fs_type))
         return;
 
     if (node->root->fs_type == FAT32)
     {
-        fatfs_node_t *entry = (fatfs_node_t *)node->data;
-        write_to_fatnode(entry, buf, size);
+        FatFSNode *entry = (FatFSNode *)node->data;
+        WriteToFatNode(entry, buf, size);
     }
 }

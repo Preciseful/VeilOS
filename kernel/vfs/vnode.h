@@ -15,17 +15,17 @@ enum FSeek_Types
     SEEK_CUR,
 };
 
-typedef struct vnode
+typedef struct VNode
 {
     const char *path;
-    vfs_root_t *root;
+    VfsRoot *root;
     enum VNode_Types type;
     unsigned long seek;
     void *data;
-} vnode_t;
+} VNode;
 
-vnode_t *fopen(const char *path);
-void fclose(vnode_t *node);
-void fseek(vnode_t *node, unsigned long seek, enum FSeek_Types type);
-unsigned long fread(void *buf, unsigned long size, vnode_t *node);
-void fwrite(void *buf, unsigned long size, vnode_t *node);
+VNode *OpenFile(const char *path);
+void CloseFile(VNode *node);
+void SeekInFile(VNode *node, unsigned long seek, enum FSeek_Types type);
+unsigned long ReadFile(void *buf, unsigned long size, VNode *node);
+void WriteToFile(void *buf, unsigned long size, VNode *node);

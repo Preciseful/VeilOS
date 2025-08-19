@@ -1,6 +1,6 @@
 #include <drivers/timer.h>
 
-void timer_sleep(unsigned int ms)
+void TimerSleep(unsigned int ms)
 {
     unsigned long start = timer_ticks();
 

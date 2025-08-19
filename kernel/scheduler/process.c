@@ -8,7 +8,7 @@
 
 extern unsigned char el1_vectors[];
 
-bool task_contains_va(task_t *task, VirtualAddr va)
+bool TaskContainsVA(Task *task, VirtualAddr va)
 {
     for (unsigned long i = 0; i < task->mappings_length; i++)
     {
@@ -19,7 +19,7 @@ bool task_contains_va(task_t *task, VirtualAddr va)
     return false;
 }
 
-void map_task_page(task_t *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len)
+void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len)
 {
     PhysicalAddr pa = VIRT_TO_PHYS(code);
     unsigned long num_pages = (code_len + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -27,17 +27,17 @@ void map_task_page(task_t *task, VirtualAddr va, enum MMU_Flags flags, VirtualAd
     for (unsigned long i = 0; i < num_pages; i++)
     {
         unsigned long offset = i * PAGE_SIZE;
-        mmu_map_page(task->mmu_ctx.pgd, va + offset, pa + offset, MAIR_IDX_NORMAL, flags);
+        MapTablePage(task->mmu_ctx.pgd, va + offset, pa + offset, MAIR_IDX_NORMAL, flags);
     }
 
-    task_mapping_t map;
+    TaskMapping map;
     map.code = code;
     map.va = va;
     map.pa = pa;
 
-    task_mapping_t *old_mappings = task->mappings;
-    task->mappings = malloc(sizeof(task_mapping_t) * (task->mappings_length + 1));
-    memcpy(task->mappings, old_mappings, sizeof(task_mapping_t) * task->mappings_length);
+    TaskMapping *old_mappings = task->mappings;
+    task->mappings = malloc(sizeof(TaskMapping) * (task->mappings_length + 1));
+    memcpy(task->mappings, old_mappings, sizeof(TaskMapping) * task->mappings_length);
 
     task->mappings[task->mappings_length] = map;
     task->mappings_length++;
@@ -46,22 +46,22 @@ void map_task_page(task_t *task, VirtualAddr va, enum MMU_Flags flags, VirtualAd
         free(old_mappings);
 }
 
-void unmap_task_page(task_t *task, VirtualAddr va, unsigned long length)
+void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
 {
-    if (!task_contains_va(task, va))
+    if (!TaskContainsVA(task, va))
         return;
 
     unsigned long num_pages = (length + PAGE_SIZE - 1) / PAGE_SIZE;
     for (unsigned long i = 0; i < num_pages; i++)
     {
         unsigned long offset = i * PAGE_SIZE;
-        mmu_unmap_page(task->mmu_ctx.pgd, va + offset);
+        UnmapTablePage(task->mmu_ctx.pgd, va + offset);
     }
 }
 
-task_t *pcreate(const char *name, VirtualAddr va, VirtualAddr code)
+Task *PCreate(const char *name, VirtualAddr va, VirtualAddr code)
 {
-    task_t *task = malloc(sizeof(task_t));
+    Task *task = malloc(sizeof(Task));
     task->name = name;
     task->flags = ACTIVE_TASK;
     task->time = DEFAULT_TIME;
@@ -82,9 +82,9 @@ task_t *pcreate(const char *name, VirtualAddr va, VirtualAddr code)
     memset(task->mmu_ctx.pgd, 0, PAGE_SIZE);
 
     if (code != 0)
-        map_task_page(task, task->mmu_ctx.va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
-    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
+        MapTaskPage(task, task->mmu_ctx.va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
+    MapTaskPage(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
 
-    add_task(task);
+    AddTask(task);
     return task;
 }

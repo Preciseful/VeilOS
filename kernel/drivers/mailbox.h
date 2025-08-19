@@ -39,7 +39,7 @@ enum Mailbox_Channels
 
 extern volatile unsigned int mailbox[36];
 
-unsigned int mailbox_clock(enum Mailbox_Clocks clock);
-bool mailbox_call(unsigned char channel);
+unsigned int GetMailboxClock(enum Mailbox_Clocks clock);
+bool CallMailbox(unsigned char channel);
 
 #endif

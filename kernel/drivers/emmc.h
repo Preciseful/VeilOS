@@ -158,11 +158,11 @@ typedef struct
 
 #define EMMC ((emmc_regs *)EMMC_BASE)
 
-bool emmc_init();
-int emmc_read(unsigned char *buffer, unsigned int size);
-int emmc_write(unsigned char *buffer, unsigned int size);
-void emmc_seek(unsigned long offset);
-bool emmc_command(unsigned int command, unsigned int arg, unsigned int timeout);
+bool EmmcInit();
+int ReadFromEMMC(unsigned char *buffer, unsigned int size);
+int WriteToEMMC(unsigned char *buffer, unsigned int size);
+void SeekInEMMC(unsigned long offset);
+bool CommandEMMC(unsigned int command, unsigned int arg, unsigned int timeout);
 
 #define EMMC_CTRL1_RESET_DATA (1 << 26)
 #define EMMC_CTRL1_RESET_CMD (1 << 25)

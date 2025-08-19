@@ -12,6 +12,6 @@
 
 #ifndef __ASSEMBLER__
 
-void gic_allow(unsigned int interrupt, unsigned int core);
+void AllowInterruptInGIC(unsigned int interrupt, unsigned int core);
 
 #endif

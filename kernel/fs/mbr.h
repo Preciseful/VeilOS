@@ -2,27 +2,27 @@
 
 #define BOOT_SIGNATURE 0xAA55
 
-typedef struct __attribute__((packed)) chs_address
+typedef struct __attribute__((packed)) ChsAddress
 {
     unsigned char head;
     unsigned char sector : 6;
     unsigned char cylinder_hi : 2;
     unsigned char cylinder_lo;
-} chs_address_t;
+} ChsAddress;
 
-typedef struct __attribute__((packed)) partition_entry
+typedef struct __attribute__((packed)) PartitionEntry
 {
     unsigned char status;
-    struct chs_address first_sector;
+    struct ChsAddress first_sector;
     unsigned char type;
-    struct chs_address last_sector;
+    struct ChsAddress last_sector;
     unsigned int first_lba_sector;
     unsigned int num_sectors;
-} partition_entry_t;
+} PartitionEntry;
 
-typedef struct __attribute__((packed)) master_boot_record
+typedef struct __attribute__((packed)) MasterBootRecord
 {
     unsigned char bootCode[0x1BE];
-    struct partition_entry partitions[4];
+    struct PartitionEntry partitions[4];
     unsigned short bootSignature;
-} mbr_t;
+} MasterBootRecord;

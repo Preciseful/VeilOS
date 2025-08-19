@@ -13,54 +13,54 @@
 
 void putc(void *p, char c)
 {
-    uart_put(c);
+    UartPut(c);
 }
 
-void uart_init()
+void UartInit()
 {
-    gpio_setAlt0(14);
-    gpio_setAlt0(15);
+    SetAlt0(14);
+    SetAlt0(15);
 
-    gpio_pull(14, Pull_None);
-    gpio_pull(15, Pull_None);
+    PullGPIO(14, Pull_None);
+    PullGPIO(15, Pull_None);
 
-    mmio_write(UART0_CR, 0);
-    mmio_write(UART0_IBRD, 26);
-    mmio_write(UART0_FBRD, 3);
-    mmio_write(UART0_LCRH, 3 << 5);
-    mmio_write(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
-    mmio_write(UART0_IMSC, 1 << 4);
+    WriteToMMIO(UART0_CR, 0);
+    WriteToMMIO(UART0_IBRD, 26);
+    WriteToMMIO(UART0_FBRD, 3);
+    WriteToMMIO(UART0_LCRH, 3 << 5);
+    WriteToMMIO(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
+    WriteToMMIO(UART0_IMSC, 1 << 4);
 
-    init_printf(0, putc);
+    PrintfInit(0, putc);
 }
 
-void uart_put(char c)
+void UartPut(char c)
 {
     if (c == '\n')
-        uart_put('\r');
-    while (mmio_read(UART0_FR) & (1 << 5))
+        UartPut('\r');
+    while (ReadMMIO(UART0_FR) & (1 << 5))
         ;
-    mmio_write(UART0_DR, c);
+    WriteToMMIO(UART0_DR, c);
 }
 
-void uart_puts(const char *str)
+void UartPuts(const char *str)
 {
     while (*str)
     {
         if (*str == '\n')
-            uart_put('\r');
-        uart_put(*str++);
+            UartPut('\r');
+        UartPut(*str++);
     }
 }
 
-char uart_character()
+char UartCharacter()
 {
-    return (char)mmio_read(UART0_DR);
+    return (char)ReadMMIO(UART0_DR);
 }
 
-char uart_recv()
+char UartRecv()
 {
-    while (mmio_read(UART0_FR) & (1 << 4))
+    while (ReadMMIO(UART0_FR) & (1 << 4))
         ;
-    return (char)mmio_read(UART0_DR);
+    return (char)ReadMMIO(UART0_DR);
 }

@@ -14,22 +14,22 @@ void handle_svc(unsigned long *sp)
     switch (code)
     {
     case 0:
-        printf("%c", sp[0]);
+        Printf("%c", sp[0]);
         break;
 
     case 1:
         sp[0] = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
         // this piece of code seems to make no sense as we pass a phys to virtual,
         // but it is because its virtual in user space
-        map_task_page(get_running_task(), sp[0], MMU_RWRW, sp[0], PAGE_SIZE);
+        MapTaskPage(GetRunningTask(), sp[0], MMU_RWRW, sp[0], PAGE_SIZE);
         break;
 
     case 2:
-        if (!task_contains_va(get_running_task(), sp[0]))
+        if (!TaskContainsVA(GetRunningTask(), sp[0]))
             break;
 
         unsigned long len = free(PHYS_TO_VIRT((void *)sp[0]));
-        unmap_task_page(get_running_task(), sp[0], len);
+        UnmapTaskPage(GetRunningTask(), sp[0], len);
         break;
 
     default:
@@ -59,7 +59,7 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
 
 void handle_irq(unsigned long *stack)
 {
-    unsigned int iar = mmio_read(GICC_IAR);
+    unsigned int iar = ReadMMIO(GICC_IAR);
     unsigned int id = iar & 0x2FF;
 
     switch (id)
@@ -68,19 +68,19 @@ void handle_irq(unsigned long *stack)
     case 30:
         // printf(".");
         refresh_cntp_tval(SYS_FREQ);
-        mmio_write(GICC_EOIR, iar);
-        scheduler_tick(stack);
+        WriteToMMIO(GICC_EOIR, iar);
+        SchedulerTick(stack);
         break;
 
     // uart0
     case 153:
-        LOG("got: %c\n", uart_character());
-        mmio_write(GICC_EOIR, iar);
+        LOG("got: %c\n", UartCharacter());
+        WriteToMMIO(GICC_EOIR, iar);
         break;
 
     default:
         LOG("Unknown IRQ %u\n", id);
-        mmio_write(GICC_EOIR, iar);
+        WriteToMMIO(GICC_EOIR, iar);
         break;
     }
 }

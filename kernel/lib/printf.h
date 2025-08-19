@@ -59,7 +59,7 @@ something like :
 Before you can call printf you need to initialize it to use your
 character output function with something like:
 
-    init_printf(NULL,putc);
+    PrintfInit(NULL,putc);
 
 Notice the 'NULL' in 'init_printf' and the parameter 'void* p' in 'putc',
 the NULL (or any pointer) you pass into the 'init_printf' will eventually be
@@ -93,20 +93,20 @@ regs Kusti, 23.10.2004
 #pragma GCC diagnostic ignored "-Wmultistatement-macros"
 
 #define PRINTF_MAGIC_PADDING "                 "
-#define LOG(x, ...)                                                                                 \
-    tfp_printf("[%s]%s" x, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1), ##__VA_ARGS__); \
+#define LOG(x, ...)                                                                                \
+    TFPPrintf("[%s]%s" x, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1), ##__VA_ARGS__); \
     _Static_assert(sizeof(__func__) - 1 <= sizeof(PRINTF_MAGIC_PADDING), "Function name too long for printing.");
 
 #include <stdarg.h>
 
-void init_printf(void *putp, void (*putf)(void *, char));
+void PrintfInit(void *putp, void (*putf)(void *, char));
 
-void tfp_printf(char *fmt, ...);
-void tfp_sprintf(char *s, char *fmt, ...);
+void TFPPrintf(char *fmt, ...);
+void TFPSPrintf(char *s, char *fmt, ...);
 
-void tfp_format(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
+void TFPFormat(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
 
-#define printf tfp_printf
-#define sprintf tfp_sprintf
+#define Printf TFPPrintf
+#define SPrintf TFPSPrintf
 
 #endif

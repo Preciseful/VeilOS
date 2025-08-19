@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 
-typedef struct __attribute__((packed)) fat32_extbs
+typedef struct __attribute__((packed)) Fat32ExtBS
 {
     unsigned int table_size_32;
     unsigned short extended_flags;
@@ -17,9 +17,9 @@ typedef struct __attribute__((packed)) fat32_extbs
     unsigned int volume_id;
     char volume_label[11];
     unsigned char fat_type_label[8];
-} fat32_extbs_t;
+} Fat32ExtBS;
 
-typedef struct __attribute__((packed)) fat32_bs
+typedef struct __attribute__((packed)) Fat32BS
 {
     unsigned char bootjmp[3];
     unsigned char oem_name[8];
@@ -35,10 +35,10 @@ typedef struct __attribute__((packed)) fat32_bs
     unsigned short head_side_count;
     unsigned int hidden_sector_count;
     unsigned int total_sectors_32;
-    struct fat32_extbs ext;
-} fat32_bs_t;
+    struct Fat32ExtBS ext;
+} Fat32BS;
 
-typedef struct __attribute__((packed)) fat32_dir_entry
+typedef struct __attribute__((packed)) Fat32DirEntry
 {
     unsigned char name[8];
     unsigned char ext[3];
@@ -53,9 +53,9 @@ typedef struct __attribute__((packed)) fat32_dir_entry
     unsigned short modification_date;
     unsigned short cluster_low;
     unsigned int size;
-} fat32_entry_t;
+} Fat32DirEntry;
 
-typedef struct __attribute__((packed)) long_filename
+typedef struct __attribute__((packed)) Fat32LFNEntry
 {
     unsigned char order;
     unsigned short characters1[5];
@@ -65,36 +65,36 @@ typedef struct __attribute__((packed)) long_filename
     unsigned short characters2[6];
     unsigned short res2;
     unsigned short characters3[2];
-} lfn_entry_t;
+} Fat32LFNEntry;
 
-typedef struct fatfs
+typedef struct FatFS
 {
-    fat32_bs_t *bs;
+    Fat32BS *bs;
     unsigned int root_cluster;
     unsigned int first_data_sector;
     unsigned int first_fat_sector;
     unsigned int sectors_per_fat;
-} fatfs_t;
+} FatFS;
 
-typedef struct fatfs_node
+typedef struct FatFSNode
 {
     unsigned int lfn_count;
-    lfn_entry_t lfn_entries[20];
-    fat32_entry_t entry;
+    Fat32LFNEntry lfn_entries[20];
+    Fat32DirEntry entry;
     char *name;
     char *extension;
     unsigned int cluster;
     unsigned int content_cluster;
     unsigned int parent_cluster;
-    fatfs_t *fatfs;
-} fatfs_node_t;
+    FatFS *fatfs;
+} FatFSNode;
 
-fatfs_t *fatfs_init();
-unsigned int fat_cluster_size(fatfs_t *fs);
-unsigned long get_fatentries(fatfs_t *fs, unsigned int cluster, fatfs_node_t **bnodes);
+FatFS *FatFSInit();
+unsigned int FatClusterSize(FatFS *fs);
+unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes);
 
-unsigned char *read_fatnode(fatfs_node_t node);
-unsigned char *read_fatnode_at(fatfs_node_t node, unsigned long pos);
+unsigned char *ReadFatNode(FatFSNode node);
+unsigned char *ReadFatNodeAt(FatFSNode node, unsigned long pos);
 
-bool write_to_fatnode(fatfs_node_t *node, const char *cbuf, unsigned long size);
-fatfs_node_t create_fatnode(fatfs_t *fs, unsigned int parent_cluster, const char *name, unsigned char attrs);
+bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size);
+FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name, unsigned char attrs);
