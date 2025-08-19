@@ -8,7 +8,7 @@
 
 extern unsigned char el1_vectors[];
 
-bool task_contains_va(task_t *task, virtual_addr va)
+bool task_contains_va(task_t *task, VirtualAddr va)
 {
     for (unsigned long i = 0; i < task->mappings_length; i++)
     {
@@ -19,9 +19,9 @@ bool task_contains_va(task_t *task, virtual_addr va)
     return false;
 }
 
-void map_task_page(task_t *task, virtual_addr va, enum MMU_Flags flags, virtual_addr code, unsigned long code_len)
+void map_task_page(task_t *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len)
 {
-    physical_addr pa = VIRT_TO_PHYS(code);
+    PhysicalAddr pa = VIRT_TO_PHYS(code);
     unsigned long num_pages = (code_len + PAGE_SIZE - 1) / PAGE_SIZE;
 
     for (unsigned long i = 0; i < num_pages; i++)
@@ -46,7 +46,7 @@ void map_task_page(task_t *task, virtual_addr va, enum MMU_Flags flags, virtual_
         free(old_mappings);
 }
 
-void unmap_task_page(task_t *task, virtual_addr va, unsigned long length)
+void unmap_task_page(task_t *task, VirtualAddr va, unsigned long length)
 {
     if (!task_contains_va(task, va))
         return;
@@ -59,7 +59,7 @@ void unmap_task_page(task_t *task, virtual_addr va, unsigned long length)
     }
 }
 
-task_t *pcreate(const char *name, virtual_addr va, virtual_addr code)
+task_t *pcreate(const char *name, VirtualAddr va, VirtualAddr code)
 {
     task_t *task = malloc(sizeof(task_t));
     task->name = name;

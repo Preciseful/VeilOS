@@ -13,7 +13,7 @@
 #define PAGE_TABLE_ENTRIES 512
 #define PAGE_MASK 0xFFFFFFFFF000ULL
 
-void mmu_map_page(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags)
+void mmu_map_page(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -66,7 +66,7 @@ void mmu_map_page(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigne
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
-void mmu_unmap_page(unsigned long *pgd, virtual_addr va)
+void mmu_unmap_page(unsigned long *pgd, VirtualAddr va)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -91,7 +91,7 @@ void mmu_unmap_page(unsigned long *pgd, virtual_addr va)
     l3[pte_index] = 0;
 }
 
-void mmu_map_block(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags)
+void mmu_map_block(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;

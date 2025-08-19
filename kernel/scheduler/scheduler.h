@@ -29,17 +29,17 @@ typedef struct task_regs
 
 typedef struct task_mapping
 {
-    virtual_addr code;
-    virtual_addr va;
-    physical_addr pa;
+    VirtualAddr code;
+    VirtualAddr va;
+    PhysicalAddr pa;
 } task_mapping_t;
 
 typedef struct task_mmu_ctx
 {
     unsigned long *pgd;
-    virtual_addr sp_alloc;
-    virtual_addr va;
-    physical_addr pa;
+    VirtualAddr sp_alloc;
+    VirtualAddr va;
+    PhysicalAddr pa;
 } task_mmu_ctx_t;
 
 typedef struct task
