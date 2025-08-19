@@ -13,59 +13,7 @@
 #define PAGE_TABLE_ENTRIES 512
 #define PAGE_MASK 0xFFFFFFFFF000ULL
 
-void debug_mmu_address(unsigned long *pgd, unsigned long va)
-{
-    unsigned long l1_index = (va >> 39) & 0x1FF;
-    unsigned long l2_index = (va >> 30) & 0x1FF;
-    unsigned long l3_index = (va >> 21) & 0x1FF;
-    unsigned long pte_index = (va >> 12) & 0x1FF;
-
-    LOG("Address is meant to be mapped to [%d][%d][%d][%d].\n", l1_index, l2_index, l3_index, pte_index);
-
-    if (!(pgd[l1_index] & 1))
-    {
-        LOG("L1 Table missing!\n");
-        return;
-    }
-
-    unsigned long *l1 = (unsigned long *)(pgd[l1_index] & 0xFFFFFFFFF000ULL);
-
-    if (!(l1[l2_index] & 1))
-    {
-        LOG("L2 Table missing!\n");
-        return;
-    }
-
-    unsigned long *l2 = (unsigned long *)(l1[l2_index] & 0xFFFFFFFFF000ULL);
-    unsigned long l2_val = l2[l3_index];
-
-    if (!(l2_val & 1))
-    {
-        LOG("L3 Table missing!\n");
-        return;
-    }
-
-    if (!((l2_val >> 1) & 1))
-    {
-        LOG("Mapped as 2MB memory in L2!\n");
-        LOG("Entry: %x\n", l2_val);
-        return;
-    }
-
-    unsigned long *l3 = (unsigned long *)(l2[l3_index] & 0xFFFFFFFFF000ULL);
-    unsigned long l3_val = l3[pte_index];
-
-    if (!(l3_val & 1))
-    {
-        LOG("PTE missing!\n");
-        return;
-    }
-
-    LOG("Entry: %x\n", l3_val);
-    return;
-}
-
-void mmu_map_page(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
+void mmu_map_page(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -118,7 +66,7 @@ void mmu_map_page(unsigned long *pgd, unsigned long va, unsigned long pa, unsign
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 
-void mmu_unmap_page(unsigned long *pgd, unsigned long va)
+void mmu_unmap_page(unsigned long *pgd, virtual_addr va)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;
@@ -143,7 +91,7 @@ void mmu_unmap_page(unsigned long *pgd, unsigned long va)
     l3[pte_index] = 0;
 }
 
-void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags)
+void mmu_map_block(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags)
 {
     unsigned long l1_index = (va >> 39) & 0x1FF;
     unsigned long l2_index = (va >> 30) & 0x1FF;

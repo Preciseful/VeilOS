@@ -25,11 +25,13 @@ enum MMU_Flags
     MMU_RR = 0b11
 };
 
-void mmu_map_page(unsigned long *table, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
-void mmu_unmap_page(unsigned long *pgd, unsigned long va);
-void mmu_map_block(unsigned long *pgd, unsigned long va, unsigned long pa, unsigned long index, enum MMU_Flags flags);
+typedef unsigned long virtual_addr;
+typedef unsigned long physical_addr;
+
+void mmu_map_page(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags);
+void mmu_unmap_page(unsigned long *pgd, virtual_addr va);
+void mmu_map_block(unsigned long *pgd, virtual_addr va, physical_addr pa, unsigned long index, enum MMU_Flags flags);
 void mmu_init();
-void debug_mmu_address(unsigned long *pgd, unsigned long va);
 
 extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);
 extern void refresh_ttbr(unsigned long pgd);

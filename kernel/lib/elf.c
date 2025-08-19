@@ -50,6 +50,6 @@ void make_elf_process(const char *path)
         fseek(vnode, phdr_offset, SEEK_SET);
         fread(read, phdr_filesz, vnode);
 
-        map_task_page(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, read, phdr_memsz);
+        map_task_page(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (virtual_addr)read, phdr_memsz);
     }
 }

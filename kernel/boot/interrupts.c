@@ -19,7 +19,9 @@ void handle_svc(unsigned long *sp)
 
     case 1:
         sp[0] = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
-        map_task_page(get_running_task(), sp[0], MMU_RWRW, (void *)sp[0], PAGE_SIZE);
+        // this piece of code seems to make no sense as we pass a phys to virtual,
+        // but it is because its virtual in user space
+        map_task_page(get_running_task(), sp[0], MMU_RWRW, sp[0], PAGE_SIZE);
         break;
 
     case 2:

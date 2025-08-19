@@ -8,7 +8,7 @@
 
 extern unsigned char el1_vectors[];
 
-bool task_contains_va(task_t *task, unsigned long va)
+bool task_contains_va(task_t *task, virtual_addr va)
 {
     for (unsigned long i = 0; i < task->mappings_length; i++)
     {
@@ -19,9 +19,9 @@ bool task_contains_va(task_t *task, unsigned long va)
     return false;
 }
 
-void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *code, unsigned long code_len)
+void map_task_page(task_t *task, virtual_addr va, enum MMU_Flags flags, virtual_addr code, unsigned long code_len)
 {
-    unsigned long pa = VIRT_TO_PHYS((unsigned long)code);
+    physical_addr pa = VIRT_TO_PHYS(code);
     unsigned long num_pages = (code_len + PAGE_SIZE - 1) / PAGE_SIZE;
 
     for (unsigned long i = 0; i < num_pages; i++)
@@ -46,7 +46,7 @@ void map_task_page(task_t *task, unsigned long va, enum MMU_Flags flags, void *c
         free(old_mappings);
 }
 
-void unmap_task_page(task_t *task, unsigned long va, unsigned long length)
+void unmap_task_page(task_t *task, virtual_addr va, unsigned long length)
 {
     if (!task_contains_va(task, va))
         return;
@@ -59,7 +59,7 @@ void unmap_task_page(task_t *task, unsigned long va, unsigned long length)
     }
 }
 
-task_t *pcreate(const char *name, unsigned long va, void *code)
+task_t *pcreate(const char *name, virtual_addr va, virtual_addr code)
 {
     task_t *task = malloc(sizeof(task_t));
     task->name = name;
@@ -74,7 +74,7 @@ task_t *pcreate(const char *name, unsigned long va, void *code)
     task->mmu_ctx.va = va;
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
 
-    task->mmu_ctx.phys_sp = (unsigned long)malloc(PAGE_SIZE);
+    task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
     task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
     task->mappings = 0;
     task->mappings_length = 0;
@@ -83,7 +83,7 @@ task_t *pcreate(const char *name, unsigned long va, void *code)
 
     if (code != 0)
         map_task_page(task, task->mmu_ctx.va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
-    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, (void *)task->mmu_ctx.phys_sp, 1);
+    map_task_page(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
 
     add_task(task);
     return task;

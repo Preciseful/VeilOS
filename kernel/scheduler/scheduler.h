@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <memory/mmu.h>
 
 #define USER_TASK 0b1
 #define ACTIVE_TASK 0b10
@@ -28,17 +29,17 @@ typedef struct task_regs
 
 typedef struct task_mapping
 {
-    void *code;
-    unsigned long va;
-    unsigned long pa;
+    virtual_addr code;
+    virtual_addr va;
+    physical_addr pa;
 } task_mapping_t;
 
 typedef struct task_mmu_ctx
 {
     unsigned long *pgd;
-    unsigned long phys_sp;
-    unsigned long va;
-    unsigned long pa;
+    virtual_addr sp_alloc;
+    virtual_addr va;
+    physical_addr pa;
 } task_mmu_ctx_t;
 
 typedef struct task
