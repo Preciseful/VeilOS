@@ -38,9 +38,9 @@ void switch_task(task_t *next, unsigned long *stack)
     task_t *last = scheduler_current;
     scheduler_current = next;
 
-    set_task_ttbr(next->pgd);
+    set_task_ttbr(next->mmu_ctx.pgd);
     stop = false;
-    LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->va);
+    LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->mmu_ctx.va);
     cpu_switch_task(last, next, stack);
 }
 

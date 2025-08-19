@@ -33,19 +33,25 @@ typedef struct task_mapping
     unsigned long pa;
 } task_mapping_t;
 
-typedef struct task
+typedef struct task_mmu_ctx
 {
-    task_regs_t regs;
-    const char *name;
-    unsigned long flags;
     unsigned long *pgd;
     unsigned long phys_sp;
     unsigned long va;
     unsigned long pa;
+} task_mmu_ctx_t;
+
+typedef struct task
+{
+    task_regs_t regs;
+    task_mmu_ctx_t mmu_ctx;
     task_mapping_t *mappings;
     unsigned long mappings_length;
-    long time;
     struct task *next;
+
+    const char *name;
+    unsigned long flags;
+    long time;
 } task_t;
 
 void scheduler_init();
