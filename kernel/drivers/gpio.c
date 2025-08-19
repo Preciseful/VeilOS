@@ -32,45 +32,45 @@ bool CallGPIO(unsigned long pin, unsigned long value, enum GPIO_Actions base, un
 
 bool SetGPIO(unsigned long pin, unsigned long value)
 {
-    return CallGPIO(pin, value, GPSET0, 1, MAX_PIN);
+    return CallGPIO(pin, value, GPIOSET0, 1, GPIO_MAX_PIN);
 }
 
 bool ClearGPIO(unsigned long pin, unsigned long value)
 {
-    return CallGPIO(pin, value, GPCLR0, 1, MAX_PIN);
+    return CallGPIO(pin, value, GPIOCLR0, 1, GPIO_MAX_PIN);
 }
 
 bool PullGPIO(unsigned long pin, enum GPIO_Pulls pull)
 {
-    return CallGPIO(pin, pull, GPPUPPDN0, 2, MAX_PIN);
+    return CallGPIO(pin, pull, GPIOPUPPDN0, 2, GPIO_MAX_PIN);
 }
 
 bool SetGPIOFunction(unsigned long pin, enum GPIO func)
 {
-    return CallGPIO(pin, func, GPFSEL0, 3, MAX_PIN);
+    return CallGPIO(pin, func, GPIOFSEL0, 3, GPIO_MAX_PIN);
 }
 
 void SetAlt0(unsigned long pin)
 {
-    PullGPIO(pin, Pull_None);
+    PullGPIO(pin, GPIO_PULL_NONE);
     SetGPIOFunction(pin, GPIO_FUNCTION_ALT0);
 }
 
 void SetAlt3(unsigned long pin)
 {
-    PullGPIO(pin, Pull_None);
+    PullGPIO(pin, GPIO_PULL_NONE);
     SetGPIOFunction(pin, GPIO_FUNCTION_ALT3);
 }
 
 void SetAlt5(unsigned long pin)
 {
-    PullGPIO(pin, Pull_None);
+    PullGPIO(pin, GPIO_PULL_NONE);
     SetGPIOFunction(pin, GPIO_FUNCTION_ALT5);
 }
 
 void InitOutputPinWithPullNone(unsigned long pin_number)
 {
-    PullGPIO(pin_number, Pull_None);
+    PullGPIO(pin_number, GPIO_PULL_NONE);
     SetGPIOFunction(pin_number, GPIO_FUNCTION_OUT);
 }
 

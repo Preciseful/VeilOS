@@ -21,8 +21,8 @@ void UartInit()
     SetAlt0(14);
     SetAlt0(15);
 
-    PullGPIO(14, Pull_None);
-    PullGPIO(15, Pull_None);
+    PullGPIO(14, GPIO_PULL_NONE);
+    PullGPIO(15, GPIO_PULL_NONE);
 
     WriteToMMIO(UART0_CR, 0);
     WriteToMMIO(UART0_IBRD, 26);
