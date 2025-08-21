@@ -91,6 +91,8 @@ void set_filename(FatFS *fs, FatFSNode *node)
         free(name);
     }
 
+    node->name[j] = '\0';
+
     unsigned long exti = 0;
     bool foundext = false;
     for (unsigned long i = 0; i < strlen(node->name); i++)

@@ -52,11 +52,13 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
 
     unsigned long *l3 = (unsigned long *)PHYS_TO_VIRT((l2[l3_index] & PAGE_MASK));
 
+    unsigned char ng = 0;
     bool uxn = !((flags & MMU_USER_EXEC) >> 2);
     bool pxn = !uxn;
     unsigned long perm = flags & 0b11;
-
-    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
+    if (perm == MMU_RR || perm == MMU_RWRW)
+        ng = 1;
+    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | (ng << 11) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)
     {
         LOG("[MMU warning]: Section already mapped (%x).\n", va);

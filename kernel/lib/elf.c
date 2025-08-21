@@ -45,8 +45,7 @@ void MakeELFProcess(const char *path)
         unsigned long phdr_filesz = phdr.p_filesz + pad_front;
         unsigned long phdr_memsz = phdr.p_memsz + pad_front;
 
-        unsigned char *read = malloc(phdr.p_memsz);
-
+        unsigned char *read = malloc(phdr_memsz);
         memset(read, 0, phdr_memsz);
         SeekInFile(vnode, phdr_offset, SEEK_SET);
         ReadFile(read, phdr_filesz, vnode);
@@ -55,4 +54,5 @@ void MakeELFProcess(const char *path)
     }
 
     CloseFile(vnode);
+    free(vnode);
 }

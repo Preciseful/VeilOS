@@ -141,8 +141,8 @@ void *entry_from_path(const char *path, VfsRoot *root)
         {
             LOG("Cannot find: \"");
             for (unsigned long i = 0; i < entry_path_size; i++)
-                LOG("%c", path[start + i]);
-            LOG("\"\n");
+                Printf("%c", path[start + i]);
+            Printf("\"\n");
             free(node);
             return 0;
         }

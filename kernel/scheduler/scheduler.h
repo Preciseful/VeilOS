@@ -36,6 +36,7 @@ typedef struct TaskMapping
 
 typedef struct TaskMMUCtx
 {
+    unsigned char asid;
     unsigned long *pgd;
     VirtualAddr sp_alloc;
     VirtualAddr va;

@@ -6,7 +6,7 @@
 #define MAIR_IDX_NORMAL 1
 
 #define MAIR_VALUE (MAIR_DEVICE_nGnRnE << (MAIR_IDX_DEVICE * 8)) | (MAIR_NORMAL_NOCACHE << (MAIR_IDX_NORMAL * 8))
-#define TCR_VALUE (((64 - 48) << 0) | ((64 - 48) << 16) | (0b00 << 14) | (0b10 << 30))
+#define TCR_VALUE (((64 - 48) << 0) | ((64 - 48) << 16) | (0b00 << 14) | (0b10 << 30) | (0b0 << 22) | (0b0 << 36))
 
 #ifndef __ASSEMBLER__
 
@@ -15,9 +15,11 @@
 #define GRANULE_4KB 0x1000
 #define GRANULE_2MB 0x200000
 #define GRANULE_1GB 0x40000000UL
+#define TTBR_BADDR_MASK (0x0000FFFFFFFFFFFFUL)
 
 enum MMU_Flags
 {
+    MMU_USER = 0b1000,
     MMU_USER_EXEC = 0b100,
     MMU_NORW = 0b00,
     MMU_RWRW = 0b01,

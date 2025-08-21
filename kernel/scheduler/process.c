@@ -5,8 +5,11 @@
 
 #define EL1H_M 0b0101
 #define EL0T_M 0b0000
+#define ASID_CHUNKS_NUMBER 255
 
 extern unsigned char el1_vectors[];
+
+Task *asid_chunks[ASID_CHUNKS_NUMBER][255] = {};
 
 bool TaskContainsVA(Task *task, VirtualAddr va)
 {
@@ -71,19 +74,37 @@ Task *PCreate(const char *name, VirtualAddr va, VirtualAddr code)
     task->regs.sp = GRANULE_1GB * 2 + PAGE_SIZE;
     task->regs.sp_el1 = (unsigned long)malloc(PAGE_SIZE) + PAGE_SIZE;
 
-    task->mmu_ctx.va = va;
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
-
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
-    task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
     task->mappings = 0;
     task->mappings_length = 0;
+    task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
+    task->mmu_ctx.va = va;
+
+    for (int i = 0; i < ASID_CHUNKS_NUMBER; i++)
+    {
+        bool found_asid = false;
+
+        for (int j = 0; j < 255; j++)
+        {
+            if (!asid_chunks[i][j])
+            {
+                found_asid = true;
+                task->mmu_ctx.asid = j;
+                asid_chunks[i][j] = task;
+                break;
+            }
+        }
+
+        if (found_asid)
+            break;
+    }
 
     memset(task->mmu_ctx.pgd, 0, PAGE_SIZE);
 
     if (code != 0)
-        MapTaskPage(task, task->mmu_ctx.va, MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
-    MapTaskPage(task, task->regs.sp - PAGE_SIZE, MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
+        MapTaskPage(task, task->mmu_ctx.va, MMU_USER | MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
+    MapTaskPage(task, task->regs.sp - PAGE_SIZE, MMU_USER | MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
 
     AddTask(task);
     return task;
