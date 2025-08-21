@@ -46,7 +46,9 @@ void kmain()
     LOG("VFS initialized with root FAT32.\n");
 
     MakeELFProcess("/modules/Luna.elf");
+    MakeELFProcess("/modules/Luna.elf");
 
+    LOG("die");
     while (1)
     {
         Schedule();

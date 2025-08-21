@@ -19,9 +19,10 @@ VfsRoot *get_root(const char *path)
 
 bool check_open_vnode(VfsRoot *root, VNode *node)
 {
+    Printf("!");
     for (unsigned long i = 0; i < root->nodes_count; i++)
     {
-        if (strcmp(root->open_nodes[i]->path, node->path) == 0)
+        if (root->open_nodes[i] && strcmp(root->open_nodes[i]->path, node->path) == 0)
             return true;
     }
 
@@ -170,6 +171,7 @@ void *entry_from_path(const char *path, VfsRoot *root)
 
 VNode *OpenFile(const char *path)
 {
+    Printf("0");
     unsigned long len = strlen(path);
     if (len == 0)
         return 0;
@@ -178,6 +180,7 @@ VNode *OpenFile(const char *path)
     if (!root)
         return 0;
 
+    Printf("1");
     VNode *node = malloc(sizeof(VNode));
     node->path = path;
     node->root = root;
@@ -187,6 +190,8 @@ VNode *OpenFile(const char *path)
         return 0;
     }
 
+    Printf("2");
+
     void *entry = entry_from_path(path, root);
     node->data = entry;
     if (is_directory(node, node->root->fs_type))
@@ -194,7 +199,9 @@ VNode *OpenFile(const char *path)
     else
         node->type = VNODE_FILE;
 
+    Printf("3");
     open_vnode(root, node);
+    Printf("4");
     return node;
 }
 
