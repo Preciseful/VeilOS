@@ -36,6 +36,7 @@ typedef struct TaskMapping
 
 typedef struct TaskMMUCtx
 {
+    unsigned long asid_chunk;
     unsigned char asid;
     unsigned long *pgd;
     VirtualAddr sp_alloc;
@@ -62,4 +63,4 @@ void AddTask(Task *task);
 void SchedulerTick(unsigned long *stack);
 Task *GetRunningTask();
 extern void cpu_switch_task(Task *prev, Task *next, unsigned long *sp);
-extern void set_task_ttbr(unsigned long *pgd);
+extern void set_task_ttbr(unsigned long *pgd, bool flush);

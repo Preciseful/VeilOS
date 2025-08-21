@@ -5,11 +5,11 @@
 
 #define EL1H_M 0b0101
 #define EL0T_M 0b0000
-#define ASID_CHUNKS_NUMBER 255
+#define ASID_CHUNKS_NUMBER 256
 
 extern unsigned char el1_vectors[];
 
-Task *asid_chunks[ASID_CHUNKS_NUMBER][255] = {};
+Task *asid_chunks[ASID_CHUNKS_NUMBER][256] = {};
 
 bool TaskContainsVA(Task *task, VirtualAddr va)
 {
@@ -85,12 +85,13 @@ Task *PCreate(const char *name, VirtualAddr va, VirtualAddr code)
     {
         bool found_asid = false;
 
-        for (int j = 0; j < 255; j++)
+        for (int j = 0; j < 256; j++)
         {
             if (!asid_chunks[i][j])
             {
                 found_asid = true;
                 task->mmu_ctx.asid = j;
+                task->mmu_ctx.asid_chunk = i;
                 asid_chunks[i][j] = task;
                 break;
             }

@@ -3,7 +3,10 @@
 .global set_task_ttbr
 set_task_ttbr:
 	msr ttbr0_el1, x0
-	dsb ish
+	cmp x1, #0
+	beq 1f
+    tlbi vmalle1is
+1:	dsb ish
 	isb
 	ret
 

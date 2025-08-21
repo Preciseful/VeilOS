@@ -5,7 +5,8 @@
 
 Task default_task = {0};
 Task *scheduler_current;
-bool stop = true;
+unsigned long last_asid_chunk;
+bool stop;
 
 void printx(unsigned long x)
 {
@@ -38,14 +39,26 @@ void switch_task(Task *next, unsigned long *stack)
     Task *last = scheduler_current;
     scheduler_current = next;
 
-    set_task_ttbr(((unsigned long)next->mmu_ctx.asid << 48) | ((unsigned long)VIRT_TO_PHYS(next->mmu_ctx.pgd) & TTBR_BADDR_MASK));
+    bool flush = false;
+    unsigned long baddr = (unsigned long)VIRT_TO_PHYS(next->mmu_ctx.pgd) & TTBR_BADDR_MASK;
+    unsigned long asid = (unsigned long)next->mmu_ctx.asid << 48;
+
+    if (last_asid_chunk != next->mmu_ctx.asid_chunk)
+        flush = true;
+
+    set_task_ttbr(asid | baddr, flush);
+
+    last_asid_chunk = next->mmu_ctx.asid_chunk;
     stop = false;
+
     LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->mmu_ctx.va);
     cpu_switch_task(last, next, stack);
 }
 
 void SchedulerInit()
 {
+    last_asid_chunk = 0;
+    stop = true;
     scheduler_current = &default_task;
 }
 
