@@ -12,7 +12,7 @@
 #include <lib/string.h>
 #include <vfs/vfs.h>
 #include <vfs/vnode.h>
-#include <lib/elf.h>
+#include <bundles/elf.h>
 #include <syscall/syscall.h>
 
 void kboot()
