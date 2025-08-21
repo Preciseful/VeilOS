@@ -7,13 +7,12 @@
 
 void MakeELFProcess(const char *path)
 {
-    Printf("a");
     VNode *vnode = OpenFile(path);
-    Printf("b");
+
     Elf64_Ehdr eheader;
     SeekInFile(vnode, 0, SEEK_SET);
     ReadFile(&eheader, sizeof(eheader), vnode);
-    Printf("c");
+
     if (memcmp(eheader.e_ident, ELFMAG, 4) != 0)
     {
         LOG("ELF file provided is not of the corresponding type.\n");
@@ -26,20 +25,17 @@ void MakeELFProcess(const char *path)
         return;
     }
 
-    Printf("d");
     Task *task = PCreate(path, eheader.e_entry, 0);
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
-        Printf("e");
         Elf64_Phdr phdr;
         SeekInFile(vnode, eheader.e_phoff + i * eheader.e_phentsize, SEEK_SET);
         ReadFile(&phdr, sizeof(phdr), vnode);
-        Printf("f");
+
         if (phdr.p_type != PT_LOAD)
             continue;
 
-        Printf("g");
         // align down both of these to page
         unsigned long phdr_offset = (phdr.p_offset / PAGE_SIZE) * PAGE_SIZE;
         unsigned long phdr_vaddr = (phdr.p_vaddr / PAGE_SIZE) * PAGE_SIZE;
@@ -50,16 +46,13 @@ void MakeELFProcess(const char *path)
         unsigned long phdr_memsz = phdr.p_memsz + pad_front;
 
         unsigned char *read = malloc(phdr.p_memsz);
-        Printf("h");
+
         memset(read, 0, phdr_memsz);
         SeekInFile(vnode, phdr_offset, SEEK_SET);
         ReadFile(read, phdr_filesz, vnode);
-        Printf("i");
 
         MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz);
-        Printf("j");
     }
 
     CloseFile(vnode);
-    Printf("k\n");
 }

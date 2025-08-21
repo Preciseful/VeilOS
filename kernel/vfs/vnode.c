@@ -19,7 +19,6 @@ VfsRoot *get_root(const char *path)
 
 bool check_open_vnode(VfsRoot *root, VNode *node)
 {
-    Printf("!");
     for (unsigned long i = 0; i < root->nodes_count; i++)
     {
         if (root->open_nodes[i] && strcmp(root->open_nodes[i]->path, node->path) == 0)
