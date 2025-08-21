@@ -14,6 +14,7 @@
 #include <vfs/vnode.h>
 #include <bundles/elf.h>
 #include <syscall/syscall.h>
+#include <bundles/vex.h>
 
 void kboot()
 {
@@ -46,7 +47,7 @@ void kmain()
 
     LOG("VFS initialized with root FAT32.\n");
 
-    MakeELFProcess("/modules/Luna.elf");
+    MakeVexProcess("/modules/Luna.vex");
 
     while (1)
     {

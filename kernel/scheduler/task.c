@@ -74,6 +74,7 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
     task->regs.spsr = EL0T_M;
     task->regs.sp = GRANULE_1GB * 2 + PAGE_SIZE;
     task->regs.sp_el1 = (unsigned long)malloc(PAGE_SIZE) + PAGE_SIZE;
+    task->bundle = 0;
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
@@ -108,6 +109,5 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
         MapTaskPage(task, task->mmu_ctx.va, MMU_USER | MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
     MapTaskPage(task, task->regs.sp - PAGE_SIZE, MMU_USER | MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
 
-    AddTask(task);
     return task;
 }
