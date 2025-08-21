@@ -22,6 +22,6 @@ typedef struct VirtualFS
     VfsRoot *roots;
 } VirtualFS;
 
-void vfs_init();
-VfsRoot *add_root(void *fs, unsigned int fs_type, char id);
+void VfsInit();
+VfsRoot *AddRootToVfs(void *fs, unsigned int fs_type, char id);
 VirtualFS *get_vfs();

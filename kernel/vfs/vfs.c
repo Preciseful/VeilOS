@@ -11,7 +11,7 @@ VirtualFS *get_vfs()
     return vfs;
 }
 
-void vfs_init()
+void VfsInit()
 {
     vfs = malloc(sizeof(VirtualFS));
     vfs->roots_count = 0;
@@ -19,7 +19,7 @@ void vfs_init()
     vfs->roots = malloc(sizeof(VfsRoot));
 }
 
-VfsRoot *add_root(void *fs, unsigned int fs_type, char id)
+VfsRoot *AddRootToVfs(void *fs, unsigned int fs_type, char id)
 {
     if (vfs->roots_count == vfs->roots_capacity)
     {

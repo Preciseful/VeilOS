@@ -40,8 +40,8 @@ void kmain()
     EmmcInit();
 
     FatFS *fatfs = FatFSInit();
-    vfs_init();
-    add_root(fatfs, FAT32, '/');
+    VfsInit();
+    AddRootToVfs(fatfs, FAT32, '/');
 
     LOG("VFS initialized with root FAT32.\n");
 
