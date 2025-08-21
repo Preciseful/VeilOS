@@ -1,7 +1,8 @@
-#include <scheduler/process.h>
+#include <scheduler/task.h>
 #include <memory/memory.h>
 #include <lib/printf.h>
 #include <syscall/syscall.h>
+#include <scheduler/scheduler.h>
 
 #define EL1H_M 0b0101
 #define EL0T_M 0b0000
@@ -62,7 +63,7 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
     }
 }
 
-Task *PCreate(const char *name, VirtualAddr va, VirtualAddr code)
+Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
 {
     Task *task = malloc(sizeof(Task));
     task->name = name;

@@ -1,7 +1,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/printf.h>
 #include <memory/mmu.h>
-#include <scheduler/process.h>
+#include <scheduler/task.h>
 
 Task default_task = {0};
 Task *scheduler_current;

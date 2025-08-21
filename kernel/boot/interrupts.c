@@ -6,7 +6,7 @@
 #include <drivers/timer.h>
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
-#include <scheduler/process.h>
+#include <scheduler/task.h>
 
 void handle_svc(unsigned long *sp)
 {

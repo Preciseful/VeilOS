@@ -3,7 +3,8 @@
 #include <boot/interrupts.h>
 #include <lib/printf.h>
 #include <drivers/timer.h>
-#include <scheduler/process.h>
+#include <scheduler/task.h>
+#include <scheduler/scheduler.h>
 #include <fs/fat32.h>
 #include <drivers/emmc.h>
 #include <memory/memory.h>

@@ -3,7 +3,7 @@
 #include <memory/mmu.h>
 #include <memory/memory.h>
 #include <lib/printf.h>
-#include <scheduler/process.h>
+#include <scheduler/task.h>
 
 void MakeELFProcess(const char *path)
 {
@@ -25,7 +25,7 @@ void MakeELFProcess(const char *path)
         return;
     }
 
-    Task *task = PCreate(path, eheader.e_entry, 0);
+    Task *task = CreateTask(path, eheader.e_entry, 0);
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
