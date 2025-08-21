@@ -170,7 +170,6 @@ void *entry_from_path(const char *path, VfsRoot *root)
 
 VNode *OpenFile(const char *path)
 {
-    Printf("0");
     unsigned long len = strlen(path);
     if (len == 0)
         return 0;
@@ -179,7 +178,6 @@ VNode *OpenFile(const char *path)
     if (!root)
         return 0;
 
-    Printf("1");
     VNode *node = malloc(sizeof(VNode));
     node->path = path;
     node->root = root;
@@ -189,8 +187,6 @@ VNode *OpenFile(const char *path)
         return 0;
     }
 
-    Printf("2");
-
     void *entry = entry_from_path(path, root);
     node->data = entry;
     if (is_directory(node, node->root->fs_type))
@@ -198,9 +194,7 @@ VNode *OpenFile(const char *path)
     else
         node->type = VNODE_FILE;
 
-    Printf("3");
     open_vnode(root, node);
-    Printf("4");
     return node;
 }
 
