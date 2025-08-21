@@ -40,7 +40,7 @@ void switch_task(Task *next, unsigned long *stack)
     scheduler_current = next;
 
     bool flush = false;
-    unsigned long baddr = (unsigned long)VIRT_TO_PHYS(next->mmu_ctx.pgd) & TTBR_BADDR_MASK;
+    unsigned long baddr = VIRT_TO_PHYS((unsigned long)next->mmu_ctx.pgd) & TTBR_BADDR_MASK;
     unsigned long asid = (unsigned long)next->mmu_ctx.asid << 48;
 
     if (last_asid_chunk != next->mmu_ctx.asid_chunk)
