@@ -14,7 +14,7 @@ Task *asid_chunks[ASID_CHUNKS_NUMBER][256] = {};
 
 bool TaskContainsVA(Task *task, VirtualAddr va)
 {
-    ListObject *obj = task->mappings.object;
+    ListObject *obj = task->mappings.first;
     while (obj)
     {
         if (GET_VALUE(obj, TaskMapping)->va == va)
@@ -71,7 +71,7 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
-    task->mappings.object = 0;
+    task->mappings.first = 0;
 
     task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;

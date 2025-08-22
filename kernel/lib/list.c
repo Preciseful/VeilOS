@@ -7,13 +7,13 @@ void AddToList(List *list, void *object_value)
     object->value = object_value;
     object->next = 0;
 
-    if (!list->object)
+    if (!list->first)
     {
-        list->object = object;
+        list->first = object;
         return;
     }
 
-    ListObject *current = list->object;
+    ListObject *current = list->first;
     while (current->next)
         current = current->next;
 
@@ -23,14 +23,14 @@ void AddToList(List *list, void *object_value)
 void *RemoveFromList(List *list, void *object_value)
 {
     ListObject *last = 0;
-    ListObject *current = list->object;
+    ListObject *current = list->first;
 
     while (current)
     {
         if (current->value == object_value)
         {
             if (last == 0)
-                list->object = current->next;
+                list->first = current->next;
             else
                 last->next = current->next;
 

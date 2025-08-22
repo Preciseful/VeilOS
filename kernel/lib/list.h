@@ -10,7 +10,7 @@ typedef struct ListObject
 
 typedef struct List
 {
-    ListObject *object;
+    ListObject *first;
 } List;
 
 void AddToList(List *list, void *object_value);
