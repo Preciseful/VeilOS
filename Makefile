@@ -15,9 +15,7 @@ lib:
 	$(MAKE) -C library ARMGNU=$(ARMGNU)
 
 setup:
-	rm -rf $(RPI_PATH)/kernel*
-	cp -rf config.txt $(RPI_PATH)
-	mkdir $(RPI_PATH)/modules
+	scripts/setup.sh $(RPI_PATH)
 
 dump:
 	$(ARMGNU)-objdump -D $(BUILD_DIR)/kernel8.elf > dump
@@ -52,4 +50,4 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	./go_rpi.sh $(RPI_PATH)
+	scripts/go_rpi.sh $(RPI_PATH)/kernel

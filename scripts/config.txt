@@ -1,0 +1,13 @@
+# aarch64 enable
+arm_64bit=1
+
+# enable gic
+armstub=armstub8-gic.bin
+
+# enable uart
+enable_uart=1
+dtoverlay=disable-bt
+
+# point firmware to these files
+kernel=kernel/kernel8.img
+device_tree=dtb/bcm2711-rpi-4-b.dtb
