@@ -14,4 +14,4 @@ typedef struct List
 } List;
 
 void AddToList(List *list, void *object_value);
-void *RemoveFromList(List *list, void *object_value);
+void RemoveFromList(List *list, void *object_value);

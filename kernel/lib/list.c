@@ -20,7 +20,7 @@ void AddToList(List *list, void *object_value)
     current->next = object;
 }
 
-void *RemoveFromList(List *list, void *object_value)
+void RemoveFromList(List *list, void *object_value)
 {
     ListObject *last = 0;
     ListObject *current = list->first;
@@ -35,12 +35,12 @@ void *RemoveFromList(List *list, void *object_value)
                 last->next = current->next;
 
             free(current);
-            return current->value;
+            return;
         }
 
         last = current;
         current = current->next;
     }
 
-    return 0;
+    return;
 }
