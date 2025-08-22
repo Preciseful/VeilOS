@@ -41,7 +41,7 @@ void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr c
     map->va = va;
     map->pa = pa;
 
-    AddToList(task->mappings, map);
+    AddToList(&task->mappings, map);
 }
 
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
