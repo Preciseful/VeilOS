@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory/mmu.h>
+#include <lib/list.h>
 
 #define USER_TASK 0b1
 #define ACTIVE_TASK 0b10
@@ -46,8 +47,7 @@ typedef struct Task
 {
     TaskRegs regs;
     TaskMMUCtx mmu_ctx;
-    TaskMapping *mappings;
-    unsigned long mappings_length;
+    List mappings;
     struct Task *next;
 
     const char *name;

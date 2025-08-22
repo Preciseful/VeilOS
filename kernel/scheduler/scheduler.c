@@ -3,6 +3,8 @@
 #include <memory/mmu.h>
 #include <scheduler/task.h>
 
+// TODO: make this use the new lib/list.h
+
 Task default_task = {0};
 Task *scheduler_current;
 unsigned long last_asid_chunk;

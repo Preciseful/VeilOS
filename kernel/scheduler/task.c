@@ -14,10 +14,12 @@ Task *asid_chunks[ASID_CHUNKS_NUMBER][256] = {};
 
 bool TaskContainsVA(Task *task, VirtualAddr va)
 {
-    for (unsigned long i = 0; i < task->mappings_length; i++)
+    ListObject *obj = task->mappings.object;
+    while (obj)
     {
-        if (task->mappings[i].va == va)
+        if (GET_VALUE(obj, TaskMapping)->va == va)
             return true;
+        obj = obj->next;
     }
 
     return false;
@@ -34,20 +36,12 @@ void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr c
         MapTablePage(task->mmu_ctx.pgd, va + offset, pa + offset, MAIR_IDX_NORMAL, flags);
     }
 
-    TaskMapping map;
-    map.code = code;
-    map.va = va;
-    map.pa = pa;
+    TaskMapping *map = malloc(sizeof(TaskMapping));
+    map->code = code;
+    map->va = va;
+    map->pa = pa;
 
-    TaskMapping *old_mappings = task->mappings;
-    task->mappings = malloc(sizeof(TaskMapping) * (task->mappings_length + 1));
-    memcpy(task->mappings, old_mappings, sizeof(TaskMapping) * task->mappings_length);
-
-    task->mappings[task->mappings_length] = map;
-    task->mappings_length++;
-
-    if (old_mappings != 0)
-        free(old_mappings);
+    AddToList(task->mappings, map);
 }
 
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
@@ -77,8 +71,8 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
-    task->mappings = 0;
-    task->mappings_length = 0;
+    task->mappings.object = 0;
+
     task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
 

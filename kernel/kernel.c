@@ -47,6 +47,7 @@ void kmain()
     LOG("VFS initialized with root FAT32.\n");
 
     MakeElfProcess("/kernel/modules/Luna.elf");
+    MakeElfProcess("/kernel/modules/Luna.elf");
 
     while (1)
     {
