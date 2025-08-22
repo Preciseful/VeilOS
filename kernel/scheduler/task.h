@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory/mmu.h>
-#include <bundles/vex.h>
 
 #define USER_TASK 0b1
 #define ACTIVE_TASK 0b10
@@ -50,7 +49,6 @@ typedef struct Task
     TaskMapping *mappings;
     unsigned long mappings_length;
     struct Task *next;
-    Vex *bundle;
 
     const char *name;
     unsigned long flags;

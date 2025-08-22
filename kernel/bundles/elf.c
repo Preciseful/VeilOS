@@ -6,12 +6,12 @@
 #include <scheduler/task.h>
 #include <scheduler/scheduler.h>
 
-Task *MakeELFProcess(const char *path, bool add, unsigned long offset)
+Task *MakeElfProcess(const char *path)
 {
     VNode *vnode = OpenFile(path);
 
     Elf64_Ehdr eheader;
-    SeekInFile(vnode, offset + 0, SEEK_SET);
+    SeekInFile(vnode, 0, SEEK_SET);
     ReadFile(&eheader, sizeof(eheader), vnode);
 
     if (memcmp(eheader.e_ident, ELFMAG, 4) != 0)
@@ -31,7 +31,7 @@ Task *MakeELFProcess(const char *path, bool add, unsigned long offset)
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
         Elf64_Phdr phdr;
-        SeekInFile(vnode, offset + eheader.e_phoff + i * eheader.e_phentsize, SEEK_SET);
+        SeekInFile(vnode, eheader.e_phoff + i * eheader.e_phentsize, SEEK_SET);
         ReadFile(&phdr, sizeof(phdr), vnode);
 
         if (phdr.p_type != PT_LOAD)
@@ -48,7 +48,7 @@ Task *MakeELFProcess(const char *path, bool add, unsigned long offset)
 
         unsigned char *read = malloc(phdr_memsz);
         memset(read, 0, phdr_memsz);
-        SeekInFile(vnode, offset + phdr_offset, SEEK_SET);
+        SeekInFile(vnode, phdr_offset, SEEK_SET);
         ReadFile(read, phdr_filesz, vnode);
 
         MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz);
@@ -57,8 +57,7 @@ Task *MakeELFProcess(const char *path, bool add, unsigned long offset)
     CloseFile(vnode);
     free(vnode);
 
-    if (add)
-        AddTask(task);
+    AddTask(task);
 
     return task;
 }
