@@ -60,3 +60,15 @@ void UnregisterPortal(enum Portal_Category category, PortalID id)
 
     free(portal);
 }
+
+Portal *GetPortal(enum Portal_Category category, PortalID id)
+{
+    for (ListObject *object = overseer.portals.first; object; object = object->next)
+    {
+        Portal *current_portal = GET_VALUE(object, Portal);
+        if (current_portal->category == category && current_portal->id == id)
+            return current_portal;
+    }
+
+    return 0;
+}

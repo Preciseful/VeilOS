@@ -47,7 +47,7 @@ void kmain()
 
     LOG("VFS initialized with root FAT32.\n");
 
-    RegisterPortal(PORTAL_UART, 0, 0, 0);
+    RegisterPortal(PORTAL_UART, UartPortalRead, UartPortalWrite, 0);
 
     MakeElfProcess("/kernel/modules/Luna.elf");
     MakeElfProcess("/kernel/modules/Luna.elf");

@@ -64,3 +64,15 @@ char UartRecv()
         ;
     return (char)ReadMMIO(UART0_DR);
 }
+
+void UartPortalRead(unsigned char *buf, unsigned long length)
+{
+    for (unsigned long i = 0; i < length; i++)
+        buf[i] = (unsigned char)UartRecv();
+}
+
+void UartPortalWrite(unsigned char *buf, unsigned long length)
+{
+    for (unsigned long i = 0; i < length; i++)
+        UartPut((char)buf[i]);
+}

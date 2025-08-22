@@ -7,6 +7,46 @@
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
 #include <scheduler/task.h>
+#include <interface/portal.h>
+
+void handle_portal(unsigned long *sp)
+{
+    unsigned long category = sp[0];
+    unsigned long id = sp[1];
+
+    Portal *portal = GetPortal(category, id);
+    if (!portal)
+    {
+        LOG("no such portal bruh %lu %lu", category, id);
+        return;
+    }
+
+    switch (sp[2])
+    {
+        // read
+    case 0:
+        if (portal->read)
+            portal->read((unsigned char *)sp[3], sp[4]);
+        break;
+
+        // write
+    case 1:
+        if (portal->write)
+            portal->write((unsigned char *)sp[3], sp[4]);
+        break;
+
+        // read
+    case 2:
+        if (portal->request)
+            sp[0] = portal->request(sp[3], (void *)sp[4]);
+        else
+            sp[0] = 0;
+        break;
+
+    default:
+        break;
+    }
+}
 
 void handle_svc(unsigned long *sp)
 {
@@ -14,7 +54,7 @@ void handle_svc(unsigned long *sp)
     switch (code)
     {
     case 0:
-        Printf("%c", sp[0]);
+        handle_portal(sp);
         break;
 
     case 1:
