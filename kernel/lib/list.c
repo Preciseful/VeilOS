@@ -20,6 +20,16 @@ void AddToList(List *list, void *object_value)
     current->next = object;
 }
 
+void RemoveKnownFromList(List *list, ListObject *prev, ListObject *current)
+{
+    if (prev == 0)
+        list->first = current->next;
+    else
+        prev->next = current->next;
+
+    free(current);
+}
+
 void RemoveFromList(List *list, void *object_value)
 {
     ListObject *last = 0;
@@ -29,18 +39,11 @@ void RemoveFromList(List *list, void *object_value)
     {
         if (current->value == object_value)
         {
-            if (last == 0)
-                list->first = current->next;
-            else
-                last->next = current->next;
-
-            free(current);
+            RemoveKnownFromList(list, last, current);
             return;
         }
 
         last = current;
         current = current->next;
     }
-
-    return;
 }

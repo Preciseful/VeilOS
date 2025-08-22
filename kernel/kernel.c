@@ -14,6 +14,7 @@
 #include <vfs/vnode.h>
 #include <bundles/elf.h>
 #include <syscall/syscall.h>
+#include <interface/portal.h>
 
 void kboot()
 {
@@ -45,6 +46,8 @@ void kmain()
     AddRootToVfs(fatfs, FAT32, '/');
 
     LOG("VFS initialized with root FAT32.\n");
+
+    RegisterPortal(PORTAL_UART, 0, 0, 0);
 
     MakeElfProcess("/kernel/modules/Luna.elf");
     MakeElfProcess("/kernel/modules/Luna.elf");
