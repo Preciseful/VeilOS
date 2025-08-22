@@ -3,7 +3,8 @@
 #include <memory/mmu.h>
 #include <scheduler/task.h>
 
-// TODO: make this use the new lib/list.h
+// dont use lib/list.h here as that allocates more
+// + if it works, dont fix it
 
 Task default_task = {0};
 Task *scheduler_current;
