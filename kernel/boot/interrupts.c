@@ -16,10 +16,7 @@ void handle_portal(unsigned long *sp)
 
     Portal *portal = GetPortal(category, id);
     if (!portal)
-    {
-        LOG("no such portal bruh %lu %lu", category, id);
         return;
-    }
 
     switch (sp[2])
     {
