@@ -50,10 +50,7 @@ void kmain()
     RegisterPortal(PORTAL_UART, UartPortalRead, UartPortalWrite, 0);
 
     MakeElfProcess("/kernel/modules/Luna.elf");
-    MakeElfProcess("/kernel/modules/Luna.elf");
 
     while (1)
-    {
         Schedule();
-    }
 }
