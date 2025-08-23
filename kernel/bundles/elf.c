@@ -9,6 +9,8 @@
 Task *MakeElfProcess(const char *path)
 {
     VNode *vnode = OpenFile(path);
+    if (!vnode)
+        return;
 
     Elf64_Ehdr eheader;
     SeekInFile(vnode, 0, SEEK_SET);
