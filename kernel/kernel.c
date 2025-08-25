@@ -57,16 +57,6 @@ void kmain()
 
     MakeElfProcess("@kernel/modules/Luna.elf");
 
-    VNode *node = OpenFile("/123");
-    SeekInFile(node, 0, SEEK_SET);
-
-    LOG("Node: %s\n", node->path);
-    char *read = malloc(VOIDITE_CONTENT_SIZE * 5);
-    unsigned long read_count = ReadFile(read, VOIDITE_CONTENT_SIZE * 5, node);
-    read[read_count] = 0;
-
-    LOG("read : \n%s\n", read);
-
     while (1)
         Schedule();
 }
