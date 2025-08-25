@@ -119,49 +119,50 @@ void set_filename(FatFS *fs, FatFSNode *node)
     }
 }
 
-Fat32BS *get_fat(unsigned long offset)
+bool get_fat(Fat32BS *bs, unsigned long offset)
 {
     SeekInEMMC(offset);
-    unsigned char *buf = malloc(512);
+    unsigned char buf[512];
     int read = ReadFromEMMC(buf, 512);
 
     if (read < 0)
     {
         LOG("Read failed.\n");
-        return 0;
+        return false;
     }
 
     if (read != 512)
     {
         LOG("Read only %d bytes.\n", read);
-        return 0;
+        return false;
     }
 
-    Fat32BS *bs = (Fat32BS *)buf;
+    memcpy(bs, buf, sizeof(Fat32BS));
+
     if (bs->bootjmp[0] != 0xeb)
     {
         LOG("Not a valid FAT filesystem.\n", bs->bootjmp[0]);
-        return 0;
+        return false;
     }
 
     unsigned int root_dir_sectors = (bs->root_entry_count * 32 + bs->bytes_per_sector - 1) / bs->bytes_per_sector;
     if (root_dir_sectors != 0)
     {
         LOG("Root dir sectors isnt 0. FAT32 requires this to be 0.\n");
-        return 0;
+        return false;
     }
 
-    return bs;
+    return true;
 }
 
-FatFS *FatFSInit(Partition partition)
+bool FatFSInit(FatFS *fs, Partition partition)
 {
-    FatFS *fs = malloc(sizeof(FatFS));
-    Fat32BS *bs;
-
-    bs = get_fat(partition.offset);
-    if (!bs)
-        return 0;
+    Fat32BS *bs = malloc(sizeof(Fat32BS));
+    if (!get_fat(bs, partition.offset))
+    {
+        free(bs);
+        return false;
+    }
 
     fs->partition = partition;
     fs->bs = bs;
@@ -169,7 +170,7 @@ FatFS *FatFSInit(Partition partition)
     fs->first_data_sector = bs->reserved_sector_count + (bs->table_count * bs->ext.table_size_32);
     fs->first_fat_sector = bs->reserved_sector_count;
     fs->sectors_per_fat = bs->ext.table_size_32;
-    return fs;
+    return true;
 }
 
 unsigned int free_cluster(FatFS *fs)

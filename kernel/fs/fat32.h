@@ -91,7 +91,7 @@ typedef struct FatFSNode
     FatFS *fatfs;
 } FatFSNode;
 
-FatFS *FatFSInit(Partition partition);
+bool FatFSInit(FatFS *fs, Partition partition);
 unsigned int FatClusterSize(FatFS *fs);
 unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes);
 
