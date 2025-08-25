@@ -49,7 +49,7 @@ void kmain()
 
     VfsInit();
     AddRootToVfs(fatfs, FAT32, '@');
-    AddRootToVfs(voidom, VOIDELLE, '/');
+    AddRootToVfs(voidom, VOIDELLE, VOIDELLE_ROOT_CHARACTER);
 
     LOG("VFS initialized with boot FAT32 and root VOIDELLE.\n");
 
