@@ -26,7 +26,7 @@ VfsRoot *AddRootToVfs(void *fs, unsigned int fs_type, char id)
         vfs->roots_capacity *= 2;
 
         VfsRoot *new_roots = malloc(vfs->roots_capacity * sizeof(VfsRoot));
-        memcpy(new_roots, vfs->roots, vfs->roots_count);
+        memcpy(new_roots, vfs->roots, sizeof(VfsRoot) * vfs->roots_count);
 
         free(vfs->roots);
         vfs->roots = new_roots;

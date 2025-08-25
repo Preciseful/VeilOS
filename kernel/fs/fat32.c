@@ -154,37 +154,20 @@ Fat32BS *get_fat(unsigned long offset)
     return bs;
 }
 
-FatFS *FatFSInit()
+FatFS *FatFSInit(Partition partition)
 {
     FatFS *fs = malloc(sizeof(FatFS));
     Fat32BS *bs;
-    MasterBootRecord mbr;
-    SeekInEMMC(0);
-    ReadFromEMMC((unsigned char *)&mbr, sizeof(mbr));
 
-    if (mbr.bootSignature != BOOT_SIGNATURE)
-    {
-        LOG("Bad MBR signature.\n");
-        return 0;
-    }
-
-    for (int i = 0; mbr.partitions[i].type != 0; i++)
-    {
-        bs = get_fat((unsigned long)mbr.partitions[i].first_lba_sector * 512);
-        if (bs)
-        {
-            LOG("Found FAT32 on partition %d.\n", i + 1);
-            break;
-        }
-    }
-
+    bs = get_fat(partition.offset);
     if (!bs)
         return 0;
 
+    fs->partition = partition;
     fs->bs = bs;
     fs->root_cluster = bs->ext.root_cluster;
-    fs->first_data_sector = bs->reserved_sector_count + (bs->table_count * bs->ext.table_size_32) + 8192;
-    fs->first_fat_sector = bs->reserved_sector_count + 8192;
+    fs->first_data_sector = bs->reserved_sector_count + (bs->table_count * bs->ext.table_size_32);
+    fs->first_fat_sector = bs->reserved_sector_count;
     fs->sectors_per_fat = bs->ext.table_size_32;
     return fs;
 }
@@ -196,7 +179,7 @@ unsigned int free_cluster(FatFS *fs)
 
     for (unsigned int i = 0; i < fs->sectors_per_fat; i++)
     {
-        SeekInEMMC((fs->first_fat_sector + i) * 512);
+        SeekInEMMC(fs->partition.offset + (fs->first_fat_sector + i) * 512);
         ReadFromEMMC(FAT_table, 512);
 
         for (unsigned int entry = 0; entry < entries; entry++)
@@ -225,7 +208,7 @@ unsigned int next_cluster(FatFS *fs, unsigned int cluster_no)
     unsigned int fat_sector = fs->first_fat_sector + (fat_offset / fs->bs->bytes_per_sector);
     unsigned int ent_offset = fat_offset % fs->bs->bytes_per_sector;
 
-    SeekInEMMC(fat_sector * 512);
+    SeekInEMMC(fs->partition.offset + fat_sector * 512);
     ReadFromEMMC(FAT_table, 512);
 
     unsigned int table_value = *(unsigned int *)&FAT_table[ent_offset];
@@ -242,7 +225,7 @@ unsigned int read_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
     unsigned int cluster_sector = ((cluster - 2) * fs->bs->sectors_per_cluster) + fs->first_data_sector;
     unsigned int entries_bytes = FatClusterSize(fs);
 
-    SeekInEMMC(cluster_sector * 512);
+    SeekInEMMC(fs->partition.offset + cluster_sector * 512);
     ReadFromEMMC(buf, entries_bytes);
 
     return entries_bytes;
@@ -253,7 +236,7 @@ unsigned int write_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
     unsigned int cluster_sector = ((cluster - 2) * fs->bs->sectors_per_cluster) + fs->first_data_sector;
     unsigned int entries_bytes = FatClusterSize(fs);
 
-    SeekInEMMC(cluster_sector * 512);
+    SeekInEMMC(fs->partition.offset + cluster_sector * 512);
     WriteToEMMC(buf, entries_bytes);
 
     return entries_bytes;
@@ -266,13 +249,13 @@ void write_cluster_link(FatFS *fs, unsigned int cluster_no, unsigned int value)
     unsigned int fat_sector = fs->first_fat_sector + (fat_offset / fs->bs->bytes_per_sector);
     unsigned int ent_offset = fat_offset % fs->bs->bytes_per_sector;
 
-    SeekInEMMC(fat_sector * 512);
+    SeekInEMMC(fs->partition.offset + fat_sector * 512);
     ReadFromEMMC(FAT_table, 512);
 
     value &= 0x0FFFFFFF;
     *(unsigned int *)&FAT_table[ent_offset] = value;
 
-    SeekInEMMC(fat_sector * 512);
+    SeekInEMMC(fs->partition.offset + fat_sector * 512);
     WriteToEMMC(FAT_table, 512);
 }
 
@@ -301,7 +284,7 @@ bool update_entry(unsigned int parent_cluster, FatFSNode *target_entry, bool cle
     for (unsigned int sector = 0; sector < fs->bs->sectors_per_cluster; sector++)
     {
         unsigned char sector_buf[512];
-        SeekInEMMC((cluster_sector + sector) * 512);
+        SeekInEMMC(fs->partition.offset + (cluster_sector + sector) * 512);
         ReadFromEMMC(sector_buf, 512);
 
         Fat32DirEntry *entries = (Fat32DirEntry *)sector_buf;
@@ -330,7 +313,7 @@ bool update_entry(unsigned int parent_cluster, FatFSNode *target_entry, bool cle
                     content = next_cluster(fs, content);
                 }
 
-                SeekInEMMC((cluster_sector + sector) * 512);
+                SeekInEMMC(fs->partition.offset + (cluster_sector + sector) * 512);
                 WriteToEMMC(sector_buf, 512);
                 return true;
             }
@@ -493,7 +476,7 @@ FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name
 
             unsigned int cluster_sector = ((parent_cluster - 2) * fs->bs->sectors_per_cluster) + fs->first_data_sector;
 
-            SeekInEMMC(cluster_sector * 512);
+            SeekInEMMC(fs->partition.offset + cluster_sector * 512);
             WriteToEMMC(buf, entries_bytes);
             LOG("Created file %s.\n", name);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <interface/partition.h>
 
 typedef struct __attribute__((packed)) Fat32ExtBS
 {
@@ -69,6 +70,7 @@ typedef struct __attribute__((packed)) Fat32LFNEntry
 
 typedef struct FatFS
 {
+    Partition partition;
     Fat32BS *bs;
     unsigned int root_cluster;
     unsigned int first_data_sector;
@@ -89,7 +91,7 @@ typedef struct FatFSNode
     FatFS *fatfs;
 } FatFSNode;
 
-FatFS *FatFSInit();
+FatFS *FatFSInit(Partition partition);
 unsigned int FatClusterSize(FatFS *fs);
 unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes);
 

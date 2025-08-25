@@ -3,6 +3,7 @@
 #include <memory/memory.h>
 #include <vfs/vfs.h>
 #include <fs/fat32.h>
+#include <fs/voidelle.h>
 #include <drivers/emmc.h>
 #include <lib/printf.h>
 
@@ -44,7 +45,7 @@ void open_vnode(VfsRoot *root, VNode *node)
     {
         root->nodes_capacity *= 2;
 
-        VNode **new_nodes = malloc(root->nodes_capacity * sizeof(VNode));
+        VNode **new_nodes = malloc(root->nodes_capacity * sizeof(VNode *));
         memcpy(new_nodes, root->open_nodes, root->nodes_count);
 
         free(root->open_nodes);
@@ -89,6 +90,8 @@ bool is_directory(void *node, enum Filesystems fs)
     {
     case FAT32:
         return ((FatFSNode *)node)->entry.attrs & 0x10;
+    case VOIDELLE:
+        return ((Voidelle *)node)->flags & VOIDELLE_DIRECTORY;
     default:
         return false;
     }
@@ -96,6 +99,18 @@ bool is_directory(void *node, enum Filesystems fs)
 
 void *entry_from_path(const char *path, VfsRoot *root)
 {
+    if (root->fs_type == VOIDELLE)
+    {
+        Voidelle *voidelle = malloc(sizeof(Voidelle));
+        if (!GetVoidelleFromPath(root->fs, path, voidelle))
+        {
+            LOG("Voidelle at '%s' does not exist!\n", path);
+            return 0;
+        }
+
+        return voidelle;
+    }
+
     bool found_node = false;
     bool finishing = false;
     void *node = malloc(sizeof(FatFSNode));
@@ -141,8 +156,8 @@ void *entry_from_path(const char *path, VfsRoot *root)
         {
             LOG("Cannot find: \"");
             for (unsigned long i = 0; i < entry_path_size; i++)
-                Printf("%c", path[start + i]);
-            Printf("\"\n");
+                LOG("%c", path[start + i]);
+            LOG("\"\n");
             free(node);
             return 0;
         }
@@ -184,11 +199,13 @@ VNode *OpenFile(const char *path)
     if (check_open_vnode(root, node))
     {
         LOG("File is already open.\n");
+        free(node);
         return 0;
     }
 
     void *entry = entry_from_path(path, root);
     node->data = entry;
+
     if (is_directory(node, node->root->fs_type))
         node->type = VNODE_DIRECTORY;
     else
@@ -236,15 +253,58 @@ unsigned long ReadFile(void *write_buf, unsigned long size, VNode *node)
     if (is_directory(node, node->root->fs_type))
         return 0;
 
-    void *buf = write_buf;
-    if (node->root->fs_type == FAT32)
+    if (node->root->fs_type == VOIDELLE)
+    {
+        Voidelle *entry = (Voidelle *)node->data;
+        Voidom *voidom = (Voidom *)node->root->fs;
+
+        void *buf = write_buf;
+        unsigned long first_voidite = node->seek / VOIDITE_CONTENT_SIZE;
+        unsigned long last_voidite = (node->seek + size - 1) / VOIDITE_CONTENT_SIZE;
+        unsigned long start = node->seek % VOIDITE_CONTENT_SIZE;
+        unsigned long end = (node->seek + size) % VOIDITE_CONTENT_SIZE;
+
+        unsigned long bytes_left = size;
+
+        for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
+        {
+            Voidite voidite;
+            if (!ReadVoidelleAt(voidom, *entry, voidite_index, &voidite))
+                return buf - write_buf;
+
+            unsigned char *cpy_start = voidite.data;
+            unsigned long cpy_len = VOIDITE_CONTENT_SIZE;
+
+            if (voidite_index == first_voidite)
+            {
+                cpy_start += start;
+                cpy_len -= start;
+            }
+
+            if (voidite_index == last_voidite && end != 0)
+                // edge case
+                cpy_len = end;
+
+            if (cpy_len > bytes_left)
+                cpy_len = bytes_left;
+
+            memcpy(buf, cpy_start, cpy_len);
+
+            buf += cpy_len;
+            bytes_left -= cpy_len;
+        }
+
+        return buf - write_buf;
+    }
+
+    else if (node->root->fs_type == FAT32)
     {
         FatFSNode *entry = (FatFSNode *)node->data;
         FatFS *fs = (FatFS *)node->root->fs;
         if (size > entry->entry.size)
             size = entry->entry.size;
 
-        void *init_buf = buf;
+        void *buf = write_buf;
         unsigned long cl_size = FatClusterSize(fs);
         unsigned long first_cluster = node->seek / cl_size;
         unsigned long last_cluster = (node->seek + size - 1) / cl_size;
@@ -256,6 +316,9 @@ unsigned long ReadFile(void *write_buf, unsigned long size, VNode *node)
         for (unsigned long cluster = first_cluster; cluster <= last_cluster; cluster++)
         {
             unsigned char *read = ReadFatNodeAt(*entry, cluster);
+            if (read == 0)
+                return buf - write_buf;
+
             unsigned char *cpy_start = read;
             unsigned long cpy_len = cl_size;
 
@@ -279,7 +342,7 @@ unsigned long ReadFile(void *write_buf, unsigned long size, VNode *node)
             bytes_left -= cpy_len;
         }
 
-        return buf - init_buf;
+        return buf - write_buf;
     }
 
     return 0;
@@ -290,7 +353,15 @@ void WriteToFile(void *buf, unsigned long size, VNode *node)
     if (is_directory(node, node->root->fs_type))
         return;
 
-    if (node->root->fs_type == FAT32)
+    if (node->root->fs_type == VOIDELLE)
+    {
+        Voidelle *entry = (Voidelle *)node->data;
+        Voidom *voidom = (Voidom *)node->root->fs;
+
+        WriteToVoidelle(voidom, entry, buf, size);
+    }
+
+    else if (node->root->fs_type == FAT32)
     {
         FatFSNode *entry = (FatFSNode *)node->data;
         WriteToFatNode(entry, buf, size);
