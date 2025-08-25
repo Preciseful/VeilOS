@@ -6,7 +6,7 @@
 
 static VirtualFS *vfs = 0;
 
-VirtualFS *get_vfs()
+VirtualFS *GetVfs()
 {
     return vfs;
 }
