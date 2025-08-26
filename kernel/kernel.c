@@ -6,16 +6,14 @@
 #include <scheduler/task.h>
 #include <scheduler/scheduler.h>
 #include <fs/fat32.h>
-#include <fs/voidelle.h>
 #include <drivers/emmc.h>
 #include <memory/memory.h>
 #include <memory/mmu.h>
 #include <lib/string.h>
-#include <vfs/vfs.h>
-#include <vfs/vnode.h>
 #include <bundles/elf.h>
 #include <syscall/syscall.h>
 #include <interface/portal.h>
+#include <fs/voidelle.h>
 
 void kboot()
 {
@@ -44,18 +42,13 @@ void kmain()
 
     Partition *partitions = PartitionsInit();
 
-    FatFS *fatfs = FatFSInit(partitions[0]);
-    Voidom *voidom = VoidelleInit(partitions[1]);
+    FatFS *fatfs = malloc(sizeof(FatFS));
+    Voidom *voidom = malloc(sizeof(Voidom));
 
-    VfsInit();
-    AddRootToVfs(fatfs, FAT32, '@');
-    AddRootToVfs(voidom, VOIDELLE, VOIDELLE_ROOT_CHARACTER);
-
-    LOG("VFS initialized with boot FAT32 and root VOIDELLE.\n");
+    FatFSInit(fatfs, partitions[0]);
+    VoidelleInit(voidom, partitions[1]);
 
     RegisterPortal(PORTAL_UART, UartPortalRead, UartPortalWrite, 0);
-
-    MakeElfProcess("@kernel/modules/Luna.elf");
 
     while (1)
         Schedule();

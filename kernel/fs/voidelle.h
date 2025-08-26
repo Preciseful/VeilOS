@@ -1,9 +1,7 @@
 #pragma once
 
-#include <stdbool.h>
 #include <interface/partition.h>
 
-#define VOIDELLE_ROOT_CHARACTER '/'
 #define VOID_SIZE 512
 #define VOIDITE_CONTENT_SIZE (VOID_SIZE - sizeof(unsigned long) * 2)
 
@@ -35,6 +33,7 @@ typedef struct __attribute__((aligned(VOID_SIZE))) __attribute__((packed)) Voide
     unsigned char velle[5];
     unsigned long flags;
     unsigned long name;
+    unsigned long name_size;
     unsigned long content;
     unsigned long content_size;
     unsigned long next;
@@ -55,14 +54,9 @@ typedef struct Voidom
     Voidelle root;
 } Voidom;
 
-Voidom *VoidelleInit(Partition partition);
-bool GetVoidelleFromPath(Voidom *voidom, const char *path, Voidelle *b_voidelle);
-bool MakeVoidelle(Voidom *voidom, const char *path, unsigned long flags, bool recursive);
-// we maintain char *path here as it just extracts from the path directly
-// for better perf
-const char *GetVoidelleName(Voidom *voidom, const char *path);
-// we also mantain char *path for remove voidelle as it has the same perf impact
-// as if we would pass the voidelle directly
-bool RemoveVoidelle(Voidom *voidom, const char *path, bool recursive);
-bool WriteToVoidelle(Voidom *voidom, Voidelle *voidelle, char *data, unsigned long size);
-bool ReadVoidelleAt(Voidom *voidom, Voidelle voidelle, unsigned long index, Voidite *buf);
+void VoidelleInit(Voidom *voidom, Partition partition);
+void ReadVoid(Voidom voidom, void *void_section, unsigned long pos);
+void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos);
+Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsigned long flags);
+unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, void *data, unsigned long size);
+void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
