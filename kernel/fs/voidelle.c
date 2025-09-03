@@ -54,7 +54,6 @@ unsigned long get_free_section(Voidom voidom)
         SeekInEMMC(voidom.partition.offset + voidom.voidlet.voidmap + (i / 512));
         WriteToEMMC(total_bits, VOID_SIZE);
 
-        LOG("returned pos: %lu\n", pos);
         return pos;
     }
 
