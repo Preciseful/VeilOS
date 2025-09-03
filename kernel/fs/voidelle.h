@@ -1,6 +1,7 @@
 #pragma once
 
 #include <interface/partition.h>
+#include <stdbool.h>
 
 #define VOID_SIZE 512
 #define VOIDITE_CONTENT_SIZE (VOID_SIZE - sizeof(unsigned long) * 2)
@@ -13,13 +14,13 @@ enum Voidelle_Entry_Flags
     VOIDELLE_DELETED = 0b1000,
 };
 
-typedef struct __attribute__((aligned(VOID_SIZE))) __attribute__((packed)) Voidlet
+typedef struct Voidlet
 {
     unsigned char identifier[4];
     unsigned long void_size;
     unsigned long voidmap_size;
     unsigned long voidmap;
-} Voidlet;
+} __attribute__((aligned(VOID_SIZE))) __attribute__((packed)) Voidlet;
 
 typedef struct __attribute__((packed)) Voidite
 {
@@ -54,9 +55,9 @@ typedef struct Voidom
     Voidelle root;
 } Voidom;
 
-void VoidelleInit(Voidom *voidom, Partition partition);
+bool VoidelleInit(Voidom *voidom, Partition partition);
 void ReadVoid(Voidom voidom, void *void_section, unsigned long pos);
 void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos);
 Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsigned long flags);
-unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, void *data, unsigned long size);
+unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, const void *data, unsigned long size);
 void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
