@@ -180,10 +180,7 @@ bool VoidelleInit(Voidom *voidom, Partition partition)
     voidom->voidlet = get_voidlet(*voidom);
 
     if (memcmp(voidom->voidlet.identifier, "VOID", 4) != 0)
-        LOG("Identifier is not VOID.\n");
-    LOG("Voidelle is found on: %s at %lu.\n", voidom->partition.name, voidom->partition.offset);
-    LOG("%c %c %c %c\n", voidom->voidlet.identifier[0], voidom->voidlet.identifier[1], voidom->voidlet.identifier[2], voidom->voidlet.identifier[3]);
-    LOG("Voidmap is at %lu.\n", voidom->voidlet.voidmap);
+        return false;
 
     return true;
 }
