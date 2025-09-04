@@ -71,7 +71,7 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
-    task->mappings.first = 0;
+    task->mappings = CreateList(LIST_LINKED);
 
     task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;

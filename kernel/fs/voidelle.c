@@ -2,6 +2,8 @@
 #include <drivers/emmc.h>
 #include <lib/printf.h>
 #include <lib/string.h>
+#include <interface/portal.h>
+#include <vfs/vfs.h>
 
 Voidlet get_voidlet(Voidom voidom)
 {
@@ -95,6 +97,31 @@ void get_voidelle_name(Voidom voidom, Voidelle voidelle, char *buffer)
     }
 }
 
+bool find_content_with_name(Voidom voidom, Voidelle parent, Voidelle *voidelle, char *name)
+{
+    unsigned long pos = parent.content;
+    while (pos)
+    {
+        Voidelle content;
+        ReadVoid(voidom, &content, pos);
+
+        char *buffer = malloc(content.name_size);
+        get_voidelle_name(voidom, content, buffer);
+
+        if (strcmp(buffer, name) == 0)
+        {
+            *voidelle = content;
+            free(buffer);
+            return true;
+        }
+
+        free(buffer);
+        pos = content.next;
+    }
+
+    return false;
+}
+
 bool get_prev_neighbour(Voidom voidom, Voidelle parent, Voidelle voidelle, Voidelle *prev)
 {
     if (parent.content == 0)
@@ -172,11 +199,95 @@ unsigned long populate_data(Voidom voidom, Voidite *voidite, const void *data, u
     return initial_size - size;
 }
 
-bool VoidelleInit(Voidom *voidom, Partition partition)
+static PORTAL_READ_FUNCTION(read_portal_voidelle)
+{
+    FSObject *fsobj = (FSObject *)obj;
+    Voidom *voidom = (Voidom *)fsobj->fs;
+    Voidelle voidelle;
+    ReadVoid(*voidom, &voidelle, fsobj->id);
+
+    unsigned char *current_buf = buf;
+    unsigned long first_voidite = fsobj->seek / VOIDITE_CONTENT_SIZE;
+    unsigned long last_voidite = (fsobj->seek + length - 1) / VOIDITE_CONTENT_SIZE;
+    unsigned long start = fsobj->seek % VOIDITE_CONTENT_SIZE;
+    unsigned long end = (fsobj->seek + length) % VOIDITE_CONTENT_SIZE;
+
+    unsigned long bytes_left = length;
+
+    for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
+    {
+        Voidite voidite;
+        if (!ReadVoidelleAt(*voidom, voidelle, &voidite, voidite_index))
+            return current_buf - buf;
+
+        unsigned char *cpy_start = voidite.data;
+        unsigned long cpy_len = VOIDITE_CONTENT_SIZE;
+
+        if (voidite_index == first_voidite)
+        {
+            cpy_start += start;
+            cpy_len -= start;
+        }
+
+        if (voidite_index == last_voidite && end != 0)
+            // edge case
+            cpy_len = end;
+
+        if (cpy_len > bytes_left)
+            cpy_len = bytes_left;
+
+        memcpy(current_buf, cpy_start, cpy_len);
+
+        current_buf += cpy_len;
+        bytes_left -= cpy_len;
+    }
+
+    return current_buf - buf;
+}
+
+static PORTAL_WRITE_FUNCTION(write_portal_voidelle)
+{
+    FSObject *fsobj = (FSObject *)obj;
+    Voidom *voidom = (Voidom *)fsobj->fs;
+    Voidelle voidelle;
+    ReadVoid(*voidom, &voidelle, fsobj->id);
+
+    return WriteToVoidelle(*voidom, &voidelle, buf, length);
+}
+
+static PORTAL_REQUEST_FUNCTION(request_portal_voidelle)
+{
+    FSObject *fsobj = (FSObject *)obj;
+    Voidom *voidom = (Voidom *)fsobj->fs;
+    Voidelle voidelle;
+    ReadVoid(*voidom, &voidelle, fsobj->id);
+
+    switch (code)
+    {
+    case FS_GET_ROOT_ID:
+        return VOID_SIZE;
+
+    case FS_REQUEST_FILE:
+        Voidelle entry;
+        if (!find_content_with_name(*voidom, voidelle, &entry, (char *)data))
+            return 0;
+        return entry.pos;
+
+    default:
+        return false;
+    }
+
+    return false;
+}
+
+bool VoidelleInit(Voidom *voidom, Portal *portal, Partition partition)
 {
     voidom->partition = partition;
     voidom->root = get_root(*voidom);
     voidom->voidlet = get_voidlet(*voidom);
+
+    PortalID id = RegisterPortal(PORTAL_FILESYSTEM_DRIVER, voidom, read_portal_voidelle, write_portal_voidelle, request_portal_voidelle);
+    GetPortal(PORTAL_FILESYSTEM_DRIVER, id, portal);
 
     if (memcmp(voidom->voidlet.identifier, "VOID", 4) != 0)
         return false;
@@ -184,10 +295,10 @@ bool VoidelleInit(Voidom *voidom, Partition partition)
     return true;
 }
 
-void ReadVoid(Voidom voidom, void *void_section, unsigned long pos)
+void ReadVoid(Voidom voidom, void *buffer, unsigned long pos)
 {
     SeekInEMMC(voidom.partition.offset + pos);
-    ReadFromEMMC(void_section, VOID_SIZE);
+    ReadFromEMMC(buffer, VOID_SIZE);
 }
 
 void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos)
@@ -275,4 +386,21 @@ void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle)
     clear_voidites(voidom, voidelle->name);
     clear_voidites(voidom, voidelle->content);
     invalidate_section(voidom, voidelle->pos);
+}
+
+bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index)
+{
+    unsigned long content_pos = voidelle.content;
+    for (unsigned long i = 0; i < index; i++)
+    {
+        if (content_pos == 0)
+            return false;
+
+        Voidite voidite;
+        ReadVoid(voidom, &voidite, content_pos);
+        content_pos = voidite.next;
+    }
+
+    ReadVoid(voidom, voidite, voidite->pos);
+    return true;
 }

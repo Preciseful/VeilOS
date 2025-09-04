@@ -14,6 +14,7 @@
 #include <syscall/syscall.h>
 #include <interface/portal.h>
 #include <fs/voidelle.h>
+#include <vfs/vfs.h>
 
 void kboot()
 {
@@ -38,17 +39,31 @@ void kmain()
     SchedulerInit();
     LOG("Scheduler initialized.\n");
 
+    PortalsInit();
+    RegisterPortal(PORTAL_UART, 0, UartPortalRead, UartPortalWrite, 0);
+    LOG("Initialized UART portal.\n");
+
     EmmcInit();
 
     Partition *partitions = PartitionsInit();
 
     FatFS *fatfs = malloc(sizeof(FatFS));
     Voidom *voidom = malloc(sizeof(Voidom));
+    Portal voidelle_portal;
 
     FatFSInit(fatfs, partitions[0]);
-    VoidelleInit(voidom, partitions[1]);
+    VoidelleInit(voidom, &voidelle_portal, partitions[1]);
+    LOG("Initialized partitions.\n");
 
-    RegisterPortal(PORTAL_UART, UartPortalRead, UartPortalWrite, 0);
+    VFSInit();
+    LOG("VFS initialized.\n");
+
+    AddRoot("/", voidelle_portal);
+    LOG("Added root.\n");
+
+    OpenFile("/teddy bear/you were/my teddy bear");
+    FileID file = OpenFile("/pony yeah");
+    LOG("Opened the file with FileID: %d.\n", file);
 
     while (1)
         Schedule();

@@ -1,6 +1,8 @@
+
 #include <drivers/uart.h>
 #include <drivers/gpio.h>
 #include <lib/printf.h>
+#include <interface/portal.h>
 
 #define UART0_BASE (PERIPHERAL_BASE + 0x201000)
 #define UART0_DR (UART0_BASE + 0x00)
@@ -65,14 +67,18 @@ char UartRecv()
     return (char)ReadMMIO(UART0_DR);
 }
 
-void UartPortalRead(unsigned char *buf, unsigned long length)
+PORTAL_READ_FUNCTION(UartPortalRead)
 {
     for (unsigned long i = 0; i < length; i++)
         buf[i] = (unsigned char)UartRecv();
+
+    return length;
 }
 
-void UartPortalWrite(unsigned char *buf, unsigned long length)
+PORTAL_WRITE_FUNCTION(UartPortalWrite)
 {
     for (unsigned long i = 0; i < length; i++)
         UartPut((char)buf[i]);
+
+    return length;
 }

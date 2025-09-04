@@ -14,28 +14,32 @@ void handle_portal(unsigned long *sp)
     unsigned long category = sp[0];
     unsigned long id = sp[1];
 
-    Portal *portal = GetPortal(category, id);
-    if (!portal)
+    Portal portal;
+    if (!GetPortal(category, id, &portal))
         return;
 
     switch (sp[2])
     {
         // read
     case 0:
-        if (portal->read)
-            portal->read((unsigned char *)sp[3], sp[4]);
+        if (portal.read)
+            sp[0] = portal.read(portal.object, (unsigned char *)sp[3], sp[4]);
+        else
+            sp[0] = 0;
         break;
 
         // write
     case 1:
-        if (portal->write)
-            portal->write((unsigned char *)sp[3], sp[4]);
+        if (portal.write)
+            sp[0] = portal.write(portal.object, (unsigned char *)sp[3], sp[4]);
+        else
+            sp[0] = 0;
         break;
 
-        // read
+        // request
     case 2:
-        if (portal->request)
-            sp[0] = portal->request(sp[3], (void *)sp[4]);
+        if (portal.request)
+            sp[0] = portal.request(portal.object, sp[3], (void *)sp[4]);
         else
             sp[0] = 0;
         break;

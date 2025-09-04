@@ -1,14 +1,20 @@
 #pragma once
 #include <lib/list.h>
+#include <stdbool.h>
 
-typedef void (*WriteFunction)(unsigned char *buf, unsigned long length);
-typedef void (*ReadFunction)(unsigned char *buf, unsigned long length);
-typedef unsigned long (*RequestFunction)(unsigned long code, void *data);
+#define PORTAL_WRITE_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
+#define PORTAL_READ_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
+#define PORTAL_REQUEST_FUNCTION(name) unsigned long name(void *obj, unsigned long code, void *data)
+
+typedef unsigned long (*WriteFunction)(void *obj, unsigned char *buf, unsigned long length);
+typedef unsigned long (*ReadFunction)(void *obj, unsigned char *buf, unsigned long length);
+typedef unsigned long (*RequestFunction)(void *obj, unsigned long code, void *data);
 typedef unsigned long PortalID;
 
 enum Portal_Category
 {
     PORTAL_UART,
+    PORTAL_FILESYSTEM_DRIVER,
     PORTAL_CATEGORY_COUNT
 };
 
@@ -25,9 +31,10 @@ typedef struct Portal
     WriteFunction write;
     ReadFunction read;
     RequestFunction request;
+    void *object;
 } Portal;
 
-void PortalInit();
-PortalID RegisterPortal(enum Portal_Category category, ReadFunction read, WriteFunction write, RequestFunction request);
+void PortalsInit();
+PortalID RegisterPortal(enum Portal_Category category, void *object, ReadFunction read, WriteFunction write, RequestFunction request);
 void UnregisterPortal(enum Portal_Category name, PortalID);
-Portal *GetPortal(enum Portal_Category category, PortalID id);
+bool GetPortal(enum Portal_Category category, PortalID id, Portal *portal);

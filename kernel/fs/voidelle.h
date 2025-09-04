@@ -2,6 +2,7 @@
 
 #include <interface/partition.h>
 #include <stdbool.h>
+#include <interface/portal.h>
 
 #define VOID_SIZE 512
 #define VOIDITE_CONTENT_SIZE (VOID_SIZE - sizeof(unsigned long) * 2)
@@ -55,9 +56,10 @@ typedef struct Voidom
     Voidelle root;
 } Voidom;
 
-bool VoidelleInit(Voidom *voidom, Partition partition);
+bool VoidelleInit(Voidom *voidom, Portal *portal, Partition partition);
 void ReadVoid(Voidom voidom, void *void_section, unsigned long pos);
 void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos);
 Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsigned long flags);
 unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, const void *data, unsigned long size);
 void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
+bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index);

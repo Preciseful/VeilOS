@@ -3,9 +3,9 @@
 
 PortalOverseer overseer;
 
-void PortalInit()
+void PortalsInit()
 {
-    overseer.portals.first = 0;
+    overseer.portals = CreateList(LIST_ARRAY);
     memset(overseer.counts, 0, PORTAL_CATEGORY_COUNT * sizeof(unsigned long));
 }
 
@@ -29,13 +29,14 @@ void SetID(Portal *portal)
     free(used);
 }
 
-PortalID RegisterPortal(enum Portal_Category category, ReadFunction read, WriteFunction write, RequestFunction request)
+PortalID RegisterPortal(enum Portal_Category category, void *object, ReadFunction read, WriteFunction write, RequestFunction request)
 {
     Portal *portal = malloc(sizeof(Portal));
     portal->category = category;
     portal->read = read;
     portal->write = write;
     portal->request = request;
+    portal->object = object;
     SetID(portal);
 
     AddToList(&overseer.portals, portal);
@@ -61,14 +62,17 @@ void UnregisterPortal(enum Portal_Category category, PortalID id)
     free(portal);
 }
 
-Portal *GetPortal(enum Portal_Category category, PortalID id)
+bool GetPortal(enum Portal_Category category, PortalID id, Portal *portal)
 {
     for (ListObject *object = overseer.portals.first; object; object = object->next)
     {
         Portal *current_portal = GET_VALUE(object, Portal);
         if (current_portal->category == category && current_portal->id == id)
-            return current_portal;
+        {
+            *portal = *current_portal;
+            return true;
+        }
     }
 
-    return 0;
+    return false;
 }
