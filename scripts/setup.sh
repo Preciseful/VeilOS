@@ -3,7 +3,6 @@ RPI_PATH=$1
 rm -rf "$RPI_PATH"/*
 cp -rf scripts/config.txt "$RPI_PATH/config.txt"
 
-mkdir -p "$RPI_PATH/kernel/modules"
 mkdir "$RPI_PATH/overlays"
 mkdir "$RPI_PATH/dtb"
 

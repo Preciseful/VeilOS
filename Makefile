@@ -50,4 +50,4 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	scripts/go_rpi.sh $(RPI_PATH)/kernel
+	scripts/go_rpi.sh $(RPI_PATH)
