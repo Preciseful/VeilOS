@@ -206,6 +206,12 @@ static PORTAL_READ_FUNCTION(read_portal_voidelle)
     Voidelle voidelle;
     ReadVoid(*voidom, &voidelle, fsobj->id);
 
+    if (voidelle.flags & VOIDELLE_DIRECTORY)
+    {
+        LOG("Attempted to read a directory voidelle.\n");
+        return 0;
+    }
+
     unsigned char *current_buf = buf;
     unsigned long first_voidite = fsobj->seek / VOIDITE_CONTENT_SIZE;
     unsigned long last_voidite = (fsobj->seek + length - 1) / VOIDITE_CONTENT_SIZE;
@@ -251,6 +257,9 @@ static PORTAL_WRITE_FUNCTION(write_portal_voidelle)
     Voidom *voidom = (Voidom *)fsobj->fs;
     Voidelle voidelle;
     ReadVoid(*voidom, &voidelle, fsobj->id);
+
+    if (voidelle.flags & VOIDELLE_DIRECTORY)
+        return 0;
 
     return WriteToVoidelle(*voidom, &voidelle, buf, length);
 }
@@ -391,16 +400,20 @@ void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle)
 bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index)
 {
     unsigned long content_pos = voidelle.content;
+
     for (unsigned long i = 0; i < index; i++)
     {
         if (content_pos == 0)
             return false;
 
-        Voidite voidite;
-        ReadVoid(voidom, &voidite, content_pos);
-        content_pos = voidite.next;
+        Voidite current_voidite;
+        ReadVoid(voidom, &current_voidite, content_pos);
+        content_pos = current_voidite.next;
     }
 
-    ReadVoid(voidom, voidite, voidite->pos);
+    if (content_pos == 0)
+        return false;
+
+    ReadVoid(voidom, voidite, content_pos);
     return true;
 }

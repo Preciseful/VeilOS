@@ -23,6 +23,7 @@ typedef struct VEntry
     const char *path;
     // index in path where the name starts
     unsigned long name_position;
+    unsigned long seek;
     Portal portal;
 
     List cached_entries;
@@ -39,4 +40,9 @@ typedef struct VFS
 
 void VFSInit();
 bool AddRoot(const char *path, Portal filesystem);
+bool AddDistinctEntry(const char *path, Portal filesystem);
 FileID OpenFile(const char *path);
+void SeekInFile(FileID id, unsigned long seek);
+unsigned long ReadFromFile(FileID id, void *buf, unsigned long size);
+unsigned long WriteInFile(FileID id, void *buf, unsigned long size);
+void CloseFile(FileID id);

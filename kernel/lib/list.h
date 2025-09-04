@@ -27,3 +27,4 @@ void AddToList(List *list, void *object_value);
 void RemoveKnownFromList(List *list, ListObject *prev, ListObject *current);
 void RemoveFromList(List *list, void *object_value);
 void FreeList(List *list, bool free_values);
+void *GetAtIndex(List list, unsigned long index);

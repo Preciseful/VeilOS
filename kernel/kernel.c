@@ -61,9 +61,9 @@ void kmain()
     AddRoot("/", voidelle_portal);
     LOG("Added root.\n");
 
-    OpenFile("/teddy bear/you were/my teddy bear");
-    FileID file = OpenFile("/pony yeah");
-    LOG("Opened the file with FileID: %d.\n", file);
+    LOG("Creating process Luna.elf...\n");
+    MakeElfProcess("/Luna.elf");
+    LOG("Created Luna.elf.\n");
 
     while (1)
         Schedule();

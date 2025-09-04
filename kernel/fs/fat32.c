@@ -4,6 +4,8 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
 #include <lib/string.h>
+#include <interface/portal.h>
+#include <vfs/vfs.h>
 
 unsigned int FatClusterSize(FatFS *fs)
 {
@@ -170,6 +172,7 @@ bool FatFSInit(FatFS *fs, Partition partition)
     fs->first_data_sector = bs->reserved_sector_count + (bs->table_count * bs->ext.table_size_32);
     fs->first_fat_sector = bs->reserved_sector_count;
     fs->sectors_per_fat = bs->ext.table_size_32;
+
     return true;
 }
 

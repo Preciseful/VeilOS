@@ -99,3 +99,18 @@ void FreeList(List *list, bool free_values)
             RemoveKnownFromList(list, 0, list->first);
     }
 }
+
+void *GetAtIndex(List list, unsigned long index)
+{
+    unsigned long i = 0;
+    for (ListObject *object = list.first; object; object = object->next, i++)
+    {
+        if (object == 0)
+            return 0;
+
+        if (i == index)
+            return object->value;
+    }
+
+    return 0;
+}
