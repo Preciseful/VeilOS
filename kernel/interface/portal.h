@@ -15,6 +15,7 @@ enum Portal_Category
 {
     PORTAL_UART,
     PORTAL_FILESYSTEM_DRIVER,
+    PORTAL_VFS,
     PORTAL_CATEGORY_COUNT
 };
 

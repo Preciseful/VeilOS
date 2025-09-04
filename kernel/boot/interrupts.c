@@ -23,7 +23,7 @@ void handle_portal(unsigned long *sp)
         // read
     case 0:
         if (portal.read)
-            sp[0] = portal.read(portal.object, (unsigned char *)sp[3], sp[4]);
+            sp[0] = portal.read((void *)sp[3], (unsigned char *)sp[4], sp[5]);
         else
             sp[0] = 0;
         break;
@@ -31,7 +31,7 @@ void handle_portal(unsigned long *sp)
         // write
     case 1:
         if (portal.write)
-            sp[0] = portal.write(portal.object, (unsigned char *)sp[3], sp[4]);
+            sp[0] = portal.write((void *)sp[3], (unsigned char *)sp[4], sp[5]);
         else
             sp[0] = 0;
         break;
@@ -39,7 +39,7 @@ void handle_portal(unsigned long *sp)
         // request
     case 2:
         if (portal.request)
-            sp[0] = portal.request(portal.object, sp[3], (void *)sp[4]);
+            sp[0] = portal.request((void *)sp[3], sp[4], (void *)sp[5]);
         else
             sp[0] = 0;
         break;

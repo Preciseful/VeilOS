@@ -7,6 +7,8 @@
 VFS *vfs;
 List open_entries;
 
+#define VFS_REQUEST_SEEK 0
+
 VEntry *find_root(char root_char)
 {
     if (root_char == 0)
@@ -83,11 +85,39 @@ VEntry *get_distinct_entry(VEntry *root, const char *path)
     return 0;
 }
 
+static PORTAL_READ_FUNCTION(read_portal_vfs)
+{
+    FileID id = *((FileID *)obj);
+    return ReadFromFile(id, buf, length);
+}
+
+static PORTAL_WRITE_FUNCTION(write_portal_vfs)
+{
+    FileID id = *((FileID *)obj);
+    return WriteInFile(id, buf, length);
+}
+
+static PORTAL_REQUEST_FUNCTION(request_portal_vfs)
+{
+    FileID id = *((FileID *)obj);
+
+    switch (code)
+    {
+    case VFS_REQUEST_SEEK:
+        SeekInFile(id, *((unsigned long *)data));
+        return 0;
+    }
+
+    return 0;
+}
+
 void VFSInit()
 {
     open_entries = CreateList(LIST_ARRAY);
     vfs = malloc(sizeof(VFS));
     memset(vfs->roots, 0, sizeof(VEntry) * VFS_MAX_ROOTS);
+
+    RegisterPortal(PORTAL_VFS, vfs, read_portal_vfs, write_portal_vfs, request_portal_vfs);
 }
 
 bool AddRoot(const char *path, Portal filesystem)

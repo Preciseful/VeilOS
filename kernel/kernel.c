@@ -11,7 +11,6 @@
 #include <memory/mmu.h>
 #include <lib/string.h>
 #include <bundles/elf.h>
-#include <syscall/syscall.h>
 #include <interface/portal.h>
 #include <fs/voidelle.h>
 #include <vfs/vfs.h>

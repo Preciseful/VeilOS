@@ -1,7 +1,6 @@
 #include <scheduler/task.h>
 #include <memory/memory.h>
 #include <lib/printf.h>
-#include <syscall/syscall.h>
 #include <scheduler/scheduler.h>
 
 #define EL1H_M 0b0101

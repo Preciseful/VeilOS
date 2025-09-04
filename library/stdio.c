@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 void stdputf(void *v, char x)
 {
-    svc_call(0, 0, 1, (unsigned long)&x, 1, 0, 0, 0, 0);
+    svc_call(0, 0, 0, 1, (unsigned long)&x, 1, 0, 0, 0);
 }
 
 typedef void (*putcf)(void *, char);
