@@ -7,7 +7,9 @@
 VFS *vfs;
 List open_entries;
 
-#define VFS_REQUEST_SEEK 0
+#define VFS_REQUEST_OPEN 0
+#define VFS_REQUEST_CLOSE 1
+#define VFS_REQUEST_SEEK 2
 
 VEntry *find_root(char root_char)
 {
@@ -87,24 +89,31 @@ VEntry *get_distinct_entry(VEntry *root, const char *path)
 
 static PORTAL_READ_FUNCTION(read_portal_vfs)
 {
-    FileID id = *((FileID *)obj);
+    FileID id = (FileID)obj;
     return ReadFromFile(id, buf, length);
 }
 
 static PORTAL_WRITE_FUNCTION(write_portal_vfs)
 {
-    FileID id = *((FileID *)obj);
+    FileID id = (FileID)obj;
     return WriteInFile(id, buf, length);
 }
 
 static PORTAL_REQUEST_FUNCTION(request_portal_vfs)
 {
-    FileID id = *((FileID *)obj);
+    FileID id = (FileID)obj;
 
     switch (code)
     {
+    case VFS_REQUEST_OPEN:
+        return OpenFile(data);
+
+    case VFS_REQUEST_CLOSE:
+        CloseFile(id);
+        return 0;
+
     case VFS_REQUEST_SEEK:
-        SeekInFile(id, *((unsigned long *)data));
+        SeekInFile(id, (unsigned long)data);
         return 0;
     }
 

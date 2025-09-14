@@ -9,7 +9,7 @@
 #define FS_REQUEST_FILE 1
 
 typedef unsigned long FileRequestID;
-typedef int FileID;
+typedef long FileID;
 
 typedef struct FSObject
 {

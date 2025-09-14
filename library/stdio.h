@@ -102,6 +102,7 @@ extern "C"
 
     void tfp_format(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
 
+    void readline(char *buf, unsigned long size);
 #ifdef __cplusplus
 }
 #endif

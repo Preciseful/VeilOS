@@ -4,11 +4,11 @@
 
 #define PORTAL_WRITE_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
 #define PORTAL_READ_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
-#define PORTAL_REQUEST_FUNCTION(name) unsigned long name(void *obj, unsigned long code, void *data)
+#define PORTAL_REQUEST_FUNCTION(name) unsigned long name(void *obj, unsigned long code, const void *data)
 
 typedef unsigned long (*WriteFunction)(void *obj, unsigned char *buf, unsigned long length);
 typedef unsigned long (*ReadFunction)(void *obj, unsigned char *buf, unsigned long length);
-typedef unsigned long (*RequestFunction)(void *obj, unsigned long code, void *data);
+typedef unsigned long (*RequestFunction)(void *obj, unsigned long code, const void *data);
 typedef unsigned long PortalID;
 
 enum Portal_Category

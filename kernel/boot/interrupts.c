@@ -42,6 +42,7 @@ void handle_portal(unsigned long *sp)
             sp[0] = portal.request((void *)sp[3], sp[4], (void *)sp[5]);
         else
             sp[0] = 0;
+
         break;
 
     default:
@@ -60,8 +61,6 @@ void handle_svc(unsigned long *sp)
 
     case 1:
         sp[0] = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
-        // this piece of code seems to make no sense as we pass a phys to virtual,
-        // but it is because its virtual in user space
         MapTaskPage(GetRunningTask(), sp[0], MMU_RWRW, sp[0], PAGE_SIZE);
         break;
 

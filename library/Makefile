@@ -1,4 +1,4 @@
-FILES=stdio.c stdlib.c svc.c
+FILES=stdio.c stdlib.c svc.c stdfile.c portal.c
 
 all: build
 

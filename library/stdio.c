@@ -20,11 +20,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "stdio.h"
-#include "svc.h"
+#include "portal.h"
+
+void readline(char *buf, unsigned long size)
+{
+    portal_read(PORTAL_UART, 0, 0, buf, size);
+}
 
 void stdputf(void *v, char x)
 {
-    svc_call(0, 0, 1, 0, (unsigned long)&x, 1, 0, 0, 0);
+    portal_write(PORTAL_UART, 0, 0, &x, 1);
 }
 
 typedef void (*putcf)(void *, char);
