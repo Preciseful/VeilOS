@@ -2,9 +2,10 @@ FILES=stdio.c stdlib.c svc.c stdfile.c portal.c
 
 all: build
 
-OBJS = $(FILES:.c=.o)
+OBJS = $(addprefix bin/,$(FILES:.c=.o))
 
-%.o: %.c
+bin/%.o: %.c
+	@mkdir -p bin
 	$(ARMGNU)-gcc -c -ffreestanding -nostdlib -o $@ $<
 
 build: $(OBJS)
