@@ -2,5 +2,4 @@ bin
 .vscode
 *.img
 dump
-library/*.o
 library/libveil.a
