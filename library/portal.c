@@ -1,5 +1,5 @@
-#include "portal.h"
-#include "svc.h"
+#include <portal.h>
+#include <svc.h>
 
 unsigned long portal_write(unsigned long portal, unsigned long portal_id, void *obj, void *buf, unsigned long size)
 {

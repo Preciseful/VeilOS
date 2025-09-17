@@ -91,18 +91,19 @@ regs Kusti, 23.10.2004
 #define __TFP_PRINTF__
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
     void tfp_printf(char *fmt, ...);
     void tfp_sprintf(char *s, char *fmt, ...);
 
     void tfp_format(void *putp, void (*putf)(void *, char), char *fmt, va_list va);
 
-    void readline(char *buf, unsigned long size);
+    unsigned long getline(char **wbbuf);
+    unsigned long getinput(char *buf, unsigned long size);
 #ifdef __cplusplus
 }
 #endif

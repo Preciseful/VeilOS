@@ -70,7 +70,11 @@ char UartRecv()
 PORTAL_READ_FUNCTION(UartPortalRead)
 {
     for (unsigned long i = 0; i < length; i++)
+    {
         buf[i] = (unsigned char)UartRecv();
+        if (buf[i] == '\r')
+            buf[i] = '\n';
+    }
 
     return length;
 }

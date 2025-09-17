@@ -1,12 +1,12 @@
-FILES=stdio.c stdlib.c svc.c stdfile.c portal.c
+FILES = $(shell find . -type f -name "*.c" -print | cut -d'/' -f2-)
 
 all: build
 
 OBJS = $(addprefix bin/,$(FILES:.c=.o))
 
 bin/%.o: %.c
-	@mkdir -p bin
-	$(ARMGNU)-gcc -c -ffreestanding -nostdlib -o $@ $<
+	@mkdir -p $(dir $@)
+	$(ARMGNU)-gcc -I . -c -ffreestanding -nostdlib -o $@ $<
 
 build: $(OBJS)
 	ar rcs libveil.a $(OBJS)

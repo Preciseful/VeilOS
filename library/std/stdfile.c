@@ -1,5 +1,5 @@
-#include "stdfile.h"
-#include "portal.h"
+#include <std/stdfile.h>
+#include <portal.h>
 
 #define VFS_REQUEST_OPEN 0
 #define VFS_REQUEST_CLOSE 1

@@ -1,5 +1,5 @@
-#include "stdlib.h"
-#include "svc.h"
+#include <std/stdlib.h>
+#include <svc.h>
 
 void *malloc(unsigned int size)
 {

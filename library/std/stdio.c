@@ -19,13 +19,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
 
-#include "stdio.h"
-#include "portal.h"
+#include <std/stdio.h>
+#include <portal.h>
+#include <std/stdlib.h>
+#include <string.h>
 
-void readline(char *buf, unsigned long size)
-{
-    portal_read(PORTAL_UART, 0, 0, buf, size);
-}
+#define PRINTF_LONG_SUPPORT
 
 void stdputf(void *v, char x)
 {
@@ -36,7 +35,46 @@ typedef void (*putcf)(void *, char);
 static putcf stdout_putf = stdputf;
 static void *stdout_putp = 0;
 
-#define PRINTF_LONG_SUPPORT
+unsigned long getline(char **wbbuf)
+{
+    char *buf = malloc(512);
+    unsigned long buf_size = 512;
+    unsigned long len = 0;
+
+    while (1)
+    {
+        if (len == buf_size)
+        {
+            char *old_buf = buf;
+            buf = malloc(buf_size + 512);
+            memcpy(buf, old_buf, buf_size);
+            buf_size += 512;
+
+            free(old_buf);
+        }
+
+        char read_character;
+        portal_read(PORTAL_UART, 0, 0, &read_character, 1);
+        stdputf(0, read_character);
+
+        if (read_character == '\n')
+        {
+            buf[len] = 0;
+            break;
+        }
+
+        buf[len] = read_character;
+        len++;
+    }
+
+    *wbbuf = buf;
+    return len;
+}
+
+unsigned long getinput(char *buf, unsigned long size)
+{
+    return portal_read(PORTAL_UART, 0, 0, buf, size);
+}
 
 #ifdef PRINTF_LONG_SUPPORT
 
