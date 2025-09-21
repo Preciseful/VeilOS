@@ -11,9 +11,16 @@ Task *scheduler_current;
 unsigned long last_asid_chunk;
 bool stop;
 
-void printx(unsigned long x)
+void SchedulerInit()
 {
-    LOG("x: %lu\n", x);
+    last_asid_chunk = 0;
+    stop = true;
+    scheduler_current = &default_task;
+}
+
+Task *GetRunningTask()
+{
+    return scheduler_current;
 }
 
 void AddTask(Task *task)
@@ -58,13 +65,6 @@ void switch_task(Task *next, unsigned long *stack)
     cpu_switch_task(last, next, stack);
 }
 
-void SchedulerInit()
-{
-    last_asid_chunk = 0;
-    stop = true;
-    scheduler_current = &default_task;
-}
-
 Task *get_next_task()
 {
     Task *start = scheduler_current;
@@ -72,6 +72,9 @@ Task *get_next_task()
 
     do
     {
+        if (current->next && current->next->flags & KILL_MARK)
+            current->next = current->next->next;
+
         current = current->next ? current->next : default_task.next;
         if (current == 0)
             return 0;
@@ -104,7 +107,9 @@ void SchedulerTick(unsigned long *stack)
     switch_task(next, stack);
 }
 
-Task *GetRunningTask()
+SYSCALL_HANDLER(exit_process)
 {
-    return scheduler_current;
+    scheduler_current->flags |= KILL_MARK;
+    scheduler_current->time = 0;
+    return 1;
 }

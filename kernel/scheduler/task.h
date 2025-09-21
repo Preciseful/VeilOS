@@ -5,6 +5,7 @@
 
 #define USER_TASK 0b1
 #define ACTIVE_TASK 0b10
+#define KILL_MARK 0b100
 
 typedef struct TaskRegs
 {
