@@ -76,3 +76,40 @@ bool GetPortal(enum Portal_Category category, PortalID id, Portal *portal)
 
     return false;
 }
+
+SYSCALL_HANDLER(portal)
+{
+    unsigned long category = sp[0];
+    unsigned long id = sp[1];
+
+    Portal portal;
+    if (!GetPortal(category, id, &portal))
+        return -1;
+
+    switch (sp[2])
+    {
+        // read
+    case 0:
+        if (portal.read)
+            return portal.read((void *)sp[3], (unsigned char *)sp[4], sp[5]);
+        else
+            return 0;
+        break;
+
+        // write
+    case 1:
+        if (portal.write)
+            return portal.write((void *)sp[3], (unsigned char *)sp[4], sp[5]);
+        else
+            return 0;
+
+        // request
+    case 2:
+        if (portal.request)
+            return portal.request((void *)sp[3], sp[4], (void *)sp[5]);
+        else
+            return 0;
+    }
+
+    return -1;
+}

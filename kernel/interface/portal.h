@@ -1,6 +1,8 @@
 #pragma once
+
 #include <lib/list.h>
 #include <stdbool.h>
+#include <interface/syscall.h>
 
 #define PORTAL_WRITE_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
 #define PORTAL_READ_FUNCTION(name) unsigned long name(void *obj, unsigned char *buf, unsigned long length)
@@ -39,3 +41,5 @@ void PortalsInit();
 PortalID RegisterPortal(enum Portal_Category category, void *object, ReadFunction read, WriteFunction write, RequestFunction request);
 void UnregisterPortal(enum Portal_Category name, PortalID);
 bool GetPortal(enum Portal_Category category, PortalID id, Portal *portal);
+
+SYSCALL_HANDLER(portal);

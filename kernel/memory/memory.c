@@ -1,5 +1,8 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
+#include <memory/mmu.h>
+#include <scheduler/task.h>
+#include <scheduler/scheduler.h>
 
 __attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
@@ -56,11 +59,17 @@ void *malloc(unsigned int size)
     return headers[index].data;
 }
 
-unsigned long free(void *data)
+unsigned int free(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
         mem_map[index + i] = 0;
+    return headers[index].size;
+}
+
+unsigned int memory_size(void *data)
+{
+    unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     return headers[index].size;
 }
 
@@ -91,4 +100,32 @@ int memcmp(const void *s1, const void *s2, unsigned long n)
     }
 
     return 0;
+}
+
+SYSCALL_HANDLER(malloc)
+{
+
+    unsigned long addr = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
+    MapTaskPage(GetRunningTask(), addr, MMU_RWRW, addr, PAGE_SIZE);
+
+    return addr;
+}
+
+SYSCALL_HANDLER(free)
+{
+    if (!TaskContainsVA(GetRunningTask(), sp[0]))
+        return 0;
+
+    unsigned long len = free(PHYS_TO_VIRT((void *)sp[0]));
+    UnmapTaskPage(GetRunningTask(), sp[0], len);
+
+    return len;
+}
+
+SYSCALL_HANDLER(memory_size)
+{
+    if (!TaskContainsVA(GetRunningTask(), sp[0]))
+        return 0;
+
+    return memory_size((void *)sp[0]);
 }

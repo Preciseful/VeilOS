@@ -8,75 +8,7 @@
 #include <scheduler/scheduler.h>
 #include <scheduler/task.h>
 #include <interface/portal.h>
-
-void handle_portal(unsigned long *sp)
-{
-    unsigned long category = sp[0];
-    unsigned long id = sp[1];
-
-    Portal portal;
-    if (!GetPortal(category, id, &portal))
-        return;
-
-    switch (sp[2])
-    {
-        // read
-    case 0:
-        if (portal.read)
-            sp[0] = portal.read((void *)sp[3], (unsigned char *)sp[4], sp[5]);
-        else
-            sp[0] = 0;
-        break;
-
-        // write
-    case 1:
-        if (portal.write)
-            sp[0] = portal.write((void *)sp[3], (unsigned char *)sp[4], sp[5]);
-        else
-            sp[0] = 0;
-        break;
-
-        // request
-    case 2:
-        if (portal.request)
-            sp[0] = portal.request((void *)sp[3], sp[4], (void *)sp[5]);
-        else
-            sp[0] = 0;
-
-        break;
-
-    default:
-        break;
-    }
-}
-
-void handle_svc(unsigned long *sp)
-{
-    unsigned long code = sp[8];
-    switch (code)
-    {
-    case 0:
-        handle_portal(sp);
-        break;
-
-    case 1:
-        sp[0] = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
-        MapTaskPage(GetRunningTask(), sp[0], MMU_RWRW, sp[0], PAGE_SIZE);
-        break;
-
-    case 2:
-        if (!TaskContainsVA(GetRunningTask(), sp[0]))
-            break;
-
-        unsigned long len = free(PHYS_TO_VIRT((void *)sp[0]));
-        UnmapTaskPage(GetRunningTask(), sp[0], len);
-        break;
-
-    default:
-        LOG("SVC code #%lu does not exist.\n", code);
-        break;
-    }
-}
+#include <interface/syscall.h>
 
 unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr, unsigned long far, unsigned long *sp)
 {
@@ -84,7 +16,7 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
 
     if (ec == 0b010101)
     {
-        handle_svc(sp);
+        HandleSystemCall(sp);
         return 1;
     }
 

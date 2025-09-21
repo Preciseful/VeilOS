@@ -25,6 +25,8 @@
 
 #ifndef __ASSEMBLER__
 
+#include <interface/syscall.h>
+
 typedef struct MHeader
 {
     unsigned long size;
@@ -34,9 +36,14 @@ typedef struct MHeader
 
 void MMInit();
 void *malloc(unsigned int size);
-unsigned long free(void *data);
+unsigned int free(void *data);
+unsigned int memory_size(void *data);
 void memset(void *dest, int value, unsigned long size);
 void memcpy(void *dst, const void *src, unsigned long size);
 int memcmp(const void *m1, const void *m2, unsigned long n);
+
+SYSCALL_HANDLER(malloc);
+SYSCALL_HANDLER(free);
+SYSCALL_HANDLER(memory_size);
 
 #endif
