@@ -10,20 +10,24 @@ set_task_ttbr:
 	isb
 	ret
 
+// x3 = sp_el0
+// x4 = sp
+// x5 = spsr_el1
+// x6 = elr_el1
 .global cpu_switch_task
 cpu_switch_task:
 	// check stack and if interrupt should be restored
 	cmp x2, #0
 	beq 1f
 
-	ldp	x12, x29, [x2, #224]
-	ldp x30, x28, [x2, #240]
+	ldp	x6, x29, [x2, #16 * 14]
+	ldp x30, x28, [x2, #16 * 15]
 
-1:	mov x8, x0
+1:	mrs x3, sp_el0
+	mov x4, sp
+	mrs x5, spsr_el1
 
-	mrs x11, spsr_el1
-	mov x10, sp
-	mrs x9, sp_el0
+	mov x8, x0
 
     stp x19, x20, [x8], #16
     stp	x21, x22, [x8], #16
@@ -31,8 +35,8 @@ cpu_switch_task:
 	stp	x25, x26, [x8], #16
 	stp	x27, x28, [x8], #16
 	stp	x29, x30, [x8], #16
-	stp	x9, x10, [x8], #16
-	stp x11, x12, [x8]
+	stp	x3, x4, [x8], #16
+	stp x5, x6, [x8]
 
 	mov x8, x1
 
@@ -42,13 +46,12 @@ cpu_switch_task:
 	ldp	x25, x26, [x8], #16
 	ldp	x27, x28, [x8], #16
 	ldp	x29, x30, [x8], #16
-	ldp	x9, x10, [x8], #16
-	ldp x11, x12, [x8]
+	ldp	x3, x4, [x8], #16
+	ldp x5, x6, [x8]
 
-	msr sp_el0, x9
-	mov x0, x9
-	mov sp, x10
-	msr spsr_el1, x11
-	msr elr_el1, x12
+	msr sp_el0, x3
+	mov sp, x4
+	msr spsr_el1, x5
+	msr elr_el1, x6
 
     eret
