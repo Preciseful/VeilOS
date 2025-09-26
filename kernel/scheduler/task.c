@@ -82,7 +82,7 @@ void KillTask(Task *task)
 
     free(task->name);
     FreeTable(task->mmu_ctx.pgd, 0);
-    free(task->mmu_ctx.pa);
+    free((void *)task->mmu_ctx.pa);
     free(task);
 }
 
