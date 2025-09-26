@@ -109,8 +109,7 @@ static PORTAL_REQUEST_FUNCTION(request_portal_vfs)
         return OpenFile(data);
 
     case VFS_REQUEST_CLOSE:
-        CloseFile(id);
-        return 0;
+        return (unsigned long)CloseFile(id);
 
     case VFS_REQUEST_SEEK:
         SeekInFile(id, (unsigned long)data);
@@ -316,10 +315,10 @@ unsigned long WriteInFile(FileID id, void *buf, unsigned long size)
     return entry->portal.write(&obj, buf, size);
 }
 
-void CloseFile(FileID id)
+int CloseFile(FileID id)
 {
     if (id == -1)
-        return;
+        return -1;
 
     int i = 0;
     for (ListObject *obj = open_entries.first; obj; obj = obj->next, i++)
@@ -329,4 +328,6 @@ void CloseFile(FileID id)
 
         RemoveKnownFromList(&open_entries, 0, obj);
     }
+
+    return 1;
 }
