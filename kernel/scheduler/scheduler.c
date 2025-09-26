@@ -87,7 +87,10 @@ Task *get_next_task()
     do
     {
         if (current->next && (current->next->flags & KILL_TASK))
+        {
             current->next = current->next->next;
+            KillTask(current->next);
+        }
 
         current = current->next ? current->next : default_task.next;
         if (current == 0)

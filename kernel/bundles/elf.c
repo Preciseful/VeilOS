@@ -53,7 +53,7 @@ Task *MakeElfProcess(const char *path, int argc, char **argv, char **environment
         SeekInFile(file, phdr_offset);
         ReadFromFile(file, read, phdr_filesz);
 
-        MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz);
+        MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
     }
 
     CloseFile(file);

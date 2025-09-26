@@ -105,7 +105,7 @@ int memcmp(const void *s1, const void *s2, unsigned long n)
 SYSCALL_HANDLER(malloc)
 {
     unsigned long addr = VIRT_TO_PHYS(malloc(sp[0]));
-    MapTaskPage(GetRunningTask(), addr, MMU_RWRW, addr, PAGE_SIZE);
+    MapTaskPage(GetRunningTask(), addr, MMU_RWRW, PHYS_TO_VIRT(addr), PAGE_SIZE, MAP_PROPERTY_CODE);
 
     return addr;
 }

@@ -15,11 +15,19 @@ typedef struct TaskRegs
     unsigned long x28, x29, x30;
 } TaskRegs;
 
+enum Task_Mapping_Properties
+{
+    MAP_PROPERTY_CODE = 0b1,
+    MAP_PROPERTY_VA = 0b10,
+    MAP_PROPERTY_PA = 0b100
+};
+
 typedef struct TaskMapping
 {
     VirtualAddr code;
     VirtualAddr va;
     PhysicalAddr pa;
+    enum Task_Mapping_Properties to_free;
 } TaskMapping;
 
 typedef struct TaskMMUCtx
@@ -39,8 +47,9 @@ typedef struct Task
     List mappings;
     struct Task *next;
 
-    const char *name;
+    char *name;
     int argc;
+    int environc;
     // the values within argv are user allocated, accesses must be done with PHYS_TO_VIRT
     char **argv;
     // the values within environ are user allocated, accesses must be done with PHYS_TO_VIRT
@@ -52,5 +61,7 @@ typedef struct Task
 
 bool TaskContainsVA(Task *task, VirtualAddr va);
 Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc);
-void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len);
+void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len,
+                 enum Task_Mapping_Properties properties_to_free);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length);
+void KillTask(Task *task);

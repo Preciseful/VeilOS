@@ -52,12 +52,14 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
 
     unsigned long *l3 = (unsigned long *)PHYS_TO_VIRT((l2[l3_index] & PAGE_MASK));
 
-    unsigned char ng = 0;
     bool uxn = !((flags & MMU_USER_EXEC) >> 2);
     bool pxn = !uxn;
+
+    unsigned char ng = 0;
     unsigned long perm = flags & 0b11;
     if (perm == MMU_RR || perm == MMU_RWRW)
         ng = 1;
+
     unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | (ng << 11) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)
     {
@@ -124,6 +126,28 @@ void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned
     unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
 
     l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
+}
+
+void FreeTable(unsigned long *table, unsigned int level)
+{
+    for (unsigned long i = 0; i < 512; i++)
+    {
+        if (!(table[i] & 1))
+            continue;
+
+        unsigned long type = table[i] & 0x3;
+        unsigned long *child = (unsigned long *)PHYS_TO_VIRT((table[i] & PAGE_MASK));
+
+        if (type == 0x3 && level < 3)
+            FreeTable(child, level + 1);
+        else
+            table[i] = 0;
+
+        free(child);
+    }
+
+    if (level == 0)
+        free(table);
 }
 
 void *temp_malloc(unsigned long i)

@@ -33,6 +33,7 @@ typedef unsigned long PhysicalAddr;
 void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
 void UnmapTablePage(unsigned long *pgd, VirtualAddr va);
 void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
+void FreeTable(unsigned long *table, unsigned int level);
 void MMUInit();
 
 extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);
