@@ -8,22 +8,10 @@
 
 typedef struct TaskRegs
 {
-    unsigned long x19;
-    unsigned long x20;
-    unsigned long x21;
-    unsigned long x22;
-    unsigned long x23;
-    unsigned long x24;
-    unsigned long x25;
-    unsigned long x26;
-    unsigned long x27;
-    unsigned long x28;
-    unsigned long x29;
-    unsigned long x30;
-    unsigned long sp;
-    unsigned long sp_el1;
-    unsigned long spsr;
-    unsigned long elr;
+    unsigned long x[28];
+    unsigned long sp_el0, sp_el1;
+    unsigned long elr_el1, spsr_el1;
+    unsigned long x28, x29, x30;
 } TaskRegs;
 
 typedef struct TaskMapping

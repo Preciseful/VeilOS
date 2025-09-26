@@ -23,7 +23,7 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
     LOG("\ninterrupt encountered:"
         "\n\ttype: %lu"
         "\n\tesr: %lu"
-        "\n\telr: 0x%lx"
+        "\n\telr: 0x%x"
         "\n\tfar: 0x%lx",
         type, esr, elr, far);
     return 0;
@@ -46,7 +46,8 @@ void handle_irq(unsigned long *stack)
 
     // uart0
     case 153:
-        LOG("got: %c\n", UartCharacter());
+        char character = UartCharacter();
+        LOG("Keyboard press: '%c' (%x)\n", character);
         WriteToMMIO(GICC_EOIR, iar);
         break;
 

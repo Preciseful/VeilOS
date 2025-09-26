@@ -11,5 +11,5 @@ void Schedule();
 void AddTask(Task *task);
 void SchedulerTick(unsigned long *stack);
 Task *GetRunningTask();
-extern void cpu_switch_task(Task *prev, Task *next, unsigned long *sp);
+extern void cpu_switch_task(Task *next);
 extern void set_task_ttbr(unsigned long pgd, bool flush);

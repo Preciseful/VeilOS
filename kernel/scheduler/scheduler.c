@@ -13,7 +13,7 @@ bool stop;
 
 void printx(unsigned long x)
 {
-    LOG("x: %lu\n", x);
+    LOG("x: %u\n", x);
 }
 
 void AddTask(Task *task)
@@ -32,6 +32,13 @@ void AddTask(Task *task)
         last->next = task;
         task->next = default_task.next;
     }
+}
+
+void save_registers(Task *task, unsigned long *stack)
+{
+    if (stack == 0)
+        return;
+    memcpy(&task->regs, stack, sizeof(task->regs));
 }
 
 void switch_task(Task *next, unsigned long *stack)
@@ -54,8 +61,9 @@ void switch_task(Task *next, unsigned long *stack)
     last_asid_chunk = next->mmu_ctx.asid_chunk;
     stop = false;
 
+    save_registers(last, stack);
     LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->mmu_ctx.va);
-    cpu_switch_task(last, next, stack);
+    cpu_switch_task(next);
 }
 
 void SchedulerInit()

@@ -1,9 +1,17 @@
 #include "lib/utils.S"
 
 .macro enter_interrupt el
-    pushp x30, x28
-    mrs x28, elr_el1
+    push x30
     pushp x28, x29
+
+    mrs x28, elr_el1
+    mrs x29, spsr_el1
+    pushp x28, x29
+
+    mrs x28, sp_el0
+    mov x29, sp
+    pushp x28, x29
+
     pushp x26, x27
     pushp x24, x25
     pushp x22, x23
@@ -35,9 +43,16 @@
     popp x22, x23
     popp x24, x25
     popp x26, x27
+
+    popp x28, x29
+    msr sp_el0, x28
+
     popp x28, x29
     msr elr_el1, x28
-    popp x30, x28
+    msr spsr_el1, x29
+
+    popp x28, x29
+    pop x30
 
     eret
 .endm
