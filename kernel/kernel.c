@@ -64,6 +64,18 @@ void kmain()
     MakeElfProcess("/Luna.elf");
     LOG("Created Luna.elf.\n");
 
+    LOG("Creating process Luna.elf...\n");
+    MakeElfProcess("/Luna.elf");
+    LOG("Created Luna.elf.\n");
+
+    LOG("Creating process Luna.elf...\n");
+    MakeElfProcess("/Luna.elf");
+    LOG("Created Luna.elf.\n");
+
+    LOG("Creating process Luna.elf...\n");
+    MakeElfProcess("/Luna.elf");
+    LOG("Created Luna.elf.\n");
+
     while (1)
         Schedule();
 }

@@ -80,11 +80,14 @@ Task *get_next_task()
 
     do
     {
+        if (current->next && (current->next->flags & KILL_TASK))
+            current->next = current->next->next;
+
         current = current->next ? current->next : default_task.next;
         if (current == 0)
             return 0;
 
-        if (current->flags & ACTIVE_TASK)
+        if ((current->flags & ACTIVE_TASK) && !(current->flags & KILL_TASK))
             break;
     } while (current != start);
 
@@ -115,4 +118,11 @@ void SchedulerTick(unsigned long *stack)
 Task *GetRunningTask()
 {
     return scheduler_current;
+}
+
+SYSCALL_HANDLER(exit_process)
+{
+    scheduler_current->flags |= KILL_TASK;
+    scheduler_current->time = 0;
+    return 1;
 }

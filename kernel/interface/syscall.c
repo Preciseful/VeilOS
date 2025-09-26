@@ -19,7 +19,7 @@ static SvcHandler svc_table[] = {
     [SYS_MALLOC] = SystemCall_malloc,
     [SYS_FREE] = SystemCall_free,
     [SYS_GET_MEMORY_SIZE] = SystemCall_memory_size,
-    [SYS_EXIT_PROCESS] = 0,
+    [SYS_EXIT_PROCESS] = SystemCall_exit_process,
 };
 
 void HandleSystemCall(unsigned long *sp)
