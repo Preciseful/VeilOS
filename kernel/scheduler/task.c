@@ -68,7 +68,7 @@ void set_args(Task *task, int argc, char **argv, char **environ)
 {
     unsigned long environ_len = 0;
     // environ is terminated with zero
-    while (environ && environ[environ_len] != 0)
+    while (environ && environ[environ_len])
         environ_len++;
 
     task->environ = mapped_malloc(task, (environ_len + 1) * sizeof(char *));

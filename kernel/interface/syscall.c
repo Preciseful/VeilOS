@@ -13,7 +13,8 @@ enum System_Calls
     SYS_FREE,
     SYS_GET_MEMORY_SIZE,
     SYS_EXIT_PROCESS,
-    SYS_SET_ENVIRON
+    SYS_SET_ENVIRON,
+    SYS_EXECVE
 };
 
 static SvcHandler svc_table[] = {
@@ -23,6 +24,7 @@ static SvcHandler svc_table[] = {
     [SYS_GET_MEMORY_SIZE] = SystemCall_memory_size,
     [SYS_EXIT_PROCESS] = SystemCall_exit_process,
     [SYS_SET_ENVIRON] = SystemCall_set_environ,
+    [SYS_EXECVE] = SystemCall_execve,
 };
 
 void HandleSystemCall(unsigned long *sp)

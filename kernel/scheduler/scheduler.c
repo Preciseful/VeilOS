@@ -2,6 +2,7 @@
 #include <lib/printf.h>
 #include <memory/mmu.h>
 #include <scheduler/task.h>
+#include <bundles/elf.h>
 
 // dont use lib/list.h here as that allocates more
 // + if it works, dont fix it
@@ -9,6 +10,7 @@
 Task default_task = {0};
 Task *scheduler_current;
 unsigned long last_asid_chunk;
+long last_pid;
 bool stop;
 
 void printx(unsigned long x)
@@ -16,7 +18,7 @@ void printx(unsigned long x)
     LOG("x: %u\n", x);
 }
 
-void AddTask(Task *task)
+long AddTask(Task *task)
 {
     if (!default_task.next)
     {
@@ -32,6 +34,9 @@ void AddTask(Task *task)
         last->next = task;
         task->next = default_task.next;
     }
+
+    last_pid++;
+    return last_pid + 1;
 }
 
 void save_registers(Task *task, unsigned long *stack)
@@ -68,6 +73,7 @@ void switch_task(Task *next, unsigned long *stack)
 
 void SchedulerInit()
 {
+    last_pid = 1;
     last_asid_chunk = 0;
     stop = true;
     scheduler_current = &default_task;
@@ -124,5 +130,20 @@ SYSCALL_HANDLER(exit_process)
 {
     scheduler_current->flags |= KILL_TASK;
     scheduler_current->time = 0;
+    return 1;
+}
+
+SYSCALL_HANDLER(execve)
+{
+    char *path = (char *)sp[0];
+    char **argv = (char **)sp[1];
+    char **env = (char **)sp[2];
+
+    unsigned long argc = 0;
+    while (argv && argv[argc])
+        argc++;
+
+    if (!MakeElfProcess(path, argc, argv, env, scheduler_current->pid))
+        return 0;
     return 1;
 }

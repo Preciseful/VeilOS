@@ -47,6 +47,7 @@ typedef struct Task
     char **environ;
     unsigned long flags;
     long time;
+    long pid;
 } Task;
 
 bool TaskContainsVA(Task *task, VirtualAddr va);

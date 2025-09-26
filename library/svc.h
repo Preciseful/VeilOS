@@ -8,6 +8,7 @@ enum System_Calls
     SYS_GET_MEMORY_SIZE,
     SYS_EXIT_PROCESS,
     SYS_SET_ENVIRON,
+    SYS_EXECVE
 };
 
 unsigned long svc_call(unsigned long x0_arg, unsigned long x1_arg, unsigned long x2_arg, unsigned long x3_arg,
