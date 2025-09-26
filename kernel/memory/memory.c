@@ -104,8 +104,7 @@ int memcmp(const void *s1, const void *s2, unsigned long n)
 
 SYSCALL_HANDLER(malloc)
 {
-
-    unsigned long addr = VIRT_TO_PHYS((unsigned long)malloc(sp[0]));
+    unsigned long addr = VIRT_TO_PHYS(malloc(sp[0]));
     MapTaskPage(GetRunningTask(), addr, MMU_RWRW, addr, PAGE_SIZE);
 
     return addr;
@@ -116,7 +115,7 @@ SYSCALL_HANDLER(free)
     if (!TaskContainsVA(GetRunningTask(), sp[0]))
         return 0;
 
-    unsigned long len = free(PHYS_TO_VIRT((void *)sp[0]));
+    unsigned long len = free((void *)PHYS_TO_VIRT(sp[0]));
     UnmapTaskPage(GetRunningTask(), sp[0], len);
 
     return len;

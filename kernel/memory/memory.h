@@ -11,8 +11,8 @@
 #define SECTION_SIZE (1 << SECTION_SHIFT)
 
 #define HIGH_VA 0xFFFF000000000000ULL
-#define VIRT_TO_PHYS(x) (x - HIGH_VA)
-#define PHYS_TO_VIRT(x) (x + HIGH_VA)
+#define VIRT_TO_PHYS(x) ((VirtualAddr)x - HIGH_VA)
+#define PHYS_TO_VIRT(x) ((PhysicalAddr)x + HIGH_VA)
 
 #define LOW_MEMORY (2 * SECTION_SIZE)
 #define HIGH_MEMORY (PERIPHERAL_BASE - HIGH_VA)

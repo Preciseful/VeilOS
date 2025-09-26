@@ -2,6 +2,7 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
 #include <scheduler/scheduler.h>
+#include <lib/string.h>
 
 #define EL1H_M 0b0101
 #define EL0T_M 0b0000
@@ -56,7 +57,45 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
     }
 }
 
-Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
+void *mapped_malloc(Task *task, unsigned int size)
+{
+    void *data = malloc(size);
+    MapTaskPage(task, VIRT_TO_PHYS(data), MMU_USER | MMU_RWRW, (VirtualAddr)data, size);
+    return data;
+}
+
+void set_args(Task *task, int argc, char **argv, char **environ)
+{
+    unsigned long environ_len = 0;
+    // environ is terminated with zero
+    while (environ && environ[environ_len] != 0)
+        environ_len++;
+
+    task->environ = mapped_malloc(task, (environ_len + 1) * sizeof(char *));
+    task->environ[environ_len] = 0;
+
+    for (unsigned long i = 0; i < environ_len; i++)
+    {
+        unsigned long environ_var_len = strlen(environ[i]) + 1;
+
+        task->environ[i] = (void *)VIRT_TO_PHYS(mapped_malloc(task, environ_var_len));
+        memcpy((void *)PHYS_TO_VIRT(task->environ[i]), environ[i], environ_var_len);
+    }
+
+    task->argc = argc;
+    task->argv = mapped_malloc(task, (argc + 1) * sizeof(char *));
+    task->argv[argc] = 0;
+
+    for (unsigned long i = 0; i < argc; i++)
+    {
+        unsigned long argv_len = strlen(argv[i]) + 1;
+
+        task->argv[i] = (void *)VIRT_TO_PHYS(mapped_malloc(task, argv_len));
+        memcpy((void *)PHYS_TO_VIRT(task->argv[i]), argv[i], argv_len);
+    }
+}
+
+Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc)
 {
     Task *task = malloc(sizeof(Task));
     task->name = name;
@@ -72,7 +111,7 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
     task->mappings = CreateList(LIST_LINKED);
 
-    task->mmu_ctx.pa = VIRT_TO_PHYS((unsigned long)malloc(PAGE_SIZE));
+    task->mmu_ctx.pa = VIRT_TO_PHYS(malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
 
     for (int i = 0; i < ASID_CHUNKS_NUMBER; i++)
@@ -100,6 +139,10 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code)
     if (code != 0)
         MapTaskPage(task, task->mmu_ctx.va, MMU_USER | MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE);
     MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, MMU_USER | MMU_RWRW, task->mmu_ctx.sp_alloc, 1);
+
+    set_args(task, argc, argv, environ);
+    task->regs.x[0] = task->argc;
+    task->regs.x[1] = VIRT_TO_PHYS(task->argv);
 
     return task;
 }

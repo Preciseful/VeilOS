@@ -6,7 +6,7 @@
 #include <scheduler/scheduler.h>
 #include <vfs/vfs.h>
 
-Task *MakeElfProcess(const char *path)
+Task *MakeElfProcess(const char *path, int argc, char **argv)
 {
     FileID file = OpenFile(path);
     if (file == -1)
@@ -28,7 +28,7 @@ Task *MakeElfProcess(const char *path)
         return 0;
     }
 
-    Task *task = CreateTask(path, eheader.e_entry, 0);
+    Task *task = CreateTask(path, eheader.e_entry, 0, 0, argv, argc);
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {

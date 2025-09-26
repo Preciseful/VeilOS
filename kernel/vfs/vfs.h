@@ -45,4 +45,4 @@ FileID OpenFile(const char *path);
 void SeekInFile(FileID id, unsigned long seek);
 unsigned long ReadFromFile(FileID id, void *buf, unsigned long size);
 unsigned long WriteInFile(FileID id, void *buf, unsigned long size);
-void CloseFile(FileID id);
+int CloseFile(FileID id);

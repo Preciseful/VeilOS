@@ -40,11 +40,14 @@ typedef struct Task
     struct Task *next;
 
     const char *name;
+    int argc;
+    char **argv;
+    char **environ;
     unsigned long flags;
     long time;
 } Task;
 
 bool TaskContainsVA(Task *task, VirtualAddr va);
-Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code);
+Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc);
 void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length);

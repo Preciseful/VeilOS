@@ -24,7 +24,7 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        pgd[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
+        pgd[l1_index] = (VIRT_TO_PHYS(l1) & PAGE_MASK) | PD_TABLE;
     }
 
     unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
@@ -33,7 +33,7 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     {
         unsigned long *l2 = malloc(PAGE_SIZE);
         memset(l2, 0, PAGE_SIZE);
-        l1[l2_index] = (VIRT_TO_PHYS((unsigned long)l2) & PAGE_MASK) | PD_TABLE;
+        l1[l2_index] = (VIRT_TO_PHYS(l2) & PAGE_MASK) | PD_TABLE;
     }
 
     unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
@@ -42,7 +42,7 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     {
         unsigned long *l3 = malloc(PAGE_SIZE);
         memset(l3, 0, PAGE_SIZE);
-        l2[l3_index] = (VIRT_TO_PHYS((unsigned long)l3) & PAGE_MASK) | PD_TABLE;
+        l2[l3_index] = (VIRT_TO_PHYS(l3) & PAGE_MASK) | PD_TABLE;
     }
     else if ((l2[l3_index] & 0b11) == PD_BLOCK)
     {
@@ -103,7 +103,7 @@ void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned
     {
         unsigned long *l1 = malloc(PAGE_SIZE);
         memset(l1, 0, PAGE_SIZE);
-        pgd[l1_index] = (VIRT_TO_PHYS((unsigned long)l1) & PAGE_MASK) | PD_TABLE;
+        pgd[l1_index] = (VIRT_TO_PHYS(l1) & PAGE_MASK) | PD_TABLE;
     }
 
     unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
@@ -112,7 +112,7 @@ void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned
     {
         unsigned long *l2 = malloc(PAGE_SIZE);
         memset(l2, 0, PAGE_SIZE);
-        l1[l2_index] = (VIRT_TO_PHYS((unsigned long)l2) & PAGE_MASK) | PD_TABLE;
+        l1[l2_index] = (VIRT_TO_PHYS(l2) & PAGE_MASK) | PD_TABLE;
     }
 
     unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
