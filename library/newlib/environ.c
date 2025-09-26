@@ -5,5 +5,5 @@ char **environ = initial_env;
 
 void _set_environ()
 {
-    svc_call(&environ, 0, 0, 0, 0, 0, 0, 0, SYS_SET_ENVIRON);
+    svc_call((unsigned long)&environ, 0, 0, 0, 0, 0, 0, 0, SYS_SET_ENVIRON);
 }
