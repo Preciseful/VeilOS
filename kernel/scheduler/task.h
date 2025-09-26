@@ -41,7 +41,9 @@ typedef struct Task
 
     const char *name;
     int argc;
+    // the values within argv are user allocated, accesses must be done with PHYS_TO_VIRT
     char **argv;
+    // the values within environ are user allocated, accesses must be done with PHYS_TO_VIRT
     char **environ;
     unsigned long flags;
     long time;
