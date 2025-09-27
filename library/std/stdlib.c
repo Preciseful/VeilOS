@@ -1,7 +1,7 @@
 #include <std/stdlib.h>
 #include <svc.h>
 
-void *malloc(unsigned int size)
+void *malloc(unsigned long size)
 {
     return (void *)svc_call(size, 0, 0, 0, 0, 0, 0, 0, SYS_MALLOC);
 }

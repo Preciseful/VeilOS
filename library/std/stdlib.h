@@ -1,4 +1,4 @@
 #pragma once
 
-void *malloc(unsigned int size);
+void *malloc(unsigned long size);
 void free(void *data);
