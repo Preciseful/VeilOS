@@ -5,7 +5,8 @@
 #include <bundles/elf.h>
 
 // dont use lib/list.h here as that allocates more
-// + if it works, dont fix it
+
+#define EL1H_M 0b0101
 
 Task default_task = {0};
 Task *scheduler_current;
@@ -39,19 +40,18 @@ long AddTask(Task *task)
     return last_pid + 1;
 }
 
-void save_registers(Task *task, unsigned long *stack)
+void save_registers(Task *task, TaskRegs *registers)
 {
-    if (stack == 0)
+    if (registers == 0)
         return;
-    memcpy(&task->regs, stack, sizeof(task->regs));
+    memcpy(&task->regs, registers, sizeof(task->regs));
 }
 
-void switch_task(Task *next, unsigned long *stack)
+void switch_task(Task *next)
 {
     if (scheduler_current == next)
         return;
 
-    Task *last = scheduler_current;
     scheduler_current = next;
 
     bool flush = false;
@@ -66,7 +66,6 @@ void switch_task(Task *next, unsigned long *stack)
     last_asid_chunk = next->mmu_ctx.asid_chunk;
     stop = false;
 
-    save_registers(last, stack);
     LOG("Switching to process: '%s' at 0x%lx.\n", next->name, next->mmu_ctx.va);
     cpu_switch_task(next);
 }
@@ -105,13 +104,15 @@ Task *get_next_task()
 
 void Schedule()
 {
-    Task *current = get_next_task();
-    if (current)
-        switch_task(current, 0);
+    Task *task = get_next_task();
+    if (task)
+        switch_task(task);
 }
 
-void SchedulerTick(unsigned long *stack)
+void SchedulerTick(TaskRegs *registers)
 {
+    save_registers(scheduler_current, registers);
+
     if (stop)
         return;
 
@@ -120,8 +121,10 @@ void SchedulerTick(unsigned long *stack)
         return;
 
     scheduler_current->time = DEFAULT_TIME;
-    Task *next = get_next_task();
-    switch_task(next, stack);
+    stop = true;
+
+    registers->elr_el1 = (unsigned long)&Schedule;
+    registers->spsr_el1 = EL1H_M;
 }
 
 Task *GetRunningTask()
@@ -133,20 +136,5 @@ SYSCALL_HANDLER(exit_process)
 {
     scheduler_current->flags |= KILL_TASK;
     scheduler_current->time = 0;
-    return 1;
-}
-
-SYSCALL_HANDLER(execve)
-{
-    char *path = (char *)sp[0];
-    char **argv = (char **)sp[1];
-    char **env = (char **)sp[2];
-
-    unsigned long argc = 0;
-    while (argv && argv[argc])
-        argc++;
-
-    if (!MakeElfProcess(path, argc, argv, env, scheduler_current->pid))
-        return 0;
     return 1;
 }

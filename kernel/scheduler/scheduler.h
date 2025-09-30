@@ -10,10 +10,9 @@
 void SchedulerInit();
 void Schedule();
 long AddTask(Task *task);
-void SchedulerTick(unsigned long *stack);
+void SchedulerTick(TaskRegs *registers);
 Task *GetRunningTask();
 extern void cpu_switch_task(Task *next);
 extern void set_task_ttbr(unsigned long pgd, bool flush);
 
 SYSCALL_HANDLER(exit_process);
-SYSCALL_HANDLER(execve);

@@ -3,8 +3,8 @@
 #include <lib/printf.h>
 #include <scheduler/scheduler.h>
 #include <lib/string.h>
+#include <bundles/elf.h>
 
-#define EL1H_M 0b0101
 #define EL0T_M 0b0000
 #define ASID_CHUNKS_NUMBER 256
 
@@ -179,4 +179,19 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **envi
     task->regs.x[1] = VIRT_TO_PHYS(task->argv);
 
     return task;
+}
+
+SYSCALL_HANDLER(execve)
+{
+    char *path = (char *)sp[0];
+    char **argv = (char **)sp[1];
+    char **env = (char **)sp[2];
+
+    unsigned long argc = 0;
+    while (argv && argv[argc])
+        argc++;
+
+    if (!MakeElfProcess(path, argc, argv, env, GetRunningTask()->pid))
+        return 0;
+    return 1;
 }

@@ -65,3 +65,5 @@ void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr c
                  enum Task_Mapping_Properties properties_to_free);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length);
 void KillTask(Task *task);
+
+SYSCALL_HANDLER(execve);

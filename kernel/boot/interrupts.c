@@ -29,7 +29,7 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
     return 0;
 }
 
-void handle_irq(unsigned long *stack)
+void handle_irq(TaskRegs *registers)
 {
     unsigned int iar = ReadMMIO(GICC_IAR);
     unsigned int id = iar & 0x2FF;
@@ -41,7 +41,7 @@ void handle_irq(unsigned long *stack)
         // printf(".");
         refresh_cntp_tval(SYS_FREQ);
         WriteToMMIO(GICC_EOIR, iar);
-        SchedulerTick(stack);
+        SchedulerTick(registers);
         break;
 
     // uart0
