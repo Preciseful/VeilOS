@@ -47,7 +47,7 @@ void handle_irq(TaskRegs *registers)
     // uart0
     case 153:
         char character = UartCharacter();
-        LOG("Keyboard press: '%c' (%x)\n", character);
+        LOG("Keyboard press: '%c' (%x)\n", character, (unsigned long)character);
         WriteToMMIO(GICC_EOIR, iar);
         break;
 
