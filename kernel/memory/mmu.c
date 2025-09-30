@@ -55,10 +55,8 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     bool uxn = !((flags & MMU_USER_EXEC) >> 2);
     bool pxn = !uxn;
 
-    unsigned char ng = 0;
+    unsigned char ng = 1;
     unsigned long perm = flags & 0b11;
-    if (perm == MMU_RR || perm == MMU_RWRW)
-        ng = 1;
 
     unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | (ng << 11) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
     if (l3[pte_index] & 1)

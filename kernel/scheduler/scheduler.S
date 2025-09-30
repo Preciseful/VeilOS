@@ -49,4 +49,5 @@ cpu_switch_task:
 	pop x0
 
 	mov sp, x27
+	msr spsel, #0
     eret

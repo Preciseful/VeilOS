@@ -1,6 +1,7 @@
 #include "lib/utils.S"
 
 .macro enter_interrupt el
+    msr spsel, #1
     push x30
     pushp x28, x29
 
@@ -54,6 +55,7 @@
     popp x28, x29
     pop x30
 
+    msr spsel, #0
     eret
 .endm
 
@@ -144,7 +146,7 @@ el1_vectors:
     b serror_lower_el_aarch32
 
 sync_current_el_sp0:
-    vinvalid 0, 1
+    b irq_el1x
 irq_current_el_sp0:
     vinvalid 1, 1
 fiq_current_el_sp0:

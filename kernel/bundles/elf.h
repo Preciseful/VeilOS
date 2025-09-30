@@ -3,4 +3,4 @@
 #include <stdbool.h>
 #include <scheduler/task.h>
 
-Task *MakeElfProcess(const char *path, int argc, char **argv, char **environment, long pid);
+Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char **environment, long pid);

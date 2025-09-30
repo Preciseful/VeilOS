@@ -6,7 +6,7 @@
 #include <scheduler/scheduler.h>
 #include <vfs/vfs.h>
 
-Task *MakeElfProcess(const char *path, int argc, char **argv, char **environment, long pid)
+Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char **environment, long pid)
 {
     FileID file = OpenFile(path);
     if (file == -1)
@@ -28,7 +28,10 @@ Task *MakeElfProcess(const char *path, int argc, char **argv, char **environment
         return 0;
     }
 
-    Task *task = CreateTask(path, eheader.e_entry, 0, environment, argv, argc);
+    Task *task = CreateTask(path, kernel, eheader.e_entry, 0, environment, argv, argc);
+    char user = kernel ? 0 : MMU_USER;
+    char exec = kernel ? 0 : MMU_USER_EXEC;
+    char rw = kernel ? MMU_NORW : MMU_RWRW;
 
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
@@ -53,7 +56,7 @@ Task *MakeElfProcess(const char *path, int argc, char **argv, char **environment
         SeekInFile(file, phdr_offset);
         ReadFromFile(file, read, phdr_filesz);
 
-        MapTaskPage(task, phdr_vaddr, MMU_USER_EXEC | MMU_RWRW, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
+        MapTaskPage(task, phdr_vaddr, exec | rw, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
     }
 
     CloseFile(file);

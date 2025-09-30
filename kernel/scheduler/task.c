@@ -6,6 +6,7 @@
 #include <bundles/elf.h>
 
 #define EL0T_M 0b0000
+#define EL1H_M 0b0101
 #define ASID_CHUNKS_NUMBER 256
 
 extern unsigned char el1_vectors[];
@@ -125,7 +126,7 @@ void set_args(Task *task, int argc, char **argv, char **environ)
     }
 }
 
-Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc)
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc)
 {
     Task *task = malloc(sizeof(Task));
 
@@ -134,12 +135,13 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **envi
     memcpy(task->name, name, name_len);
 
     task->flags = ACTIVE_TASK;
+    task->kernel = kernel;
     task->time = DEFAULT_TIME;
     task->regs.x30 = va;
     task->regs.elr_el1 = va;
-    task->regs.spsr_el1 = EL0T_M;
-    task->regs.sp_el0 = GRANULE_1GB * 2 + PAGE_SIZE;
-    task->regs.sp_el1 = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
+    task->regs.spsr_el1 = kernel ? EL1H_M : EL0T_M;
+    task->regs.task_sp = GRANULE_1GB * 2 + PAGE_SIZE;
+    task->regs.interrupt_sp = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
@@ -170,9 +172,13 @@ Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **envi
 
     memset(task->mmu_ctx.pgd, 0, PAGE_SIZE);
 
+    char user = kernel ? 0 : MMU_USER;
+    char exec = kernel ? 0 : MMU_USER_EXEC;
+    char rw = kernel ? MMU_NORW : MMU_RWRW;
+
     if (code != 0)
-        MapTaskPage(task, task->mmu_ctx.va, MMU_USER | MMU_USER_EXEC | MMU_RWRW, code, PAGE_SIZE, MAP_PROPERTY_CODE);
-    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, MMU_USER | MMU_RWRW, task->mmu_ctx.sp_alloc, 1, MAP_PROPERTY_CODE);
+        MapTaskPage(task, task->mmu_ctx.va, user | exec | rw, code, PAGE_SIZE, MAP_PROPERTY_CODE);
+    MapTaskPage(task, task->regs.task_sp - PAGE_SIZE, user | rw, task->mmu_ctx.sp_alloc, 1, MAP_PROPERTY_CODE);
 
     set_args(task, argc, argv, environ);
     task->regs.x[0] = task->argc;
@@ -191,7 +197,8 @@ SYSCALL_HANDLER(execve)
     while (argv && argv[argc])
         argc++;
 
-    if (!MakeElfProcess(path, argc, argv, env, GetRunningTask()->pid))
+    Task *current_task = GetRunningTask();
+    if (!MakeElfProcess(path, current_task->kernel, argc, argv, env, current_task->pid))
         return 0;
     return 1;
 }

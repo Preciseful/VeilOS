@@ -10,7 +10,7 @@
 typedef struct TaskRegs
 {
     unsigned long x[28];
-    unsigned long sp_el0, sp_el1;
+    unsigned long task_sp, interrupt_sp;
     unsigned long elr_el1, spsr_el1;
     unsigned long x28, x29, x30;
 } TaskRegs;
@@ -48,6 +48,7 @@ typedef struct Task
     struct Task *next;
 
     char *name;
+    bool kernel;
     int argc;
     int environc;
     // the values within argv are user allocated, accesses must be done with PHYS_TO_VIRT
@@ -60,7 +61,7 @@ typedef struct Task
 } Task;
 
 bool TaskContainsVA(Task *task, VirtualAddr va);
-Task *CreateTask(const char *name, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc);
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc);
 void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len,
                  enum Task_Mapping_Properties properties_to_free);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length);
