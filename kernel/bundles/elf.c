@@ -29,6 +29,7 @@ Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char 
     }
 
     Task *task = CreateTask(path, kernel, eheader.e_entry, 0, environment, argv, argc);
+    char user = kernel ? 0 : MMU_USER;
     char exec = kernel ? 0 : MMU_USER_EXEC;
     char rw = kernel ? MMU_NORW : MMU_RWRW;
 
@@ -55,7 +56,7 @@ Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char 
         SeekInFile(file, phdr_offset);
         ReadFromFile(file, read, phdr_filesz);
 
-        MapTaskPage(task, phdr_vaddr, exec | rw, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
+        MapTaskPage(task, phdr_vaddr, user | exec | rw, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
     }
 
     CloseFile(file);
