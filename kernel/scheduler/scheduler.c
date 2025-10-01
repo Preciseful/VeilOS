@@ -19,6 +19,11 @@ void printx(unsigned long x)
     LOG("x: %u\n", x);
 }
 
+Task *GetRunningTask()
+{
+    return scheduler_current;
+}
+
 long AddTask(Task *task)
 {
     if (!default_task.next)
@@ -125,11 +130,6 @@ void SchedulerTick(TaskRegs *registers)
 
     registers->elr_el1 = (unsigned long)&Schedule;
     registers->spsr_el1 = EL1H_M;
-}
-
-Task *GetRunningTask()
-{
-    return scheduler_current;
 }
 
 SYSCALL_HANDLER(exit_process)

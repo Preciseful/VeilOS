@@ -176,7 +176,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, VirtualAddr code
     char exec = kernel ? 0 : MMU_USER_EXEC;
     char rw = kernel ? MMU_NORW : MMU_RWRW;
 
-    if (code != 0)
+    if (code != 0 && va < HIGH_VA)
         MapTaskPage(task, task->mmu_ctx.va, user | exec | rw, code, PAGE_SIZE, MAP_PROPERTY_CODE);
     MapTaskPage(task, task->regs.task_sp - PAGE_SIZE, user | rw, task->mmu_ctx.sp_alloc, 1, MAP_PROPERTY_CODE);
 
