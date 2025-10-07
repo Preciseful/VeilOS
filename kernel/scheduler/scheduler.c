@@ -10,8 +10,8 @@
 
 Task default_task = {0};
 Task *scheduler_current;
+PID last_pid;
 unsigned long last_asid_chunk;
-long last_pid;
 bool stop;
 
 void printx(unsigned long x)
@@ -22,6 +22,25 @@ void printx(unsigned long x)
 Task *GetRunningTask()
 {
     return scheduler_current;
+}
+
+bool GetTaskByPID(PID pid, Task **btask)
+{
+    Task *start = scheduler_current;
+    Task *current = start;
+
+    do
+    {
+        current = current->next ? current->next : default_task.next;
+        if (current && current->pid == pid)
+        {
+            *btask = current;
+            return true;
+        }
+
+    } while (current != start);
+
+    return false;
 }
 
 long AddTask(Task *task)

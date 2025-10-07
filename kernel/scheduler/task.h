@@ -7,6 +7,8 @@
 #define ACTIVE_TASK 0b10
 #define KILL_TASK 0b100
 
+typedef long PID;
+
 typedef struct TaskRegs
 {
     unsigned long x[28];
@@ -57,7 +59,7 @@ typedef struct Task
     char **environ;
     unsigned long flags;
     long time;
-    long pid;
+    PID pid;
 } Task;
 
 bool TaskContainsVA(Task *task, VirtualAddr va);
