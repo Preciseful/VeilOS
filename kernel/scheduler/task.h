@@ -17,21 +17,6 @@ typedef struct TaskRegs
     unsigned long x28, x29, x30;
 } TaskRegs;
 
-enum Task_Mapping_Properties
-{
-    MAP_PROPERTY_CODE = 0b1,
-    MAP_PROPERTY_VA = 0b10,
-    MAP_PROPERTY_PA = 0b100
-};
-
-typedef struct TaskMapping
-{
-    VirtualAddr code;
-    VirtualAddr va;
-    PhysicalAddr pa;
-    enum Task_Mapping_Properties to_free;
-} TaskMapping;
-
 typedef struct TaskMMUCtx
 {
     unsigned long asid_chunk;
@@ -40,13 +25,23 @@ typedef struct TaskMMUCtx
     VirtualAddr sp_alloc;
     VirtualAddr va;
     PhysicalAddr pa;
+    VirtualAddr next_va;
 } TaskMMUCtx;
+
+typedef struct MappingNode
+{
+    struct MappingNode *children[0xFF];
+    PhysicalAddr pa;
+    VirtualAddr va;
+    bool leaf;
+    bool occupied;
+} MappingNode;
 
 typedef struct Task
 {
     TaskRegs regs;
     TaskMMUCtx mmu_ctx;
-    List mappings;
+    MappingNode *map_root;
     struct Task *next;
 
     char *name;
@@ -62,11 +57,13 @@ typedef struct Task
     PID pid;
 } Task;
 
-bool TaskContainsVA(Task *task, VirtualAddr va);
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, VirtualAddr code, char **environ, char **argv, int argc);
-void MapTaskPage(Task *task, VirtualAddr va, enum MMU_Flags flags, VirtualAddr code, unsigned long code_len,
-                 enum Task_Mapping_Properties properties_to_free);
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, char **environ, char **argv, int argc);
+void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned long size, enum MMU_Flags flags);
+PhysicalAddr GetPagePA(Task *task, VirtualAddr va);
+void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned long size, enum MMU_Flags flags);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length);
+void RemoveMapsFromNode(Task *task, MappingNode *node);
 void KillTask(Task *task);
+VirtualAddr GetTaskValidVA(Task *task, unsigned int size);
 
 SYSCALL_HANDLER(execve);

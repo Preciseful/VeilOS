@@ -56,7 +56,7 @@ Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char 
         SeekInFile(file, phdr_offset);
         ReadFromFile(file, read, phdr_filesz);
 
-        MapTaskPage(task, phdr_vaddr, user | exec | rw, (VirtualAddr)read, phdr_memsz, MAP_PROPERTY_CODE);
+        MapTaskPage(task, phdr_vaddr, VIRT_TO_PHYS(read), phdr_memsz, user | exec | rw);
     }
 
     CloseFile(file);
