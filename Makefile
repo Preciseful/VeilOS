@@ -1,6 +1,7 @@
 RPI_PATH=/media/$(USER)/bootfs
 
 ARMGNU ?= aarch64-none-elf
+TTYDEV ?= /dev/ttyUSB0
 
 COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
@@ -50,4 +51,4 @@ DEP_FILES = $(OBJ_FILES:%.o=%.d)
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	scripts/go_rpi.sh $(RPI_PATH)
+	scripts/go_rpi.sh $(RPI_PATH) $(TTYDEV)
