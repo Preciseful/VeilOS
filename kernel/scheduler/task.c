@@ -17,10 +17,11 @@ extern unsigned char el1_vectors[];
 
 Task *asid_chunks[ASID_CHUNKS_NUMBER][256] = {};
 
-MappingNode *create_map_node()
+TaskMappingNode *create_map_node(TaskMappingNode *parent)
 {
-    MappingNode *node = (MappingNode *)malloc(sizeof(MappingNode));
-    memset(node, 0, sizeof(MappingNode));
+    TaskMappingNode *node = (TaskMappingNode *)malloc(sizeof(TaskMappingNode));
+    memset(node, 0, sizeof(TaskMappingNode));
+    node->parent = parent;
 
     return node;
 }
@@ -31,7 +32,7 @@ PhysicalAddr GetPagePA(Task *task, VirtualAddr va)
     for (int i = 0; i < MAPPING_LEVELS; i++)
         va_parts[i] = (va >> (i * MAP_BITS)) & MAPPING_VALUE;
 
-    MappingNode *node = task->map_root;
+    TaskMappingNode *node = task->map_root;
     for (unsigned long i = 0; i < MAPPING_LEVELS; i++)
     {
         if (!node->children[va_parts[i]])
@@ -43,7 +44,7 @@ PhysicalAddr GetPagePA(Task *task, VirtualAddr va)
     return node->pa;
 }
 
-void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned long size, enum MMU_Flags flags)
+void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned int size, enum MMU_Flags flags)
 {
     unsigned long num_pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
 
@@ -53,17 +54,29 @@ void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned long size
         for (int i = 0; i < MAPPING_LEVELS; i++)
             va_parts[i] = (va >> (i * MAP_BITS)) & MAPPING_VALUE;
 
-        MappingNode *node = task->map_root;
+        TaskMappingNode *node = task->map_root;
         for (unsigned long i = 0; i < MAPPING_LEVELS; i++)
         {
             if (!node->children[va_parts[i]])
-                node->children[va_parts[i]] = create_map_node();
+                node->children[va_parts[i]] = create_map_node(node);
 
             node = node->children[va_parts[i]];
         }
 
         if (node->leaf && node->pa != pa && node->pa != 0)
             UnmapTablePage(task->mmu_ctx.pgd, va);
+
+        TaskMappingNode *parent = node->parent;
+
+        while (parent)
+        {
+            parent->full_children++;
+            if (parent->full_children < MAPPING_VALUE)
+                break;
+
+            parent->full_children = MAPPING_VALUE;
+            parent = parent->parent;
+        }
 
         node->leaf = true;
         node->pa = pa;
@@ -76,7 +89,7 @@ void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned long size
     }
 }
 
-void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
+void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length)
 {
     if (!GetPagePA(task, va))
         return;
@@ -91,9 +104,7 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
         for (int i = 0; i < MAPPING_LEVELS; i++)
             va_parts[i] = (va >> (i * MAP_BITS)) & MAPPING_VALUE;
 
-        MappingNode *node = task->map_root;
-        MappingNode *node_parent = 0;
-
+        TaskMappingNode *node = task->map_root;
         for (unsigned long i = 0; i < MAPPING_LEVELS; i++)
         {
             // something def went wrong
@@ -103,18 +114,28 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned long length)
                 return;
             }
 
-            node_parent = node;
             node = node->children[va_parts[i]];
         }
 
-        free(node);
-        node_parent->children[va_parts[MAPPING_LEVELS - 1]] = 0;
+        TaskMappingNode *parent = node->parent;
+        parent->children[va_parts[MAPPING_LEVELS - 1]] = 0;
 
+        while (parent)
+        {
+            parent->full_children--;
+
+            if (parent->full_children == MAPPING_VALUE - 1)
+                parent = parent->parent;
+            else
+                break;
+        }
+
+        free(node);
         UnmapTablePage(task->mmu_ctx.pgd, va);
     }
 }
 
-void RemoveMapsFromNode(Task *task, MappingNode *node)
+void RemoveMapsFromNode(Task *task, TaskMappingNode *node)
 {
     for (unsigned long i = 0; i < MAPPING_VALUE; i++)
     {
@@ -154,33 +175,40 @@ void KillTask(Task *task)
 
 VirtualAddr GetTaskValidVA(Task *task, unsigned int size)
 {
-    VirtualAddr va = 0;
+    unsigned long va = 0;
 
-    while (1)
+    TaskMappingNode *node = task->map_root;
+    for (unsigned long level = 0; level < MAPPING_LEVELS - 1; level++)
     {
-        while (GetPagePA(task, task->mmu_ctx.next_va))
-            task->mmu_ctx.next_va += PAGE_SIZE;
-
-        va = task->mmu_ctx.next_va;
-        bool ok = true;
-
-        for (unsigned int i = 0; i < size; i += PAGE_SIZE)
+        for (unsigned long i = 0; i < MAPPING_VALUE; i++)
         {
-            if (GetPagePA(task, task->mmu_ctx.next_va))
+            TaskMappingNode *child = node->children[i];
+
+            if (!child)
             {
-                ok = false;
-                break;
+                va += i << ((MAPPING_LEVELS - 1 - level) * MAP_BITS + PAGE_SHIFT);
+                return va;
             }
 
-            task->mmu_ctx.next_va += PAGE_SIZE;
-        }
+            if (child->full_children == MAPPING_VALUE)
+                continue;
 
-        if (ok)
+            va += i << ((MAPPING_LEVELS - 1 - level) * MAP_BITS + PAGE_SHIFT);
+            node = child;
             break;
+        }
     }
 
-    task->mmu_ctx.next_va += PAGE_SIZE;
-    return va;
+    for (unsigned long i = 1; i < MAPPING_VALUE; i++)
+    {
+        if (node->children[i])
+            continue;
+
+        va += i << PAGE_SHIFT;
+        return va;
+    }
+
+    return 0;
 }
 
 void *mapped_malloc(Task *task, unsigned int size)
@@ -244,10 +272,9 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     task->mmu_ctx.pa = VIRT_TO_PHYS(malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
-    task->mmu_ctx.next_va = 0x400000;
 
-    task->map_root = malloc(sizeof(MappingNode));
-    memset(task->map_root, 0, sizeof(MappingNode));
+    task->map_root = malloc(sizeof(TaskMappingNode));
+    memset(task->map_root, 0, sizeof(TaskMappingNode));
 
     for (int i = 0; i < ASID_CHUNKS_NUMBER; i++)
     {
