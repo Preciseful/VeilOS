@@ -77,7 +77,7 @@ void invalidate_section(Voidom voidom, unsigned long pos)
     WriteToEMMC(buf, VOID_SIZE);
 }
 
-void get_voidelle_name(Voidom voidom, Voidelle voidelle, char *buffer)
+void GetVoidelleName(Voidom voidom, Voidelle voidelle, char *buffer)
 {
     unsigned long pos = voidelle.name;
     unsigned long bytes_left = voidelle.name_size;
@@ -104,7 +104,7 @@ bool find_content_with_name(Voidom voidom, Voidelle parent, Voidelle *voidelle, 
         ReadVoid(voidom, &content, pos);
 
         char *buffer = malloc(content.name_size);
-        get_voidelle_name(voidom, content, buffer);
+        GetVoidelleName(voidom, content, buffer);
 
         if (strcmp(buffer, name) == 0)
         {

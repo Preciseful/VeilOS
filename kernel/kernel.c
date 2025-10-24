@@ -12,6 +12,7 @@
 #include <lib/string.h>
 #include <bundles/elf.h>
 #include <fs/voidelle.h>
+#include <interface/module.h>
 
 void kboot()
 {
@@ -46,6 +47,8 @@ void kmain()
     FatFSInit(fatfs, partitions[0]);
     VoidelleInit(voidom, partitions[1]);
     LOG("Initialized partitions.\n");
+
+    ModulesInit(*voidom);
 
     while (1)
         Schedule();

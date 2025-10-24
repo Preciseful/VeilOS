@@ -60,5 +60,6 @@ void ReadVoid(Voidom voidom, void *void_section, unsigned long pos);
 void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos);
 Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsigned long flags);
 unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, const void *data, unsigned long size);
+void GetVoidelleName(Voidom voidom, Voidelle voidelle, char *buffer);
 void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
 bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index);
