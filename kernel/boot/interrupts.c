@@ -7,7 +7,6 @@
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
 #include <scheduler/task.h>
-#include <interface/portal.h>
 #include <interface/syscall.h>
 
 unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr, unsigned long far, unsigned long *sp)

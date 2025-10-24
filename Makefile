@@ -37,9 +37,9 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
 	@$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
 
-C_FILES = $(shell find . \( -path ./library \) -prune -o -type f -name "*.c" -print | cut -d'/' -f2-)
-CPP_FILES = $(shell find . \( -path ./library \) -prune -o -type f -name "*.cpp" -print | cut -d'/' -f2-)
-ASM_FILES = $(shell find . \( -path ./library \) -prune -o -type f -name "*.S" -print | cut -d'/' -f2-)
+C_FILES = $(shell find . \( -path ./library -o -path ./modules \) -prune -o -type f -name "*.c" -print | cut -d'/' -f2-)
+CPP_FILES = $(shell find . \( -path ./library -o -path ./modules \) -prune -o -type f -name "*.cpp" -print | cut -d'/' -f2-)
+ASM_FILES = $(shell find . \( -path ./library -o -path ./modules \) -prune -o -type f -name "*.S" -print | cut -d'/' -f2-)
 
 OBJ_FILES = $(C_FILES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%_c.o)
 OBJ_FILES += $(CPP_FILES:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%_cpp.o)

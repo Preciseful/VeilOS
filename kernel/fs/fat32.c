@@ -4,8 +4,6 @@
 #include <memory/memory.h>
 #include <lib/printf.h>
 #include <lib/string.h>
-#include <interface/portal.h>
-#include <vfs/vfs.h>
 
 unsigned int FatClusterSize(FatFS *fs)
 {
