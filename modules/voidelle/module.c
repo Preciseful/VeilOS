@@ -10,8 +10,8 @@ void print(const char *msg, unsigned long size)
 
 int main()
 {
+    print("Voidelle fs module\n", 20);
     while (1)
     {
-        print("vor dem mir graut", 18);
     }
 }
