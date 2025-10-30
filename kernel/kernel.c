@@ -49,6 +49,9 @@ void kmain()
     LOG("Initialized partitions.\n");
 
     ModulesInit(*voidom);
+    LOG("Modules initialized.\n");
+    StartModule("Voidelle");
+    LOG("Started module: Voidelle.\n");
 
     while (1)
         Schedule();

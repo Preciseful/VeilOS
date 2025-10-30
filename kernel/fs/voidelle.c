@@ -302,7 +302,7 @@ void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle)
     invalidate_section(voidom, voidelle->pos);
 }
 
-bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index)
+bool read_voidelle_at_index(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index)
 {
     unsigned long content_pos = voidelle.content;
 
@@ -321,4 +321,48 @@ bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned
 
     ReadVoid(voidom, voidite, content_pos);
     return true;
+}
+
+unsigned long ReadVoidelleAt(Voidom voidom, Voidelle voidelle, unsigned long seek, void *buf, unsigned long buf_size)
+{
+    unsigned char *current_buf = buf;
+    unsigned long first_voidite = seek / VOIDITE_CONTENT_SIZE;
+    unsigned long last_voidite = (seek + buf_size - 1) / VOIDITE_CONTENT_SIZE;
+    unsigned long start = seek % VOIDITE_CONTENT_SIZE;
+    unsigned long end = (seek + buf_size) % VOIDITE_CONTENT_SIZE;
+    unsigned long bytes_left = buf_size;
+
+    for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
+    {
+        Voidite voidite;
+
+        if (!read_voidelle_at_index(voidom, voidelle, &voidite, voidite_index))
+        {
+            LOG("failed read??\n");
+            return current_buf - (unsigned char *)buf;
+        }
+
+        unsigned char *cpy_start = voidite.data;
+        unsigned long cpy_len = VOIDITE_CONTENT_SIZE;
+
+        if (voidite_index == first_voidite)
+        {
+            cpy_start += start;
+            cpy_len -= start;
+        }
+
+        if (voidite_index == last_voidite && end != 0)
+            // edge case
+            cpy_len = end;
+
+        if (cpy_len > bytes_left)
+            cpy_len = bytes_left;
+
+        memcpy(current_buf, cpy_start, cpy_len);
+
+        current_buf += cpy_len;
+        bytes_left -= cpy_len;
+    }
+
+    return current_buf - (unsigned char *)buf;
 }

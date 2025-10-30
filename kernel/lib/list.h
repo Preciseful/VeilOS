@@ -3,6 +3,10 @@
 #include <stdbool.h>
 
 #define GET_VALUE(object, type) ((type *)object->value)
+#define LIST_FOREACH(type, name, list)                                                                           \
+    ListObject *list_foreach_object = list.first;                                                                \
+    for (unsigned long index = 0; list_foreach_object; list_foreach_object = list_foreach_object->next, index++) \
+        for (type *name = GET_VALUE(list_foreach_object, type); name; name = 0)
 
 enum List_Type
 {

@@ -1,4 +1,4 @@
-RPI_PATH=/media/$(USER)/bootfs
+RPI_PATH=/run/media/$(USER)/bootfs
 
 ARMGNU ?= aarch64-none-elf
 TTYDEV ?= /dev/ttyUSB0
@@ -9,8 +9,18 @@ ASMOPS = -Ikernel -fPIE
 
 BUILD_DIR = build/bin
 SRC_DIR = kernel
+MODULE_DIRS = $(wildcard modules/*)
 
 all : clean kernel8.img
+
+.PHONY: modules $(MODULE_DIRS)
+modules: $(MODULE_DIRS)
+
+$(MODULE_DIRS):
+	$(MAKE) -C $@ ARMGNU=$(ARMGNU)
+
+screen:
+	scripts/view_tty.sh $(TTYDEV)
 
 lib:
 	$(MAKE) -C library ARMGNU=$(ARMGNU)

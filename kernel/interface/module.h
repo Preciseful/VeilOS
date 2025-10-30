@@ -12,3 +12,4 @@ typedef struct Module
 
 List GetModules();
 void ModulesInit(Voidom voidom);
+void StartModule(const char *name);

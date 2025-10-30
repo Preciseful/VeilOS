@@ -103,6 +103,7 @@ void FreeList(List *list, bool free_values)
 void *GetAtIndex(List list, unsigned long index)
 {
     unsigned long i = 0;
+
     for (ListObject *object = list.first; object; object = object->next, i++)
     {
         if (object == 0)

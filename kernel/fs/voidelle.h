@@ -62,4 +62,4 @@ Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsig
 unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, const void *data, unsigned long size);
 void GetVoidelleName(Voidom voidom, Voidelle voidelle, char *buffer);
 void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
-bool ReadVoidelleAt(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index);
+unsigned long ReadVoidelleAt(Voidom voidom, Voidelle voidelle, unsigned long seek, void *buf, unsigned long buf_size);
