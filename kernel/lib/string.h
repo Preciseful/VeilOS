@@ -10,5 +10,6 @@ char *strcat(char *dest, const char *src);
 int ustrcmp(const unsigned char *s1, const unsigned char *s2);
 char toupper(char x);
 unsigned char utoupper(unsigned char x);
+char *strrchr(const char *s, int c);
 
 List GetSubstrings(const char *string, char split);

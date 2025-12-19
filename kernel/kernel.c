@@ -12,7 +12,8 @@
 #include <lib/string.h>
 #include <bundles/elf.h>
 #include <fs/voidelle.h>
-#include <interface/module.h>
+#include <system/vfs.h>
+#include <interface/fio.h>
 
 void kboot()
 {
@@ -45,13 +46,13 @@ void kmain()
     Voidom *voidom = malloc(sizeof(Voidom));
 
     FatFSInit(fatfs, partitions[0]);
-    VoidelleInit(voidom, partitions[1]);
+    VoidelleFSInit(voidom, partitions[1]);
+
     LOG("Initialized partitions.\n");
 
-    ModulesInit(*voidom);
-    LOG("Modules initialized.\n");
-    StartModule("Voidelle");
-    LOG("Started module: Voidelle.\n");
+    VFSInit();
+
+    LOG("Used memory (reference): %lu bytes\n", get_memory_used());
 
     while (1)
         Schedule();

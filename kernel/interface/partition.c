@@ -30,6 +30,7 @@ Partition *PartitionsInit()
         partition.name = name;
         partition.mbr = mbr;
         partition.offset = sector;
+        partition.backing_data = mbr.partitions[i];
 
         partitions[i] = partition;
     }

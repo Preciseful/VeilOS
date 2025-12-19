@@ -37,6 +37,19 @@ void strcpy(void *dest, const void *source)
         i++;
 }
 
+char *strrchr(const char *s, int c)
+{
+    const char *p = 0;
+
+    for (;;)
+    {
+        if (*s == (char)c)
+            p = s;
+        if (*s++ == '\0')
+            return (char *)p;
+    }
+}
+
 char *strcat(char *dest, const char *src)
 {
     char *rdest = dest;

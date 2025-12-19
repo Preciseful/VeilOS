@@ -7,6 +7,8 @@
 __attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
+unsigned long used_memory = 0;
+
 extern char bss_begin[];
 extern char bss_end[];
 
@@ -48,6 +50,9 @@ void *get_free_page(unsigned int size)
 
 void *malloc(unsigned int size)
 {
+    if (size == 0)
+        return 0;
+
     size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
     void *page = get_free_page(size);
@@ -56,6 +61,7 @@ void *malloc(unsigned int size)
     headers[index].data = page;
     headers[index].size = size;
 
+    used_memory += headers[index].size;
     return headers[index].data;
 }
 
@@ -64,7 +70,14 @@ unsigned int free(void *data)
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
         mem_map[index + i] = 0;
+
+    used_memory -= headers[index].size;
     return headers[index].size;
+}
+
+unsigned long get_memory_used()
+{
+    return used_memory;
 }
 
 unsigned int memory_size(void *data)

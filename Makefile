@@ -13,17 +13,8 @@ MODULE_DIRS = $(wildcard modules/*)
 
 all : clean kernel8.img
 
-.PHONY: modules $(MODULE_DIRS)
-modules: $(MODULE_DIRS)
-
-$(MODULE_DIRS):
-	$(MAKE) -C $@ ARMGNU=$(ARMGNU)
-
 screen:
 	scripts/view_tty.sh $(TTYDEV)
-
-lib:
-	$(MAKE) -C library ARMGNU=$(ARMGNU)
 
 setup:
 	scripts/setup.sh $(RPI_PATH)

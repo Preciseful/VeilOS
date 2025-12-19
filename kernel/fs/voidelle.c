@@ -1,35 +1,53 @@
-#include <fs/voidelle.h>
-#include <drivers/emmc.h>
-#include <lib/printf.h>
 #include <lib/string.h>
+#include <drivers/emmc.h>
+#include <stdint.h>
+#include <stddef.h>
 
-Voidlet get_voidlet(Voidom voidom)
+#include "voidelle.h"
+
+// ALL disk_* functions should be swapped for your disk handling
+
+// seek is relative to the partition's start
+void disk_seek(Voidom voidom, uint64_t seek)
 {
-    Voidlet voidlet;
-    SeekInEMMC(voidom.partition.offset + 0);
-    ReadFromEMMC((unsigned char *)&voidlet, VOID_SIZE);
-
-    return voidlet;
+    SeekInEMMC(voidom.disk.offset + seek);
 }
 
-Voidelle get_root(Voidom voidom)
+void disk_read(Voidom voidom, void *buf, uint64_t size)
 {
-    Voidelle root;
-    SeekInEMMC(voidom.partition.offset + VOID_SIZE);
-    ReadFromEMMC((unsigned char *)&root, VOID_SIZE);
+    unsigned char temp[VOID_SIZE];
+    ReadFromEMMC(temp, VOID_SIZE);
 
-    return root;
+    memcpy(buf, temp, size);
 }
 
-unsigned long get_free_section(Voidom voidom)
+void disk_write(Voidom voidom, void *buf, uint64_t size)
 {
-    for (unsigned long i = 0; i < voidom.voidlet.voidmap_size; i++)
+    unsigned char temp[VOID_SIZE];
+    memset(temp, 0, VOID_SIZE);
+    memcpy(temp, buf, size);
+
+    WriteToEMMC(temp, VOID_SIZE);
+}
+
+long disk_size(Voidom voidom)
+{
+    return voidom.disk.backing_data.num_sectors * 512;
+}
+
+uint64_t get_free_void(Voidom voidom)
+{
+    uint8_t total_bits[VOID_SIZE];
+
+    for (uint64_t i = 0; i < voidom.voidlet.voidmap_size; i++)
     {
-        unsigned char total_bits[512];
-        unsigned char bits;
-        SeekInEMMC(voidom.partition.offset + voidom.voidlet.voidmap + (i / 512));
-        ReadFromEMMC(total_bits, VOID_SIZE);
-        bits = total_bits[i % 512];
+        if (i % VOID_SIZE == 0)
+        {
+            disk_seek(voidom, voidom.voidlet.voidmap + (i / VOID_SIZE));
+            disk_read(voidom, total_bits, VOID_SIZE);
+        }
+
+        uint8_t bits = total_bits[i % VOID_SIZE];
 
         int bit_pos = 0;
 
@@ -49,10 +67,10 @@ unsigned long get_free_section(Voidom voidom)
         }
 
         uint64_t pos = (i * 8 + (7 - bit_pos)) * VOID_SIZE;
-        total_bits[i % 512] = bits;
+        total_bits[i % VOID_SIZE] = bits;
 
-        SeekInEMMC(voidom.partition.offset + voidom.voidlet.voidmap + (i / 512));
-        WriteToEMMC(total_bits, VOID_SIZE);
+        disk_seek(voidom, voidom.voidlet.voidmap + (i / VOID_SIZE));
+        disk_write(voidom, total_bits, VOID_SIZE);
 
         return pos;
     }
@@ -60,116 +78,219 @@ unsigned long get_free_section(Voidom voidom)
     return 0;
 }
 
-void invalidate_section(Voidom voidom, unsigned long pos)
+void invalidate_section(Voidom voidom, uint64_t pos)
 {
-    unsigned long section = pos / VOID_SIZE;
-    unsigned long i = section / 8;
-    unsigned long sector_offset = (i / VOID_SIZE) * VOID_SIZE;
-    int bit_pos = 7 - (section % 8);
+    uint64_t bit_index = pos;
+    uint64_t byte_index = bit_index / 8;
+    int bit_pos = 7 - (bit_index % 8);
 
-    unsigned char buf[VOID_SIZE];
-    SeekInEMMC(voidom.partition.offset + voidom.voidlet.voidmap + sector_offset);
-    ReadFromEMMC(buf, VOID_SIZE);
+    uint8_t buf;
+    disk_seek(voidom, voidom.voidlet.voidmap + byte_index);
+    disk_read(voidom, &buf, 1);
 
-    buf[i % VOID_SIZE] &= ~(1 << bit_pos);
+    buf &= ~(1 << bit_pos);
 
-    SeekInEMMC(voidom.partition.offset + voidom.voidlet.voidmap + sector_offset);
-    WriteToEMMC(buf, VOID_SIZE);
+    disk_seek(voidom, voidom.voidlet.voidmap + byte_index);
+    disk_write(voidom, &buf, 1);
 }
 
-void GetVoidelleName(Voidom voidom, Voidelle voidelle, char *buffer)
+bool write_void(Voidom voidom, void *buf, uint64_t position, uint64_t size)
 {
-    unsigned long pos = voidelle.name;
-    unsigned long bytes_left = voidelle.name_size;
-
-    while (pos)
-    {
-        Voidite voidite;
-        ReadVoid(voidom, &voidite, pos);
-
-        unsigned long read_count = bytes_left < VOIDITE_CONTENT_SIZE ? bytes_left : VOIDITE_CONTENT_SIZE;
-        memcpy(buffer + voidelle.name_size - bytes_left, voidite.data, read_count);
-
-        bytes_left -= read_count;
-        pos = voidite.next;
-    }
-}
-
-bool find_content_with_name(Voidom voidom, Voidelle parent, Voidelle *voidelle, char *name)
-{
-    unsigned long pos = parent.content;
-    while (pos)
-    {
-        Voidelle content;
-        ReadVoid(voidom, &content, pos);
-
-        char *buffer = malloc(content.name_size);
-        GetVoidelleName(voidom, content, buffer);
-
-        if (strcmp(buffer, name) == 0)
-        {
-            *voidelle = content;
-            free(buffer);
-            return true;
-        }
-
-        free(buffer);
-        pos = content.next;
-    }
-
-    return false;
-}
-
-bool get_prev_neighbour(Voidom voidom, Voidelle parent, Voidelle voidelle, Voidelle *prev)
-{
-    if (parent.content == 0)
+    if (size > VOID_SIZE)
         return false;
 
-    unsigned long pos = parent.content;
-    while (pos)
-    {
-        Voidelle neighbour;
-        ReadVoid(voidom, &neighbour, pos);
+    uint8_t cpy_buf[VOID_SIZE];
+    memset(cpy_buf, 0, VOID_SIZE);
+    memcpy(cpy_buf, buf, size);
 
-        if (neighbour.next == voidelle.pos)
-        {
-            *prev = neighbour;
-            return true;
-        }
+    disk_seek(voidom, position);
+    disk_write(voidom, cpy_buf, VOID_SIZE);
 
-        pos = neighbour.next;
-    }
-
-    return false;
+    return true;
 }
 
-void clear_voidites(Voidom voidom, unsigned long pos)
+bool read_void(Voidom voidom, void *buf, uint64_t position, uint64_t size)
 {
+    if (size > VOID_SIZE)
+        return false;
+
+    disk_seek(voidom, position);
+    disk_read(voidom, buf, size);
+    return true;
+}
+
+void clear_voidites_after(Voidom voidom, Voidite *start)
+{
+    uint64_t pos = start->next_voidite;
+
     while (pos)
     {
         Voidite voidite;
-        ReadVoid(voidom, &voidite, pos);
-        invalidate_section(voidom, voidite.pos);
+        read_void(voidom, &voidite, pos, sizeof(Voidite));
+        pos = voidite.next_voidite;
 
-        pos = voidite.next;
+        voidite.next_voidite = 0;
+        write_void(voidom, &voidite, voidite.position, sizeof(Voidite));
+        invalidate_section(voidom, voidite.position);
+    }
+
+    start->next_voidite = 0;
+    write_void(voidom, start, start->position, sizeof(Voidite));
+}
+
+void clear_voidelle_content(Voidom voidom, Voidelle *voidelle)
+{
+    if (voidelle->content_voidelle == 0)
+        return;
+
+    if (voidelle->flags & VOIDELLE_DIRECTORY)
+    {
+        uint64_t pos = voidelle->content_voidelle;
+
+        while (pos)
+        {
+            Voidelle child;
+            read_void(voidom, &child, pos, sizeof(Voidelle));
+
+            remove_voidelle(voidom, voidelle, child, true);
+            clear_voidelle_content(voidom, &child);
+            clear_voidelle_name(voidom, &child);
+
+            pos = child.next_voidelle;
+        }
+    }
+    else
+    {
+        Voidite voidite;
+        read_void(voidom, &voidite, voidelle->content_voidelle, sizeof(Voidite));
+
+        clear_voidites_after(voidom, &voidite);
+        invalidate_section(voidom, voidite.position);
+    }
+
+    voidelle->content_voidelle = 0;
+    write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+}
+
+void clear_voidelle_name(Voidom voidom, Voidelle *voidelle)
+{
+    if (voidelle->name_voidelle == 0)
+        return;
+
+    Voidite voidite;
+    read_void(voidom, &voidite, voidelle->name_voidelle, sizeof(Voidite));
+
+    clear_voidites_after(voidom, &voidite);
+    invalidate_section(voidom, voidite.position);
+
+    voidelle->name_voidelle = 0;
+    write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+}
+
+void fill_content_voidites(Voidom voidom, Voidelle *voidelle, unsigned long count)
+{
+    if (!voidelle->content_voidelle)
+    {
+        Voidite content;
+        content.position = get_free_void(voidom);
+        content.next_voidite = 0;
+        memset(content.data, 0, VOIDITE_CONTENT_SIZE);
+
+        voidelle->content_voidelle = content.position;
+
+        write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+        write_void(voidom, &content, content.position, sizeof(Voidite));
+    }
+
+    Voidite last_voidite;
+    uint64_t pos = voidelle->content_voidelle;
+
+    unsigned long existing = 0;
+
+    while (pos)
+    {
+        read_void(voidom, &last_voidite, pos, sizeof(Voidite));
+        pos = last_voidite.next_voidite;
+        existing++;
+    }
+
+    if (count <= existing)
+        return;
+    count -= existing;
+
+    for (size_t i = 0; i < count; i++)
+    {
+        Voidite next_voidite;
+        next_voidite.next_voidite = 0;
+        next_voidite.position = get_free_void(voidom);
+        memset(next_voidite.data, 0, VOIDITE_CONTENT_SIZE);
+
+        last_voidite.next_voidite = next_voidite.position;
+
+        write_void(voidom, &last_voidite, last_voidite.position, sizeof(Voidite));
+        write_void(voidom, &next_voidite, next_voidite.position, sizeof(Voidite));
+
+        last_voidite = next_voidite;
     }
 }
 
-unsigned long populate_data(Voidom voidom, Voidite *voidite, const void *data, unsigned long size)
+void fill_name_voidites(Voidom voidom, Voidelle *voidelle, unsigned long count)
 {
-    unsigned long initial_size = size;
-    unsigned long void_count = ((size + VOIDITE_CONTENT_SIZE - 1) / VOIDITE_CONTENT_SIZE) + 1;
+    if (!voidelle->name_voidelle)
+    {
+        Voidite name;
+        name.position = get_free_void(voidom);
+        name.next_voidite = 0;
+        memset(name.data, 0, VOIDITE_CONTENT_SIZE);
+
+        voidelle->name_voidelle = name.position;
+
+        write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+        write_void(voidom, &name, name.position, sizeof(Voidite));
+    }
+
+    Voidite last_voidite;
+    uint64_t pos = voidelle->name_voidelle;
+
+    while (pos)
+    {
+        read_void(voidom, &last_voidite, pos, sizeof(Voidite));
+        pos = last_voidite.next_voidite;
+        count--;
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        Voidite next_voidite;
+        next_voidite.next_voidite = 0;
+        next_voidite.position = get_free_void(voidom);
+        memset(next_voidite.data, 0, VOIDITE_CONTENT_SIZE);
+
+        last_voidite.next_voidite = next_voidite.position;
+
+        write_void(voidom, &last_voidite, last_voidite.position, sizeof(Voidite));
+        write_void(voidom, &next_voidite, next_voidite.position, sizeof(Voidite));
+
+        last_voidite = next_voidite;
+    }
+}
+
+uint64_t populate_voidite_data(Voidom voidom, Voidite *first_voidite_buf, const void *data, uint64_t size)
+{
+    uint64_t initial_size = size;
+    uint64_t void_count = ((size + VOIDITE_CONTENT_SIZE - 1) / VOIDITE_CONTENT_SIZE);
     Voidite *sections = malloc(sizeof(Voidite) * void_count);
 
-    for (unsigned long i = 0; i < void_count; i++)
+    for (uint64_t i = 0; i < void_count; i++)
     {
-        unsigned long pos = get_free_section(voidom);
+        uint64_t pos = get_free_void(voidom);
 
         Voidite voidite;
-        voidite.pos = pos;
-        voidite.next = 0;
+        memset(&voidite, 0, sizeof(Voidite));
+        voidite.position = pos;
+        voidite.next_voidite = 0;
 
-        unsigned long bytes = size < VOIDITE_CONTENT_SIZE ? size : VOIDITE_CONTENT_SIZE;
+        uint64_t bytes = size < VOIDITE_CONTENT_SIZE ? size : VOIDITE_CONTENT_SIZE;
         memcpy(voidite.data, data, bytes);
 
         data += bytes;
@@ -184,127 +305,106 @@ unsigned long populate_data(Voidom voidom, Voidite *voidite, const void *data, u
         }
     }
 
-    for (unsigned long i = 0; i < void_count; i++)
+    for (uint64_t i = 0; i < void_count; i++)
     {
         if (i < void_count - 1)
-            sections[i].next = sections[i + 1].pos;
+            sections[i].next_voidite = sections[i + 1].position;
 
-        UpdateVoidProperties(voidom, &sections[i], sections[i].pos);
+        write_void(voidom, &sections[i], sections[i].position, sizeof(Voidite));
     }
 
-    *voidite = sections[0];
+    *first_voidite_buf = sections[0];
     free(sections);
     return initial_size - size;
 }
 
-bool VoidelleInit(Voidom *voidom, Partition partition)
+verror_t create_voidlet(Voidom *voidom)
 {
-    voidom->partition = partition;
-    voidom->root = get_root(*voidom);
-    voidom->voidlet = get_voidlet(*voidom);
+    long file_size = disk_size(*voidom);
+    long voidmap_size = (file_size / VOID_SIZE + 7) / 8;
+    long bitmap_offset = file_size - voidmap_size;
+    long voidmap = bitmap_offset - bitmap_offset % VOID_SIZE;
 
-    if (memcmp(voidom->voidlet.identifier, "VOID", 4) != 0)
-        return false;
+    Voidlet voidlet;
+    memcpy(voidlet.header, "VOID", 4);
+    voidlet.void_size = VOID_SIZE;
+    voidlet.voidmap_size = voidmap_size;
+    voidlet.voidmap = voidmap;
 
-    return true;
+    if (!write_void(*voidom, &voidlet, 0, sizeof(Voidlet)))
+        return UNKNOWN_ERROR;
+
+    voidom->voidlet = voidlet;
+
+    uint8_t zero_buf[VOID_SIZE];
+    memset(zero_buf, 0, VOID_SIZE);
+    uint8_t first_bits = 0b10000000;
+
+    for (uint64_t i = 0; i < voidmap_size; i += VOID_SIZE)
+        write_void(*voidom, zero_buf, voidmap + i, VOID_SIZE);
+
+    write_void(*voidom, &first_bits, voidmap, sizeof(uint8_t));
+
+    return SUCCESS;
 }
 
-void ReadVoid(Voidom voidom, void *buffer, unsigned long pos)
+verror_t create_voidelle(Voidom voidom, Voidelle *buf, const char *name, enum Voidelle_Flags flags, uint64_t owner_id, uint8_t owner_perm, uint8_t other_perm)
 {
-    SeekInEMMC(voidom.partition.offset + pos);
-    ReadFromEMMC(buffer, VOID_SIZE);
-}
+    uint64_t voidelle_position = get_free_void(voidom);
 
-void UpdateVoidProperties(Voidom voidom, void *void_section, unsigned long pos)
-{
-    SeekInEMMC(voidom.partition.offset + pos);
-    WriteToEMMC(void_section, VOID_SIZE);
-}
-
-Voidelle CreateVoidelle(Voidom voidom, Voidelle *parent, const char *name, unsigned long flags)
-{
     Voidelle voidelle;
-    Voidite name_voidite;
-    unsigned long name_size = strlen(name) + 1;
-    populate_data(voidom, &name_voidite, name, name_size);
-
-    strcpy(voidelle.velle, "VELLE");
-    voidelle.content = 0;
-    voidelle.content_size = 0;
-    voidelle.create_year = 0;
-    voidelle.modify_year = 0;
-    memset(voidelle.create_date, 0, 5);
-    memset(voidelle.modify_date, 0, 5);
+    memcpy(voidelle.header, "VELLE", 5);
     voidelle.flags = flags;
-    voidelle.next = 0;
-    voidelle.others_permission = 0;
-    voidelle.owner_permission = 0;
-    voidelle.owner_id = 0;
-    voidelle.pos = 0;
-    voidelle.name = name_voidite.pos;
-    voidelle.name_size = name_size;
+    voidelle.name_voidelle_size = strlen(name) + 1;
+    voidelle.content_voidelle = 0;
+    voidelle.content_voidelle_size = 0;
+    voidelle.next_voidelle = 0;
+    voidelle.position = voidelle_position;
+    voidelle.creation_seconds = 0;
+    voidelle.modification_seconds = 0;
+    voidelle.access_seconds = 0;
+    voidelle.owner_id = owner_id;
+    voidelle.other_permission = other_perm;
+    voidelle.owner_permission = owner_perm;
 
-    Voidelle prev;
-    bool found_previous = get_prev_neighbour(voidom, *parent, voidelle, &prev);
-    // we maintain voidelle.pos 0 until this point in order for
-    // get_prev_neighbour to bring the last voidelle within parent
-    voidelle.pos = get_free_section(voidom);
+    Voidite name_voidite;
+    populate_voidite_data(voidom, &name_voidite, name, voidelle.name_voidelle_size);
 
-    UpdateVoidProperties(voidom, &voidelle, voidelle.pos);
+    voidelle.name_voidelle = name_voidite.position;
 
-    if (found_previous)
-    {
-        prev.next = voidelle.pos;
-        UpdateVoidProperties(voidom, &prev, prev.pos);
-    }
-    else
-    {
-        parent->content = voidelle.pos;
-        UpdateVoidProperties(voidom, parent, parent->pos);
-    }
+    if (!write_void(voidom, &voidelle, voidelle.position, sizeof(Voidelle)))
+        return UNKNOWN_ERROR;
 
-    return voidelle;
+    memcpy(buf, &voidelle, sizeof(voidelle));
+    return SUCCESS;
 }
 
-unsigned long WriteToVoidelle(Voidom voidom, Voidelle *voidelle, const void *data, unsigned long size)
+verror_t get_voidelle_name(Voidom voidom, Voidelle voidelle, char *buf)
 {
-    if (voidelle->flags & VOIDELLE_DIRECTORY)
-        return 0;
+    uint64_t read_bytes = 0;
+    uint64_t size = voidelle.name_voidelle_size;
+    uint64_t pos = voidelle.name_voidelle;
 
-    clear_voidites(voidom, voidelle->content);
-
-    Voidite content;
-    unsigned long data_count = populate_data(voidom, &content, data, size);
-    voidelle->content = content.pos;
-    voidelle->content_size = size;
-
-    UpdateVoidProperties(voidom, voidelle, voidelle->pos);
-
-    return data_count;
-}
-
-void RemoveVoidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle)
-{
-    Voidelle prev;
-    if (get_prev_neighbour(voidom, *parent, *voidelle, &prev))
+    while (pos)
     {
-        prev.next = voidelle->next;
-        UpdateVoidProperties(voidom, &prev, prev.pos);
-    }
-    else
-    {
-        parent->content = voidelle->next;
-        UpdateVoidProperties(voidom, parent, parent->pos);
+        uint64_t aligned_size = size > VOIDITE_CONTENT_SIZE ? VOIDITE_CONTENT_SIZE : size;
+
+        Voidite voidite;
+        read_void(voidom, &voidite, pos, sizeof(Voidite));
+        memcpy(buf + read_bytes, voidite.data, aligned_size);
+
+        size -= aligned_size;
+        read_bytes += aligned_size;
+
+        pos = voidite.next_voidite;
     }
 
-    clear_voidites(voidom, voidelle->name);
-    clear_voidites(voidom, voidelle->content);
-    invalidate_section(voidom, voidelle->pos);
+    return SUCCESS;
 }
 
-bool read_voidelle_at_index(Voidom voidom, Voidelle voidelle, Voidite *voidite, unsigned long index)
+bool get_content_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigned long index)
 {
-    unsigned long content_pos = voidelle.content;
+    uint64_t content_pos = voidelle.content_voidelle;
 
     for (unsigned long i = 0; i < index; i++)
     {
@@ -312,38 +412,63 @@ bool read_voidelle_at_index(Voidom voidom, Voidelle voidelle, Voidite *voidite, 
             return false;
 
         Voidite current_voidite;
-        ReadVoid(voidom, &current_voidite, content_pos);
-        content_pos = current_voidite.next;
+        read_void(voidom, &current_voidite, content_pos, sizeof(Voidite));
+
+        content_pos = current_voidite.next_voidite;
     }
 
     if (content_pos == 0)
         return false;
 
-    ReadVoid(voidom, voidite, content_pos);
+    read_void(voidom, buf, content_pos, sizeof(Voidite));
     return true;
 }
 
-unsigned long ReadVoidelleAt(Voidom voidom, Voidelle voidelle, unsigned long seek, void *buf, unsigned long buf_size)
+bool get_name_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigned long index)
 {
-    unsigned char *current_buf = buf;
-    unsigned long first_voidite = seek / VOIDITE_CONTENT_SIZE;
-    unsigned long last_voidite = (seek + buf_size - 1) / VOIDITE_CONTENT_SIZE;
-    unsigned long start = seek % VOIDITE_CONTENT_SIZE;
-    unsigned long end = (seek + buf_size) % VOIDITE_CONTENT_SIZE;
-    unsigned long bytes_left = buf_size;
+    uint64_t name_pos = voidelle.name_voidelle;
+
+    for (unsigned long i = 0; i < index; i++)
+    {
+        if (name_pos == 0)
+            return false;
+
+        Voidite current_voidite;
+        read_void(voidom, &current_voidite, name_pos, sizeof(Voidite));
+
+        name_pos = current_voidite.next_voidite;
+    }
+
+    if (name_pos == 0)
+        return false;
+
+    read_void(voidom, buf, name_pos, sizeof(Voidite));
+    return true;
+}
+
+unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long seek, void *buf, unsigned long size)
+{
+    if (voidelle.flags & VOIDELLE_DIRECTORY)
+        return FILE_IS_DIRECTORY;
+
+    uint8_t *current_buf = buf;
+
+    uint64_t first_voidite = seek / VOIDITE_CONTENT_SIZE;
+    uint64_t last_voidite = (seek + size - 1) / VOIDITE_CONTENT_SIZE;
+    uint64_t start = seek % VOIDITE_CONTENT_SIZE;
+    uint64_t end = (seek + size) % VOIDITE_CONTENT_SIZE;
+
+    uint64_t bytes_left = size;
 
     for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
     {
         Voidite voidite;
 
-        if (!read_voidelle_at_index(voidom, voidelle, &voidite, voidite_index))
-        {
-            LOG("failed read??\n");
-            return current_buf - (unsigned char *)buf;
-        }
+        if (!get_content_voidite_at(voidom, voidelle, &voidite, voidite_index))
+            return current_buf - (uint8_t *)buf;
 
-        unsigned char *cpy_start = voidite.data;
-        unsigned long cpy_len = VOIDITE_CONTENT_SIZE;
+        uint8_t *cpy_start = voidite.data;
+        uint64_t cpy_len = VOIDITE_CONTENT_SIZE;
 
         if (voidite_index == first_voidite)
         {
@@ -364,5 +489,152 @@ unsigned long ReadVoidelleAt(Voidom voidom, Voidelle voidelle, unsigned long see
         bytes_left -= cpy_len;
     }
 
-    return current_buf - (unsigned char *)buf;
+    return current_buf - (uint8_t *)buf;
+}
+
+uint64_t get_previous_link_position(Voidom voidom, Voidelle parent, Voidelle voidelle, Voidelle *buf)
+{
+    Voidelle neighbour;
+    uint64_t pos = parent.content_voidelle;
+
+    if (pos == voidelle.position)
+        return pos;
+
+    while (pos)
+    {
+        read_void(voidom, &neighbour, pos, sizeof(neighbour));
+
+        if (neighbour.next_voidelle == voidelle.position)
+            break;
+
+        pos = neighbour.next_voidelle;
+    }
+
+    if (neighbour.next_voidelle != voidelle.position)
+        return 0;
+
+    return neighbour.position;
+}
+
+void swap_voidelles(Voidom voidom, Voidelle *first, Voidelle *second, int swaps)
+{
+    uint64_t t;
+    t = first->position;
+    first->position = second->position;
+    second->position = t;
+
+    t = first->next_voidelle;
+    first->next_voidelle = second->next_voidelle;
+    second->next_voidelle = t;
+
+    // switch name
+    if (swaps & 0x1)
+    {
+        t = first->name_voidelle;
+        first->name_voidelle = second->name_voidelle;
+        second->name_voidelle = t;
+
+        t = first->name_voidelle_size;
+        first->name_voidelle_size = second->name_voidelle_size;
+        second->name_voidelle_size = t;
+    }
+
+    // switch content
+    if (swaps & 0x2)
+    {
+        t = first->content_voidelle;
+        first->content_voidelle = second->content_voidelle;
+        second->content_voidelle = t;
+
+        t = first->content_voidelle_size;
+        first->content_voidelle_size = second->content_voidelle_size;
+        second->content_voidelle_size = t;
+    }
+
+    write_void(voidom, first, first->position, sizeof(Voidelle));
+    write_void(voidom, second, second->position, sizeof(Voidelle));
+}
+
+bool remove_voidelle(Voidom voidom, Voidelle *parent, Voidelle voidelle, bool invalidate)
+{
+    if (parent->content_voidelle == voidelle.position)
+    {
+        parent->content_voidelle = voidelle.next_voidelle;
+
+        write_void(voidom, parent, parent->position, sizeof(Voidelle));
+
+        if (invalidate)
+            invalidate_section(voidom, voidelle.position);
+
+        return true;
+    }
+    else
+    {
+        Voidelle neighbour;
+        uint64_t pos = parent->content_voidelle;
+
+        while (pos)
+        {
+            read_void(voidom, &neighbour, pos, sizeof(neighbour));
+
+            if (neighbour.next_voidelle == voidelle.position)
+                break;
+
+            pos = neighbour.next_voidelle;
+        }
+
+        if (neighbour.next_voidelle != voidelle.position)
+            return false;
+
+        neighbour.next_voidelle = voidelle.next_voidelle;
+        write_void(voidom, &neighbour, neighbour.position, sizeof(neighbour));
+
+        if (invalidate)
+            invalidate_section(voidom, voidelle.position);
+
+        return true;
+    }
+
+    return false;
+}
+
+void add_voidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle)
+{
+    voidelle->next_voidelle = parent->content_voidelle;
+    parent->content_voidelle = voidelle->position;
+
+    write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+    write_void(voidom, parent, parent->position, sizeof(Voidelle));
+}
+
+void add_voidelle_with_check(Voidom voidom, Voidelle *parent, Voidelle voidelle)
+{
+    if (!parent->content_voidelle)
+    {
+        parent->content_voidelle = voidelle.position;
+        write_void(voidom, parent, parent->position, sizeof(Voidelle));
+    }
+    else
+    {
+        Voidelle neighbour;
+        unsigned long pos = parent->content_voidelle;
+
+        while (pos)
+        {
+            if (pos == voidelle.position)
+                return;
+
+            read_void(voidom, &neighbour, pos, sizeof(Voidelle));
+            pos = neighbour.next_voidelle;
+        }
+
+        neighbour.next_voidelle = voidelle.position;
+        write_void(voidom, &neighbour, neighbour.position, sizeof(Voidelle));
+    }
+}
+
+void VoidelleFSInit(Voidom *voidom, Partition partition)
+{
+    voidom->disk = partition;
+    read_void(*voidom, &voidom->root, VOID_SIZE, sizeof(Voidelle));
 }
