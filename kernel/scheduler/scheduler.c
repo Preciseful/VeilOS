@@ -2,6 +2,7 @@
 #include <lib/printf.h>
 #include <memory/mmu.h>
 #include <scheduler/task.h>
+#include <lib/string.h>
 #include <bundles/elf.h>
 
 // dont use lib/list.h here as that allocates more

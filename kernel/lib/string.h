@@ -12,4 +12,8 @@ char toupper(char x);
 unsigned char utoupper(unsigned char x);
 char *strrchr(const char *s, int c);
 
+void memset(void *dest, int value, unsigned long size);
+void memcpy(void *dst, const void *src, unsigned long size);
+int memcmp(const void *m1, const void *m2, unsigned long n);
+
 List GetSubstrings(const char *string, char split);

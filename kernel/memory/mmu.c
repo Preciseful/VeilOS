@@ -3,6 +3,7 @@
 #include <boot/base.h>
 #include <lib/printf.h>
 #include <drivers/uart.h>
+#include <lib/string.h>
 
 #define PAGE_ENTRIES 512
 
