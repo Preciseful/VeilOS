@@ -14,6 +14,7 @@
 #include <fs/voidelle.h>
 #include <system/vfs.h>
 #include <interface/fio.h>
+#include <interface/fs/voidelle/voidelle.h>
 
 void kboot()
 {
@@ -51,6 +52,7 @@ void kmain()
     LOG("Initialized partitions.\n");
 
     VFSInit();
+    AddMountPoint("/", GetVoidelleInterface());
 
     LOG("Used memory (reference): %lu bytes\n", get_memory_used());
 

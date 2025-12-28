@@ -22,9 +22,7 @@ static SvcHandler svc_table[] = {
     [SYS_FREE] = SystemCall_free,
     [SYS_GET_MEMORY_SIZE] = SystemCall_memory_size,
     [SYS_EXIT_PROCESS] = SystemCall_exit_process,
-    [SYS_SET_ENVIRON] = SystemCall_set_environ,
-    [SYS_EXECVE] = SystemCall_execve,
-    [SYS_PRINT] = SystemCall_uart_print,
+    [SYS_SET_ENVIRON] = SystemCall_get_environ,
 };
 
 void HandleSystemCall(unsigned long *sp)

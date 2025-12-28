@@ -65,9 +65,3 @@ char UartRecv()
         ;
     return (char)ReadMMIO(UART0_DR);
 }
-
-SYSCALL_HANDLER(uart_print)
-{
-    UartPut((char)sp[0]);
-    return true;
-}

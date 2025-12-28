@@ -312,19 +312,3 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     return task;
 }
-
-SYSCALL_HANDLER(execve)
-{
-    char *path = (char *)sp[0];
-    char **argv = (char **)sp[1];
-    char **env = (char **)sp[2];
-
-    unsigned long argc = 0;
-    while (argv && argv[argc])
-        argc++;
-
-    Task *current_task = GetRunningTask();
-    if (!MakeElfProcess(path, current_task->kernel, argc, argv, env, current_task->pid))
-        return 0;
-    return 1;
-}

@@ -65,5 +65,3 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length);
 void RemoveMapsFromNode(Task *task, TaskMappingNode *node);
 void KillTask(Task *task);
 VirtualAddr GetTaskValidVA(Task *task, unsigned int size);
-
-SYSCALL_HANDLER(execve);

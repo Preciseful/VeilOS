@@ -88,3 +88,13 @@ bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
         memcpy(buf, &parent, sizeof(Voidelle));
     return true;
 }
+
+FilesystemInterface GetVoidelleInterface()
+{
+    FilesystemInterface interface;
+    interface.fread = VoidelleIRead;
+    interface.fopen = 0;
+    interface.fwrite = VoidelleIWrite;
+
+    return interface;
+}

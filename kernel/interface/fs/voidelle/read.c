@@ -2,7 +2,7 @@
 #include <interface/fio.h>
 #include <interface/errno.h>
 
-int fread(const char *path, char *buf, unsigned long size, unsigned long offset, void *key)
+int VoidelleIRead(const char *path, char *buf, unsigned long size, unsigned long offset, void *key)
 {
     Voidom voidom = *(Voidom *)key;
 

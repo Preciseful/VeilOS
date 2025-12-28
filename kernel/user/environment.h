@@ -2,4 +2,4 @@
 
 #include <interface/syscall.h>
 
-SYSCALL_HANDLER(set_environ);
+SYSCALL_HANDLER(get_environ);
