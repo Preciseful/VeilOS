@@ -1,5 +1,10 @@
 #pragma once
 
+#include <scheduler/task.h>
+
+typedef long FILEHANDLE;
+typedef unsigned char FILEMODE;
+
 typedef struct FilesystemInterface
 {
     int (*fopen)(const char *path);
@@ -7,4 +12,4 @@ typedef struct FilesystemInterface
     int (*fwrite)(const char *path, const char *buf, unsigned long size, unsigned long offset, void *key);
 } FilesystemInterface;
 
-int OpenFile(const char *path);
+FILEHANDLE OpenFile(PID pid, FILEMODE mode, const char *path);

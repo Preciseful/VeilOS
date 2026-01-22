@@ -53,6 +53,8 @@ void VFSInit()
 {
     vfs = malloc(sizeof(VFS));
     memset(vfs, 0, sizeof(VFS));
+    vfs->files = malloc(sizeof(FileReference *) * 20);
+    vfs->files_count = 20;
 }
 
 void AddMountPoint(const char *path, FilesystemInterface interface)
@@ -64,6 +66,7 @@ void AddMountPoint(const char *path, FilesystemInterface interface)
     mp->hash_value = hash;
     mp->path = malloc(path_len);
     mp->fs = interface;
+    mp->key = 0;
     memcpy(mp->path, path, path_len);
 }
 
@@ -123,4 +126,38 @@ bool GetMountPoint(const char *path, MountPoint *point_buf, char **extra_path)
     if (point_buf)
         *point_buf = root_mp;
     return true;
+}
+
+FILEHANDLE AddFileReference(FileReference reference)
+{
+    FILEHANDLE i;
+    for (i = 0; i < vfs->files_count; i++)
+    {
+        if (!vfs->files[i])
+            break;
+    }
+
+    if (i == vfs->files_count)
+    {
+        FileReference **old_files = vfs->files;
+        vfs->files = malloc(sizeof(FileReference *) * vfs->files_count * 2);
+        memcpy(vfs->files, old_files, sizeof(FileReference *) * vfs->files_count);
+
+        vfs->files_count *= 2;
+        free(old_files);
+    }
+
+    vfs->files[i] = malloc(sizeof(FileReference));
+    memcpy(vfs->files[i], &reference, sizeof(FileReference));
+
+    return i;
+}
+
+void RemoveFileReference(FILEHANDLE handle)
+{
+    if (!vfs->files[handle])
+        return;
+
+    free(vfs->files[handle]);
+    vfs->files[handle] = 0;
 }

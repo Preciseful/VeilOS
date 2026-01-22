@@ -1,13 +1,21 @@
 #include <system/vfs.h>
 
-int OpenFile(const char *path)
+FILEHANDLE OpenFile(PID pid, FILEMODE mode, const char *path)
 {
+    FileReference reference;
+    reference.owner = pid;
+    reference.mode = mode;
+    reference.path = path;
+
     MountPoint point;
     char *extra;
     GetMountPoint(path, &point, &extra);
 
     if (point.fs.fopen)
-        return point.fs.fopen(extra);
+    {
+        point.fs.fopen(extra);
+        return AddFileReference(reference);
+    }
     else
         return -1;
 }
