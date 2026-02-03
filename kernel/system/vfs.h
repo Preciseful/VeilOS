@@ -20,6 +20,8 @@ typedef struct FileReference
     PID owner;
     FILEMODE mode;
     const char *path;
+    unsigned long mount_idx;
+    char *cut_path;
 } FileReference;
 
 typedef struct VFS
@@ -35,3 +37,5 @@ bool GetMountPoint(const char *path, MountPoint *point_buf, char **extra_path);
 
 FILEHANDLE AddFileReference(FileReference reference);
 void RemoveFileReference(FILEHANDLE handle);
+bool GetFileReference(FILEHANDLE handle, FileReference **reference);
+bool GetFileMount(FILEHANDLE handle, MountPoint *mount);

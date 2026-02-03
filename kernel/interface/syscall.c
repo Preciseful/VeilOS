@@ -3,6 +3,7 @@
 #include <scheduler/scheduler.h>
 #include <user/environment.h>
 #include <drivers/uart.h>
+#include <boot/interrupts.h>
 
 typedef unsigned long (*SvcHandler)(unsigned long *sp);
 
@@ -13,8 +14,16 @@ enum System_Calls
     SYS_GET_MEMORY_SIZE,
     SYS_EXIT_PROCESS,
     SYS_SET_ENVIRON,
-    SYS_EXECVE,
-    SYS_PRINT,
+    SYS_FOPEN,
+};
+
+static int svc_priority[] = {
+    [SYS_MALLOC] = 1,
+    [SYS_FREE] = 1,
+    [SYS_GET_MEMORY_SIZE] = 1,
+    [SYS_EXIT_PROCESS] = 1,
+    [SYS_SET_ENVIRON] = 1,
+    [SYS_FOPEN] = 0,
 };
 
 static SvcHandler svc_table[] = {
@@ -33,6 +42,9 @@ void HandleSystemCall(unsigned long *sp)
         sp[0] = -1;
         return;
     }
+
+    if (svc_priority[code] == 0)
+        irq_enable();
 
     sp[0] = svc_table[code](sp);
 }

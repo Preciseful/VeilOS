@@ -13,3 +13,5 @@ typedef struct FilesystemInterface
 } FilesystemInterface;
 
 FILEHANDLE OpenFile(PID pid, FILEMODE mode, const char *path);
+void CloseFile(FILEHANDLE handle);
+int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset);

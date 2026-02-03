@@ -150,6 +150,10 @@ FILEHANDLE AddFileReference(FileReference reference)
     vfs->files[i] = malloc(sizeof(FileReference));
     memcpy(vfs->files[i], &reference, sizeof(FileReference));
 
+    MountPoint point;
+    GetMountPoint(reference.path, &point, &vfs->files[i]->cut_path);
+
+    vfs->files[i]->mount_idx = (point.hash_value & (MOUNT_COUNT - 1));
     return i;
 }
 
@@ -160,4 +164,23 @@ void RemoveFileReference(FILEHANDLE handle)
 
     free(vfs->files[handle]);
     vfs->files[handle] = 0;
+}
+
+bool GetFileReference(FILEHANDLE handle, FileReference **reference)
+{
+    if (!vfs->files[handle])
+        return false;
+
+    *reference = vfs->files[handle];
+    return true;
+}
+
+bool GetFileMount(FILEHANDLE handle, MountPoint *mount)
+{
+    if (!vfs->files[handle])
+        return false;
+
+    FileReference *reference = vfs->files[handle];
+    *mount = vfs->mounts[reference->mount_idx];
+    return true;
 }
