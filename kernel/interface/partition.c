@@ -1,6 +1,7 @@
 #include <interface/partition.h>
 #include <drivers/emmc.h>
 #include <lib/printf.h>
+#include <lib/panic.h>
 
 Partition *PartitionsInit()
 {
@@ -10,7 +11,7 @@ Partition *PartitionsInit()
 
     if (mbr.bootSignature != BOOT_SIGNATURE)
     {
-        LOG("Bad MBR signature.\n");
+        panic("Bad MBR signature.\n");
         return 0;
     }
 

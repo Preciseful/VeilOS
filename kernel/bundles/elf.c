@@ -65,6 +65,4 @@ Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char 
 
     task->pid = pid;
     return task;
-
-    return 0;
 }

@@ -4,6 +4,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/string.h>
 #include <bundles/elf.h>
+#include <lib/panic.h>
 
 #define EL0T_M 0b0000
 #define EL1H_M 0b0101
@@ -110,7 +111,7 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length)
             // something def went wrong
             if (node == 0)
             {
-                LOG("Error occured: node is 0.\n");
+                panic("Error occured: node is 0.\n");
                 return;
             }
 
