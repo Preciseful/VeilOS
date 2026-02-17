@@ -1,7 +1,6 @@
 #include <memory/mmu.h>
 #include <memory/memory.h>
 #include <scheduler/scheduler.h>
-#include <user/environment.h>
 #include <drivers/uart.h>
 #include <boot/interrupts.h>
 
@@ -13,8 +12,6 @@ enum System_Calls
     SYS_FREE,
     SYS_GET_MEMORY_SIZE,
     SYS_EXIT_PROCESS,
-    SYS_SET_ENVIRON,
-    SYS_FOPEN,
 };
 
 static int svc_priority[] = {
@@ -22,8 +19,6 @@ static int svc_priority[] = {
     [SYS_FREE] = 1,
     [SYS_GET_MEMORY_SIZE] = 1,
     [SYS_EXIT_PROCESS] = 1,
-    [SYS_SET_ENVIRON] = 1,
-    [SYS_FOPEN] = 0,
 };
 
 static SvcHandler svc_table[] = {
@@ -31,7 +26,6 @@ static SvcHandler svc_table[] = {
     [SYS_FREE] = SystemCall_free,
     [SYS_GET_MEMORY_SIZE] = SystemCall_memory_size,
     [SYS_EXIT_PROCESS] = SystemCall_exit_process,
-    [SYS_SET_ENVIRON] = SystemCall_get_environ,
 };
 
 void HandleSystemCall(unsigned long *sp)

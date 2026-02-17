@@ -10,7 +10,7 @@
 void SchedulerInit();
 void Schedule();
 long AddTask(Task *task);
-void SchedulerTick(TaskRegs *registers);
+void SchedulerTick(TaskRegs registers[]);
 Task *GetRunningTask();
 bool GetTaskByPID(PID pid, Task **btask);
 extern void cpu_switch_task(Task *next);

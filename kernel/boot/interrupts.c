@@ -28,7 +28,7 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
     return 0;
 }
 
-void handle_irq(TaskRegs *registers)
+void handle_irq(TaskRegs registers[])
 {
     unsigned int iar = ReadMMIO(GICC_IAR);
     unsigned int id = iar & 0x2FF;

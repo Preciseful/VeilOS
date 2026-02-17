@@ -65,7 +65,7 @@ long AddTask(Task *task)
     return last_pid + 1;
 }
 
-void save_registers(Task *task, TaskRegs *registers)
+void save_registers(Task *task, TaskRegs registers[])
 {
     if (registers == 0)
         return;
@@ -134,7 +134,7 @@ void Schedule()
         switch_task(task);
 }
 
-void SchedulerTick(TaskRegs *registers)
+void SchedulerTick(TaskRegs registers[])
 {
     save_registers(scheduler_current, registers);
 
