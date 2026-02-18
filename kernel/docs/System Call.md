@@ -1,8 +1,11 @@
 # System Calls
 
-| Name              | Code |
-| ----------------- | ---- |
-| [Malloc](#malloc) |  0   | 
+| Name                              | Code |
+| --------------------------------- | ---- |
+| [Malloc](#malloc)                 |  0   |
+| [Free](#free)                     |  1   | 
+| [Memory size](#memory-size)       |  1   | 
+| [Exit Process](#exit-process)     |  1   | 
 
 
 ## Malloc
@@ -24,9 +27,4 @@ Gets the size of the allocated memory region.
 
 ## Exit Process
 Marks the current process as to be killed in the next scheduler run.
-
-## Get Environment
-Gets the current process' environment variables.
-#### Arguments:
-- An array of a key value pair sequence. The end is marked with a `0`.
 
