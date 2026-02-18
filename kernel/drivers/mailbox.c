@@ -1,5 +1,6 @@
 #include <drivers/mailbox.h>
 #include <boot/base.h>
+#include <memory/mmu.h>
 #include <drivers/gpio.h>
 
 // must be 16 byte aligned
@@ -24,7 +25,7 @@ unsigned int GetMailboxClock(enum Mailbox_Clocks clock)
 
 bool CallMailbox(unsigned char channel)
 {
-    unsigned int request = ((unsigned int)((long)&mailbox) & ~0xF) | (channel & 0xF);
+    unsigned int request = (unsigned int)((unsigned long)&mailbox & ~0xF) | (channel & 0xF);
 
     // wait until its empty
     while (ReadMMIO(MAILBOX_STATUS) & MAILBOX_FULL)

@@ -1,0 +1,41 @@
+#pragma once
+
+#include <stdbool.h>
+
+enum FRAMEBUFFER_TAGS
+{
+    ALLOCATE_BUFFER = 0x40001,
+    RELEASE_BUFFER = 0x48001,
+
+    GET_PHYSICAL_WIDTH_HEIGHT = 0x40003,
+    SET_PHYSICAL_WIDTH_HEIGHT = 0x48003,
+
+    GET_VIRTUAL_WIDTH_HEIGHT = 0x40004,
+    SET_VIRTUAL_WIDTH_HEIGHT = 0x48004,
+
+    GET_DEPTH = 0x40005,
+    SET_DEPTH = 0x48005,
+
+    GET_PIXEL_ORDER = 0x40006,
+    SET_PIXEL_ORDER = 0x48006,
+
+    GET_ALPHA_MODE = 0x40007,
+    SET_ALPHA_MODE = 0x48007,
+
+    GET_PITCH = 0x40008,
+
+    GET_VIRTUAL_OFFSET = 0x40009,
+    SET_VIRTUAL_OFFSET = 0x48009,
+
+    GET_OVERSCAN = 0x4000a,
+    SET_OVERSCAN = 0x4800a,
+
+    GET_PALETTE = 0x4000b,
+    SET_PALETTE = 0x4800b,
+
+    SET_CURSOR_INFO = 0x8010,
+    SET_CURSOR_STATE = 0x8011,
+};
+
+bool FramebufferInit();
+void DrawPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);

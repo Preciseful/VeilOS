@@ -11,3 +11,7 @@ dtoverlay=disable-bt
 # point firmware to these files
 kernel=kernel8.img
 device_tree=dtb/bcm2711-rpi-4-b.dtb
+
+# display settings
+hdmi_group=2
+hdmi_mode=82

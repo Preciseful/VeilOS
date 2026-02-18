@@ -15,6 +15,7 @@
 #include <system/vfs.h>
 #include <interface/fio.h>
 #include <interface/fs/voidelle/voidelle.h>
+#include <drivers/framebuffer.h>
 
 void kboot()
 {
@@ -54,7 +55,9 @@ void kmain()
     VFSInit();
     AddMountPoint("/", GetVoidelleInterface());
 
-    LOG("Used memory (reference): %lu bytes\n", get_memory_used());
+    LOG("Used memory (reference): %lu bytes.\n", get_memory_used());
+
+    FramebufferInit();
 
     while (1)
         Schedule();
