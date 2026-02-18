@@ -4,8 +4,8 @@
 | --------------------------------- | ---- |
 | [Malloc](#malloc)                 |  0   |
 | [Free](#free)                     |  1   | 
-| [Memory size](#memory-size)       |  1   | 
-| [Exit Process](#exit-process)     |  1   | 
+| [Memory size](#memory-size)       |  2   | 
+| [Exit Process](#exit-process)     |  3   | 
 
 
 ## Malloc
