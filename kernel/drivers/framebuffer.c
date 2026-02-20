@@ -6,6 +6,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/font.h>
 #include <drivers/uart.h>
+#include <lib/string.h>
 
 static IODevice fbDevice;
 
@@ -47,6 +48,29 @@ void drawChar(unsigned char ch, int x, int y, unsigned char r, unsigned char g, 
     }
 }
 
+void makeSpaceForLine()
+{
+    unsigned long *fb = (unsigned long *)framebuffer;
+
+    for (int i = 0; i < height - FONT_HEIGHT; i++)
+    {
+        unsigned long *dest_row = fb + (i * (width / 2));
+        unsigned long *src_row = fb + ((i + FONT_HEIGHT) * (width / 2));
+
+        for (int j = 0; j < (width / 2); j++)
+            dest_row[j] = src_row[j];
+    }
+
+    for (int i = height - FONT_HEIGHT; i < height; i++)
+    {
+        unsigned long *row = fb + (i * (width / 2));
+        for (int j = 0; j < (width / 2); j++)
+            row[j] = 0;
+    }
+
+    fbDevice.cursor.yPosition = height - FONT_HEIGHT;
+}
+
 void drawString(const char *s, unsigned char r, unsigned char g, unsigned char b, bool overlay)
 {
     while (*s)
@@ -65,6 +89,15 @@ void drawString(const char *s, unsigned char r, unsigned char g, unsigned char b
             drawChar(*s, fbDevice.cursor.xPosition, fbDevice.cursor.yPosition, r, g, b, overlay);
             fbDevice.cursor.xPosition += FONT_WIDTH;
         }
+
+        if (fbDevice.cursor.xPosition >= width)
+        {
+            fbDevice.cursor.xPosition = 0;
+            fbDevice.cursor.yPosition += FONT_HEIGHT;
+        }
+
+        if (fbDevice.cursor.yPosition > height - FONT_HEIGHT)
+            makeSpaceForLine();
 
         s++;
     }
