@@ -2,6 +2,8 @@
 #include <drivers/uart.h>
 #include <drivers/gpio.h>
 #include <lib/printf.h>
+#include <interface/device/iodevice.h>
+#include <scheduler/scheduler.h>
 
 #define UART0_BASE (PERIPHERAL_BASE + 0x201000)
 #define UART0_DR (UART0_BASE + 0x00)
@@ -12,9 +14,54 @@
 #define UART0_CR (UART0_BASE + 0x30)
 #define UART0_IMSC (UART0_BASE + 0x38)
 
+static IODevice uartDevice;
+
+void uartPut(char c)
+{
+    if (c == '\n')
+        uartPut('\r');
+    while (ReadMMIO(UART0_FR) & (1 << 5))
+        ;
+    WriteToMMIO(UART0_DR, c);
+}
+
 void putc(void *p, char c)
 {
-    UartPut(c);
+    uartPut(c);
+}
+
+char uartCharacter()
+{
+    return (char)ReadMMIO(UART0_DR);
+}
+
+char uartRecv()
+{
+    while (ReadMMIO(UART0_FR) & (1 << 4))
+        ;
+    return (char)ReadMMIO(UART0_DR);
+}
+
+void uartRead(char *buf, unsigned long length)
+{
+    if (*uartDevice.owner != GetCurrentPID())
+        return;
+
+    for (unsigned long i = 0; i < length; i++)
+        buf[i] = uartRecv();
+}
+
+void uartWrite(const char *str)
+{
+    if (*uartDevice.owner != GetCurrentPID())
+        return;
+
+    while (*str)
+    {
+        if (*str == '\n')
+            uartPut('\r');
+        uartPut(*str++);
+    }
 }
 
 void UartInit()
@@ -32,36 +79,24 @@ void UartInit()
     WriteToMMIO(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
     WriteToMMIO(UART0_IMSC, 1 << 4);
 
-    PrintfInit(0, putc);
+    SetPrintf(0, putc);
+
+    uartDevice.category = IO_UART;
+    uartDevice.read = uartRead;
+    uartDevice.write = uartWrite;
+    uartDevice.request = 0;
+    uartDevice.notify = 0;
+    uartDevice.code = 0;
+    uartDevice.owner = malloc(sizeof(PID));
+
+    AddIODevice(uartDevice);
 }
 
-void UartPut(char c)
+void UartNotify()
 {
-    if (c == '\n')
-        UartPut('\r');
-    while (ReadMMIO(UART0_FR) & (1 << 5))
-        ;
-    WriteToMMIO(UART0_DR, c);
-}
+    char c = uartCharacter();
+    LOG("UART: %c\n", c);
 
-void UartPuts(const char *str)
-{
-    while (*str)
-    {
-        if (*str == '\n')
-            UartPut('\r');
-        UartPut(*str++);
-    }
-}
-
-char UartCharacter()
-{
-    return (char)ReadMMIO(UART0_DR);
-}
-
-char UartRecv()
-{
-    while (ReadMMIO(UART0_FR) & (1 << 4))
-        ;
-    return (char)ReadMMIO(UART0_DR);
+    if (uartDevice.notify != 0)
+        uartDevice.notify(UART_RECV_NOTIFICATION, (void *)(unsigned long)c);
 }

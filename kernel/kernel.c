@@ -16,6 +16,7 @@
 #include <interface/fio.h>
 #include <interface/fs/voidelle/voidelle.h>
 #include <drivers/framebuffer.h>
+#include <interface/device/console.h>
 
 void kboot()
 {
@@ -25,8 +26,11 @@ void kboot()
 void kmain()
 {
     UartInit();
+    FramebufferInit();
+    ConsoleInit();
+
     Printf("\n----- VeilOS -----\n");
-    LOG("UART initialized.\n");
+    LOG("Console initialized.\n");
 
     set_vtable();
 
@@ -56,8 +60,6 @@ void kmain()
     AddMountPoint("/", GetVoidelleInterface());
 
     LOG("Used memory (reference): %lu bytes.\n", get_memory_used());
-
-    FramebufferInit();
 
     while (1)
         Schedule();

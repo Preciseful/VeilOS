@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#define FB_SET_COLOR_REQUEST 0
+
 enum FRAMEBUFFER_TAGS
 {
     ALLOCATE_BUFFER = 0x40001,
@@ -38,4 +40,3 @@ enum FRAMEBUFFER_TAGS
 };
 
 bool FramebufferInit();
-void DrawPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);

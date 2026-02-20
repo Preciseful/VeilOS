@@ -22,6 +22,8 @@ void printx(unsigned long x)
 
 Task *GetRunningTask()
 {
+    if (scheduler_current == &default_task)
+        return 0;
     return scheduler_current;
 }
 
@@ -44,7 +46,7 @@ bool GetTaskByPID(PID pid, Task **btask)
     return false;
 }
 
-long AddTask(Task *task)
+PID AddTask(Task *task)
 {
     if (!default_task.next)
     {
@@ -150,6 +152,13 @@ void SchedulerTick(TaskRegs registers[])
 
     registers->elr_el1 = (unsigned long)&Schedule;
     registers->spsr_el1 = EL1H_M;
+}
+
+PID GetCurrentPID()
+{
+    if (GetRunningTask() == 0)
+        return 0;
+    return GetRunningTask()->pid;
 }
 
 SYSCALL_HANDLER(exit_process)

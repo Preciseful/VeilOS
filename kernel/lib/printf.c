@@ -219,7 +219,7 @@ void TFPFormat(void *putp, putcf putf, char *fmt, va_list va)
 abort:;
 }
 
-void PrintfInit(void *putp, void (*putf)(void *, char))
+void SetPrintf(void *putp, void (*putf)(void *, char))
 {
     stdout_putf = putf;
     stdout_putp = putp;

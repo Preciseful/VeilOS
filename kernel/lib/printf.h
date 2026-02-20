@@ -59,7 +59,7 @@ something like :
 Before you can call printf you need to initialize it to use your
 character output function with something like:
 
-    PrintfInit(NULL,putc);
+    SetPrintf(NULL,putc);
 
 Notice the 'NULL' in 'init_printf' and the parameter 'void* p' in 'putc',
 the NULL (or any pointer) you pass into the 'init_printf' will eventually be
@@ -99,7 +99,7 @@ regs Kusti, 23.10.2004
 
 #include <stdarg.h>
 
-void PrintfInit(void *putp, void (*putf)(void *, char));
+void SetPrintf(void *putp, void (*putf)(void *, char));
 
 void TFPPrintf(char *fmt, ...);
 void TFPSPrintf(char *s, char *fmt, ...);
