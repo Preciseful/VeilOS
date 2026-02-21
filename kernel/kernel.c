@@ -62,6 +62,8 @@ void kmain()
 
     LOG("Used memory (reference): %lu bytes.\n", get_memory_used());
 
+    ConsoleDrop();
+
     while (1)
         Schedule();
 }

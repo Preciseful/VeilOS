@@ -48,3 +48,9 @@ void ConsoleInit()
 
     SetPrintf(ConsolePutc);
 }
+
+void ConsoleDrop()
+{
+    *uartDevice.owner = -1;
+    *fbDevice.owner = -1;
+}

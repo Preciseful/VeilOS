@@ -93,7 +93,6 @@ void switch_task(Task *next)
     last_asid_chunk = next->mmu_ctx.asid_chunk;
     stop = false;
 
-    LOG("Switching to EL%u process: '%s' at 0x%lx.\n", next->kernel, next->name, next->mmu_ctx.va);
     cpu_switch_task(next);
 }
 
