@@ -1,248 +1,251 @@
-/*
-File: printf.c
+#include "printf.h"
+#include <stdbool.h>
 
-Copyright (C) 2004  Kustaa Nyholm
+static void (*printf_putc)(char c);
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-*/
-
-#include <lib/printf.h>
-
-typedef void (*putcf)(void *, char);
-static putcf stdout_putf;
-static void *stdout_putp;
-
-#define PRINTF_LONG_SUPPORT
-
-#ifdef PRINTF_LONG_SUPPORT
-
-static void uli2a(unsigned long int num, unsigned int base, int uc, char *bf)
+void SetPrintf(void (*p)(char c))
 {
-    int n = 0;
-    unsigned int d = 1;
-    while (num / d >= base)
-        d *= base;
-    while (d != 0)
+    printf_putc = p;
+}
+
+static inline char *copystring(char *dst, const char *buf)
+{
+    while (*buf)
     {
-        int dgt = num / d;
-        num %= d;
-        d /= base;
-        if (n || dgt > 0 || d == 0)
-        {
-            *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
-            ++n;
-        }
-    }
-    *bf = 0;
-}
-
-static void li2a(long num, char *bf)
-{
-    if (num < 0)
-    {
-        num = -num;
-        *bf++ = '-';
-    }
-    uli2a(num, 10, 0, bf);
-}
-
-#endif
-
-static void ui2a(unsigned int num, unsigned int base, int uc, char *bf)
-{
-    int n = 0;
-    unsigned int d = 1;
-    while (num / d >= base)
-        d *= base;
-    while (d != 0)
-    {
-        int dgt = num / d;
-        num %= d;
-        d /= base;
-        if (n || dgt > 0 || d == 0)
-        {
-            *bf++ = dgt + (dgt < 10 ? '0' : (uc ? 'A' : 'a') - 10);
-            ++n;
-        }
-    }
-    *bf = 0;
-}
-
-static void i2a(int num, char *bf)
-{
-    if (num < 0)
-    {
-        num = -num;
-        *bf++ = '-';
-    }
-    ui2a(num, 10, 0, bf);
-}
-
-static int a2d(char ch)
-{
-    if (ch >= '0' && ch <= '9')
-        return ch - '0';
-    else if (ch >= 'a' && ch <= 'f')
-        return ch - 'a' + 10;
-    else if (ch >= 'A' && ch <= 'F')
-        return ch - 'A' + 10;
-    else
-        return -1;
-}
-
-static char a2i(char ch, char **src, int base, int *nump)
-{
-    char *p = *src;
-    int num = 0;
-    int digit;
-    while ((digit = a2d(ch)) >= 0)
-    {
-        if (digit > base)
-            break;
-        num = num * base + digit;
-        ch = *p++;
-    }
-    *src = p;
-    *nump = num;
-    return ch;
-}
-
-static void putchw(void *putp, putcf putf, int n, char z, char *bf)
-{
-    char fc = z ? '0' : ' ';
-    char ch;
-    char *p = bf;
-    while (*p++ && n > 0)
-        n--;
-    while (n-- > 0)
-        putf(putp, fc);
-    while ((ch = *bf++))
-        putf(putp, ch);
-}
-
-void TFPFormat(void *putp, putcf putf, char *fmt, va_list va)
-{
-    char bf[12];
-
-    char ch;
-
-    while ((ch = *(fmt++)))
-    {
-        if (ch != '%')
-            putf(putp, ch);
+        if (dst == (void *)0)
+            printf_putc(*buf++);
         else
+            *dst++ = *buf++;
+    }
+
+    return dst;
+}
+
+static char *handlesigned(long sarg, char *dst, unsigned long padlen, char pad)
+{
+    unsigned long arg;
+    char buf[21];
+    bool negative = false;
+
+    if (sarg < 0)
+    {
+        negative = true;
+        arg = -(unsigned long)sarg;
+    }
+    else
+        arg = (unsigned long)sarg;
+
+    int i = 20;
+    buf[i] = '\0';
+
+    do
+    {
+        buf[--i] = '0' + (arg % 10);
+        arg /= 10;
+    } while (arg != 0 && i > 0);
+
+    int digits = 20 - i;
+    int padding = 0;
+    if (padlen > (unsigned long)digits)
+        padding = padlen - digits;
+
+    if (negative && padding > 0)
+        padding--;
+
+    while (padding-- > 0 && i > 0)
+        buf[--i] = pad;
+
+    if (negative && i > 0)
+        buf[--i] = '-';
+
+    return copystring(dst, &buf[i]);
+}
+
+static char *handleunsigned(unsigned long arg, char *dst, unsigned long padlen, char pad)
+{
+    char buf[21];
+    int i = 20;
+    buf[i] = '\0';
+
+    do
+    {
+        buf[--i] = '0' + (arg % 10);
+        arg /= 10;
+    } while (arg != 0 && i > 0);
+
+    int digits = 20 - i;
+    int padding = 0;
+    if (padlen > (unsigned long)digits)
+        padding = padlen - digits;
+
+    while (padding-- > 0 && i > 0)
+        buf[--i] = pad;
+
+    return copystring(dst, &buf[i]);
+}
+
+static char *handlehexa(unsigned long arg, char *dst, unsigned long padlen, char pad, bool uppercase)
+{
+    char hexastart = uppercase ? 'A' - 10 : 'a' - 10;
+
+    char buf[21];
+    int i = 20;
+    buf[i] = '\0';
+
+    do
+    {
+        char n = arg & 0x0f;
+        buf[--i] = n + (n > 9 ? hexastart : '0');
+        arg >>= 4;
+    } while (arg != 0 && i > 0);
+
+    int digits = 20 - i;
+    int padding = 0;
+    if (padlen > (unsigned long)digits)
+        padding = padlen - digits;
+
+    while (padding-- > 0)
+        buf[--i] = pad;
+
+    return copystring(dst, &buf[i]);
+}
+
+static unsigned int vsprintf(char *dst, char *fmt, va_list args)
+{
+    char *orig = dst;
+    unsigned long len;
+    char pad = ' ';
+    bool long_specifier;
+
+    while (*fmt)
+    {
+        if (*fmt != '%')
         {
-            char lz = 0;
-#ifdef PRINTF_LONG_SUPPORT
-            char lng = 0;
-#endif
-            int w = 0;
-            ch = *(fmt++);
-            if (ch == '0')
+            if (dst == 0)
+                printf_putc(*fmt);
+            else
+                *dst++ = *fmt;
+            fmt++;
+            continue;
+        }
+
+        len = 0;
+        pad = ' ';
+        fmt++;
+        long_specifier = false;
+
+        if (*fmt == '%')
+        {
+            if (dst == 0)
+                printf_putc(*fmt);
+            else
+                *dst++ = *fmt;
+            fmt++;
+            continue;
+        }
+
+        if (*fmt == '0')
+        {
+            pad = '0';
+            fmt++;
+        }
+
+        while (*fmt >= '0' && *fmt <= '9')
+        {
+            len *= 10;
+            len += *fmt - '0';
+            fmt++;
+        }
+
+        while (*fmt == 'l')
+        {
+            long_specifier = true;
+            fmt++;
+        }
+
+        if (*fmt == 'c')
+        {
+            int arg = va_arg(args, int);
+            if (dst == 0)
+                printf_putc((char)arg);
+            else
+                *dst++ = (char)arg;
+            fmt++;
+            continue;
+        }
+
+        else if (*fmt == 'i' || *fmt == 'd')
+        {
+            if (long_specifier)
             {
-                ch = *(fmt++);
-                lz = 1;
+                long arg = va_arg(args, long);
+                dst = handlesigned(arg, dst, len, pad);
             }
-            if (ch >= '0' && ch <= '9')
+            else
             {
-                ch = a2i(ch, &fmt, 10, &w);
-            }
-#ifdef PRINTF_LONG_SUPPORT
-            if (ch == 'l')
-            {
-                ch = *(fmt++);
-                lng = 1;
-            }
-#endif
-            switch (ch)
-            {
-            case 0:
-                goto abort;
-            case 'u':
-            {
-#ifdef PRINTF_LONG_SUPPORT
-                if (lng)
-                    uli2a(va_arg(va, unsigned long int), 10, 0, bf);
-                else
-#endif
-                    ui2a(va_arg(va, unsigned int), 10, 0, bf);
-                putchw(putp, putf, w, lz, bf);
-                break;
-            }
-            case 'd':
-            {
-#ifdef PRINTF_LONG_SUPPORT
-                if (lng)
-                    li2a(va_arg(va, unsigned long int), bf);
-                else
-#endif
-                    i2a(va_arg(va, int), bf);
-                putchw(putp, putf, w, lz, bf);
-                break;
-            }
-            case 'x':
-            case 'X':
-#ifdef PRINTF_LONG_SUPPORT
-                if (lng)
-                    uli2a(va_arg(va, unsigned long int), 16, (ch == 'X'), bf);
-                else
-#endif
-                    ui2a(va_arg(va, unsigned int), 16, (ch == 'X'), bf);
-                putchw(putp, putf, w, lz, bf);
-                break;
-            case 'c':
-                putf(putp, (char)(va_arg(va, int)));
-                break;
-            case 's':
-                putchw(putp, putf, w, 0, va_arg(va, char *));
-                break;
-            case '%':
-                putf(putp, ch);
-            default:
-                break;
+                int arg = va_arg(args, int);
+                dst = handlesigned(arg, dst, len, pad);
             }
         }
+        else if (*fmt == 'u')
+        {
+            if (long_specifier)
+            {
+                unsigned long arg = va_arg(args, unsigned long);
+                dst = handleunsigned(arg, dst, len, pad);
+            }
+            else
+            {
+                unsigned int arg = va_arg(args, unsigned int);
+                dst = handleunsigned(arg, dst, len, pad);
+            }
+        }
+        else if (*fmt == 's')
+        {
+            char *arg = va_arg(args, char *);
+            if (arg == (void *)0)
+                dst = copystring(dst, "(null)");
+            else
+                dst = copystring(dst, arg);
+        }
+
+        else if (*fmt == 'x' || *fmt == 'X')
+        {
+            bool uppercase = (*fmt == 'x') ? false : true;
+
+            if (long_specifier)
+            {
+                unsigned long arg = va_arg(args, unsigned long);
+                dst = handlehexa(arg, dst, len, pad, uppercase);
+            }
+            else
+            {
+                unsigned int arg = va_arg(args, unsigned int);
+                dst = handlehexa(arg, dst, len, pad, uppercase);
+            }
+        }
+
+        fmt++;
     }
-abort:;
+
+    if (dst != 0)
+        *dst = 0;
+    return dst - orig;
 }
 
-void SetPrintf(void *putp, void (*putf)(void *, char))
-{
-    stdout_putf = putf;
-    stdout_putp = putp;
-}
-
-void TFPPrintf(char *fmt, ...)
+unsigned int SPrintf(char *dst, char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    TFPFormat(stdout_putp, stdout_putf, fmt, va);
+    unsigned int result = vsprintf(dst, fmt, va);
     va_end(va);
+    return result;
 }
 
-static void putcp(void *p, char c)
-{
-    *(*((char **)p))++ = c;
-}
-
-void TFPSPrintf(char *s, char *fmt, ...)
+void Printf(char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    TFPFormat(&s, putcp, fmt, va);
-    putcp(&s, 0);
+    vsprintf(0, fmt, va);
     va_end(va);
 }
