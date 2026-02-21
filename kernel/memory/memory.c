@@ -90,30 +90,30 @@ unsigned int memory_size(void *data)
 SYSCALL_HANDLER(malloc)
 {
     Task *task = GetRunningTask();
-    VirtualAddr va = GetTaskValidVA(task, sp[0]);
-    PhysicalAddr pa = VIRT_TO_PHYS(malloc(sp[0]));
+    VirtualAddr va = GetTaskValidVA(task, sp->x0);
+    PhysicalAddr pa = VIRT_TO_PHYS(malloc(sp->x0));
 
-    MapTaskPage(GetRunningTask(), va, pa, sp[0], MMU_RWRW);
+    MapTaskPage(GetRunningTask(), va, pa, sp->x0, MMU_RWRW);
 
     return va;
 }
 
 SYSCALL_HANDLER(free)
 {
-    PhysicalAddr pa = GetPagePA(GetRunningTask(), sp[0]);
+    PhysicalAddr pa = GetPagePA(GetRunningTask(), sp->x0);
     if (pa == 0)
         return 0;
 
     unsigned long len = free((void *)PHYS_TO_VIRT(pa));
-    UnmapTaskPage(GetRunningTask(), sp[0], len);
+    UnmapTaskPage(GetRunningTask(), sp->x0, len);
 
     return len;
 }
 
 SYSCALL_HANDLER(memory_size)
 {
-    if (!GetPagePA(GetRunningTask(), sp[0]))
+    if (!GetPagePA(GetRunningTask(), sp->x0))
         return 0;
 
-    return memory_size((void *)sp[0]);
+    return memory_size((void *)sp->x0);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
-#define SYSCALL_HANDLER(name) unsigned long SystemCall_##name(unsigned long *sp)
+#include <boot/interrupts.h>
 
-void HandleSystemCall(unsigned long *sp);
+#define SYSCALL_HANDLER(name) unsigned long SystemCall_##name(InterruptStack *sp)
+
+void HandleSystemCall(InterruptStack *sp);

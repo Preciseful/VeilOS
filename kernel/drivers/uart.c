@@ -25,11 +25,6 @@ void uartPut(char c)
     WriteToMMIO(UART0_DR, c);
 }
 
-void putc(void *p, char c)
-{
-    uartPut(c);
-}
-
 char uartCharacter()
 {
     return (char)ReadMMIO(UART0_DR);
@@ -48,7 +43,11 @@ void uartRead(char *buf, unsigned long length)
         return;
 
     for (unsigned long i = 0; i < length; i++)
+    {
         buf[i] = uartRecv();
+        if (buf[i] == '\r')
+            buf[i] = '\n';
+    }
 }
 
 void uartWrite(const char *str)
@@ -79,7 +78,7 @@ void UartInit()
     WriteToMMIO(UART0_CR, (1 << 0) | (1 << 8) | (1 << 9));
     WriteToMMIO(UART0_IMSC, 1 << 4);
 
-    SetPrintf(0, putc);
+    SetPrintf(uartPut);
 
     uartDevice.category = IO_UART;
     uartDevice.read = uartRead;

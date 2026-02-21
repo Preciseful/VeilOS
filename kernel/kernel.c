@@ -17,6 +17,7 @@
 #include <interface/fs/voidelle/voidelle.h>
 #include <drivers/framebuffer.h>
 #include <interface/device/console.h>
+#include <gdb/dbg.h>
 
 void kboot()
 {

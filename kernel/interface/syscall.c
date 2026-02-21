@@ -4,7 +4,7 @@
 #include <drivers/uart.h>
 #include <boot/interrupts.h>
 
-typedef unsigned long (*SvcHandler)(unsigned long *sp);
+typedef unsigned long (*SvcHandler)(InterruptStack *sp);
 
 enum System_Calls
 {
@@ -28,17 +28,17 @@ static SvcHandler svc_table[] = {
     [SYS_EXIT_PROCESS] = SystemCall_exit_process,
 };
 
-void HandleSystemCall(unsigned long *sp)
+void HandleSystemCall(InterruptStack *sp)
 {
-    unsigned long code = sp[8];
+    unsigned long code = sp->x8;
     if (code >= sizeof(svc_table) / sizeof(svc_table[0]) || !svc_table[code])
     {
-        sp[0] = -1;
+        sp->x0 = -1;
         return;
     }
 
     if (svc_priority[code] == 0)
         irq_enable();
 
-    sp[0] = svc_table[code](sp);
+    sp->x0 = svc_table[code](sp);
 }

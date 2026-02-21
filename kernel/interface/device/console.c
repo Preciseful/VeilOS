@@ -25,7 +25,7 @@ void consoleWrite(const char *buf)
         fbDevice.write(buf);
 }
 
-void consolePutc(void *p, char c)
+void consolePutc(char c)
 {
     char buf[2] = "";
     buf[0] = c;
@@ -46,5 +46,14 @@ void ConsoleInit()
     uartDeviceExists = GetIODevice(IO_UART, 0, &uartDevice);
     fbDeviceExists = GetIODevice(IO_FRAMEBUFFER, 0, &fbDevice);
 
-    SetPrintf(0, consolePutc);
+    SetPrintf(consolePutc);
+}
+
+char ConsoleRecv()
+{
+    char buf[2] = "";
+    if (uartDeviceExists)
+        uartDevice.read(buf, 1);
+
+    return buf[0];
 }
