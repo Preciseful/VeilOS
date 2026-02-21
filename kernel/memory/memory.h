@@ -25,7 +25,7 @@
 
 #ifndef __ASSEMBLER__
 
-#include <interface/syscall.h>
+#include <system/syscall.h>
 
 typedef struct MHeader
 {

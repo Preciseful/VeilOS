@@ -7,7 +7,7 @@
 #include <drivers/uart.h>
 #include <scheduler/scheduler.h>
 #include <scheduler/task.h>
-#include <interface/syscall.h>
+#include <system/syscall.h>
 #include <gdb/dbg.h>
 #include <lib/string.h>
 

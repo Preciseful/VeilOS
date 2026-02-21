@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <memory/mmu.h>
 #include <scheduler/task.h>
-#include <interface/syscall.h>
+#include <system/syscall.h>
 
 #define DEFAULT_TIME 5
 

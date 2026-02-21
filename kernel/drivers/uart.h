@@ -1,6 +1,6 @@
 #pragma once
 
-#include <interface/syscall.h>
+#include <system/syscall.h>
 
 #define UART_RECV_NOTIFICATION 0
 
