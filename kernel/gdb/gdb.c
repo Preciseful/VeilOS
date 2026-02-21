@@ -30,7 +30,7 @@
 /* add includes here if you want */
 
 #include <lib/printf.h>
-#include <interface/device/console.h>
+#include <interface/console.h>
 
 #ifndef _STDINT_H
 typedef unsigned long uint64_t;
