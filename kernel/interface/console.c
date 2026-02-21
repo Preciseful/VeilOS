@@ -12,14 +12,14 @@ static IODevice fbDevice;
 void ConsoleRead(char *buf, unsigned long length)
 {
     if (uartDeviceExists)
-        uartDevice.read(uartDevice.code, buf, length);
+        uartDevice.read(buf, length);
 }
 
 char ConsoleRecv()
 {
     char buf[2] = "";
     if (uartDeviceExists)
-        uartDevice.read(uartDevice.code, buf, 1);
+        uartDevice.read(buf, 1);
 
     return buf[0];
 }
@@ -27,10 +27,10 @@ char ConsoleRecv()
 void ConsoleWrite(const char *buf)
 {
     if (uartDeviceExists)
-        uartDevice.write(uartDevice.code, buf);
+        uartDevice.write(buf);
 
     if (fbDeviceExists)
-        fbDevice.write(fbDevice.code, buf);
+        fbDevice.write(buf);
 }
 
 void ConsolePutc(char c)
@@ -38,7 +38,7 @@ void ConsolePutc(char c)
     char buf[2] = "";
     buf[0] = c;
 
-    consoleWrite(buf);
+    ConsoleWrite(buf);
 }
 
 void ConsoleInit()
