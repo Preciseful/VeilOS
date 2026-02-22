@@ -11,7 +11,7 @@ Partition *PartitionsInit()
 
     if (mbr.bootSignature != BOOT_SIGNATURE)
     {
-        panic("Bad MBR signature.\n");
+        panic("Bad MBR signature.");
         return 0;
     }
 

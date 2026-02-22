@@ -4,6 +4,7 @@
 #include <scheduler/task.h>
 #include <scheduler/scheduler.h>
 #include <lib/string.h>
+#include <lib/panic.h>
 
 __attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
@@ -74,6 +75,18 @@ unsigned int free(void *data)
 
     used_memory -= headers[index].size;
     return headers[index].size;
+}
+
+void *realloc(void *address, unsigned int size)
+{
+    if (size < memory_size(address))
+        panic("Cannot reallocate with a smaller size than initial.");
+
+    void *new_address = malloc(size);
+    memcpy(new_address, address, size);
+    free(address);
+
+    return new_address;
 }
 
 unsigned long get_memory_used()

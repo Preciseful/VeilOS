@@ -36,6 +36,7 @@ typedef struct MHeader
 
 void MMInit();
 void *malloc(unsigned int size);
+void *realloc(void *address, unsigned int size);
 unsigned int free(void *data);
 unsigned int memory_size(void *data);
 unsigned long get_memory_used();

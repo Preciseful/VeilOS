@@ -1,36 +1,34 @@
 #include <interface/console.h>
-#include <interface/device/iodevice.h>
+#include <interface/iodevice.h>
 #include <lib/printf.h>
 #include <drivers/framebuffer.h>
 #include <drivers/uart.h>
 
-static bool uartDeviceExists;
-static bool fbDeviceExists;
-static IODevice uartDevice;
-static IODevice fbDevice;
+static int uartToken;
+static int fbToken;
 
 void ConsoleRead(char *buf, unsigned long length)
 {
-    if (uartDeviceExists)
-        uartDevice.read(buf, length);
+    if (uartToken != -1)
+        ReadIODevice(uartToken, IO_UART, 0, buf, length);
 }
 
 char ConsoleRecv()
 {
-    char buf[2] = "";
-    if (uartDeviceExists)
-        uartDevice.read(buf, 1);
+    char buf;
+    if (uartToken != -1)
+        ReadIODevice(uartToken, IO_UART, 0, &buf, 1);
 
-    return buf[0];
+    return buf;
 }
 
 void ConsoleWrite(const char *buf)
 {
-    if (uartDeviceExists)
-        uartDevice.write(buf);
+    if (uartToken != -1)
+        WriteIODevice(uartToken, IO_UART, 0, buf);
 
-    if (fbDeviceExists)
-        fbDevice.write(buf);
+    if (fbToken != -1)
+        WriteIODevice(fbToken, IO_FRAMEBUFFER, 0, buf);
 }
 
 void ConsolePutc(char c)
@@ -43,14 +41,14 @@ void ConsolePutc(char c)
 
 void ConsoleInit()
 {
-    uartDeviceExists = GetIODevice(IO_UART, 0, &uartDevice);
-    fbDeviceExists = GetIODevice(IO_FRAMEBUFFER, 0, &fbDevice);
+    uartToken = OwnIODevice(IO_UART, 0, IO_READ | IO_WRITE);
+    fbToken = OwnIODevice(IO_FRAMEBUFFER, 0, IO_WRITE | IO_REQUEST);
 
     SetPrintf(ConsolePutc);
 }
 
 void ConsoleDrop()
 {
-    *uartDevice.owner = -1;
-    *fbDevice.owner = -1;
+    FreeIODevice(uartToken, IO_UART, 0);
+    FreeIODevice(fbToken, IO_FRAMEBUFFER, 0);
 }

@@ -3,6 +3,7 @@
 #include <scheduler/scheduler.h>
 #include <drivers/uart.h>
 #include <boot/interrupts.h>
+#include <interface/iodevice.h>
 
 typedef unsigned long (*SvcHandler)(InterruptStack *sp);
 
@@ -12,6 +13,7 @@ enum System_Calls
     SYS_FREE,
     SYS_GET_MEMORY_SIZE,
     SYS_EXIT_PROCESS,
+    SYS_OWN_DEVICE,
 };
 
 static int svc_priority[] = {
@@ -19,6 +21,7 @@ static int svc_priority[] = {
     [SYS_FREE] = 1,
     [SYS_GET_MEMORY_SIZE] = 1,
     [SYS_EXIT_PROCESS] = 1,
+    [SYS_OWN_DEVICE] = 0,
 };
 
 static SvcHandler svc_table[] = {
@@ -26,6 +29,7 @@ static SvcHandler svc_table[] = {
     [SYS_FREE] = SystemCall_free,
     [SYS_GET_MEMORY_SIZE] = SystemCall_memory_size,
     [SYS_EXIT_PROCESS] = SystemCall_exit_process,
+    [SYS_OWN_DEVICE] = SystemCall_own_device,
 };
 
 void HandleSystemCall(InterruptStack *sp)

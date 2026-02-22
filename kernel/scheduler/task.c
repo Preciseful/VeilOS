@@ -111,7 +111,7 @@ void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length)
             // something def went wrong
             if (node == 0)
             {
-                panic("Error occured: node is 0.\n");
+                panic("Error occured: node is 0.");
                 return;
             }
 

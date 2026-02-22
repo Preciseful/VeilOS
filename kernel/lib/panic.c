@@ -6,7 +6,7 @@
 [[noreturn]]
 void panic(const char *message)
 {
-    LOG("%s", message);
+    LOG("[!] %s [!]", message);
     while (1)
         ;
 }

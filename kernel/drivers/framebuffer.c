@@ -2,7 +2,7 @@
 #include <drivers/mailbox.h>
 #include <lib/printf.h>
 #include <memory/mmu.h>
-#include <interface/device/iodevice.h>
+#include <interface/iodevice.h>
 #include <scheduler/scheduler.h>
 #include <lib/font.h>
 #include <drivers/uart.h>
@@ -103,20 +103,14 @@ void drawString(const char *s, unsigned char r, unsigned char g, unsigned char b
     }
 }
 
-void fbWrite(const char *str)
+void fbWrite(unsigned int token, const char *str)
 {
-    if (*fbDevice.owner != GetCurrentPID())
-        return;
-
     drawString(str, colors[0], colors[1], colors[2], false);
-    SetIODeviceCursor(fbDevice.category, fbDevice.code, fbDevice.cursor);
+    SetIODeviceCursor(token, fbDevice.category, fbDevice.code, fbDevice.cursor);
 }
 
-bool fbRequest(unsigned int code, void *data)
+bool fbRequest(unsigned int token, unsigned int code, void *data)
 {
-    if (*fbDevice.owner != GetCurrentPID())
-        return false;
-
     switch (code)
     {
     case FB_SET_COLOR_REQUEST:
@@ -191,9 +185,10 @@ bool FramebufferInit()
         fbDevice.read = 0;
         fbDevice.write = fbWrite;
         fbDevice.request = fbRequest;
-        fbDevice.notify = 0;
         fbDevice.code = 0;
-        fbDevice.owner = malloc(sizeof(PID));
+        fbDevice.flags = 0;
+        fbDevice.tokens_length = 1;
+        fbDevice.tokens = malloc(sizeof(IODeviceToken) * 1);
 
         colors[0] = 0xFF;
         colors[1] = 0xFF;

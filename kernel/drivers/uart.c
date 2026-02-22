@@ -2,7 +2,7 @@
 #include <drivers/uart.h>
 #include <drivers/gpio.h>
 #include <lib/printf.h>
-#include <interface/device/iodevice.h>
+#include <interface/iodevice.h>
 #include <scheduler/scheduler.h>
 
 #define UART0_BASE (PERIPHERAL_BASE + 0x201000)
@@ -37,11 +37,8 @@ char uartRecv()
     return (char)ReadMMIO(UART0_DR);
 }
 
-void uartRead(char *buf, unsigned long length)
+void uartRead(unsigned int token, char *buf, unsigned long length)
 {
-    if (*uartDevice.owner != GetCurrentPID())
-        return;
-
     for (unsigned long i = 0; i < length; i++)
     {
         buf[i] = uartRecv();
@@ -50,11 +47,8 @@ void uartRead(char *buf, unsigned long length)
     }
 }
 
-void uartWrite(const char *str)
+void uartWrite(unsigned int token, const char *str)
 {
-    if (*uartDevice.owner != GetCurrentPID())
-        return;
-
     while (*str)
     {
         if (*str == '\n')
@@ -84,18 +78,15 @@ void UartInit()
     uartDevice.read = uartRead;
     uartDevice.write = uartWrite;
     uartDevice.request = 0;
-    uartDevice.notify = 0;
     uartDevice.code = 0;
-    uartDevice.owner = malloc(sizeof(PID));
+    uartDevice.flags = 0;
+    uartDevice.tokens_length = 1;
+    uartDevice.tokens = malloc(sizeof(IODeviceToken) * 1);
 
     AddIODevice(uartDevice);
 }
 
-void UartNotify()
+void UartReceived()
 {
-    char c = uartCharacter();
-    LOG("UART: %c\n", c);
-
-    if (uartDevice.notify != 0)
-        uartDevice.notify(UART_RECV_NOTIFICATION, (void *)(unsigned long)c);
+    LOG("UART: %c\n", uartRecv());
 }

@@ -78,7 +78,7 @@ void handle_irq(TaskRegs registers[])
 
     // uart0
     case 153:
-        UartNotify();
+        UartReceived();
         WriteToMMIO(GICC_EOIR, iar);
         break;
 
