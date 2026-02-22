@@ -5,6 +5,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/string.h>
 #include <lib/panic.h>
+#include <limits.h>
 
 __attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
@@ -102,11 +103,16 @@ unsigned int memory_size(void *data)
 
 SYSCALL_HANDLER(malloc)
 {
-    Task *task = GetRunningTask();
-    VirtualAddr va = GetTaskValidVA(task, sp->x0);
-    PhysicalAddr pa = VIRT_TO_PHYS(malloc(sp->x0));
+    if (sp->x0 >= UINT_MAX)
+        return 0;
 
-    MapTaskPage(GetRunningTask(), va, pa, sp->x0, MMU_RWRW);
+    unsigned int size = sp->x0;
+
+    Task *task = GetRunningTask();
+    VirtualAddr va = GetTaskValidVA(task, size);
+    PhysicalAddr pa = VIRT_TO_PHYS(malloc(size));
+
+    MapTaskPage(GetRunningTask(), va, pa, size, MMU_RWRW);
 
     return va;
 }
