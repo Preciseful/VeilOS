@@ -3,5 +3,6 @@
 enum
 {
     E_BLANK,
-    E_NOFILE,
+    E_NO_FILE,
+    E_INVALID_OPERATION,
 };

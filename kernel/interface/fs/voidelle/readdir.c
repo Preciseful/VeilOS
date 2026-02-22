@@ -10,7 +10,7 @@ int VoidelleIReadDir(const char *path, void *key)
 
     Voidelle voidelle;
     if (!FindVoidelleByPath(voidom, path, &voidelle))
-        return -E_NOFILE;
+        return -E_NO_FILE;
 
     uint64_t pos = voidelle.content_voidelle;
 

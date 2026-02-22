@@ -3,13 +3,13 @@
 #include <interface/errno.h>
 #include <lib/string.h>
 
-int VoidelleIWrite(const char *path, const char *buf, unsigned long size, unsigned long offset, void *key)
+int VoidelleIWrite(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key)
 {
     Voidelle voidelle;
     Voidom voidom = *(Voidom *)key;
 
     if (!FindVoidelleByPath(voidom, path, &voidelle))
-        return -E_NOFILE;
+        return -E_NO_FILE;
 
     if (!voidelle.content_voidelle)
     {

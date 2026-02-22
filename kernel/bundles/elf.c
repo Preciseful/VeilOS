@@ -9,7 +9,7 @@
 
 Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char **environment, long pid)
 {
-    FILEHANDLE file = OpenFile(0, 0, path);
+    FILEHANDLE file = OpenFile(FILE_READ, path);
     if (file == -1)
         return 0;
 

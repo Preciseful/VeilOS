@@ -95,6 +95,8 @@ FilesystemInterface GetVoidelleInterface()
     interface.fread = VoidelleIRead;
     interface.fopen = 0;
     interface.fwrite = VoidelleIWrite;
+    interface.fcreate_directory = VoidelleICreateDirectory;
+    interface.fcreate_file = VoidelleICreateFile;
 
     return interface;
 }

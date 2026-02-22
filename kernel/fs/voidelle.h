@@ -30,12 +30,12 @@ enum Voidelle_Flags
     VOIDELLE_INVALID = 0x8,
 };
 
-enum Permission_Flags
+enum Voidelle_Permission_Flags
 {
-    PERMISSION_EXECUTE = 0x1,
-    PERMISSION_READ = 0x2,
-    PERMISSION_WRITE = 0x4,
-    PERMISSION_ALL = 0x7,
+    VOIDELLE_PERMISSION_EXECUTE = 0x1,
+    VOIDELLE_PERMISSION_READ = 0x2,
+    VOIDELLE_PERMISSION_WRITE = 0x4,
+    VOIDELLE_PERMISSION_ALL = 0x7,
 };
 
 typedef struct __attribute__((packed)) Voidelle

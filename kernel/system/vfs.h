@@ -18,7 +18,7 @@ typedef struct MountPoint
 typedef struct FileReference
 {
     PID owner;
-    FILEMODE mode;
+    enum File_Mode mode;
     const char *path;
     unsigned long mount_idx;
     char *cut_path;
