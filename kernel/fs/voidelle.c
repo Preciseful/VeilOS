@@ -476,9 +476,8 @@ unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long seek
             cpy_len -= start;
         }
 
-        if (voidite_index == last_voidite && end != 0)
-            // edge case
-            cpy_len = end;
+        if (voidite_index == last_voidite)
+            cpy_len = (end == 0) ? size : end;
 
         if (cpy_len > bytes_left)
             cpy_len = bytes_left;

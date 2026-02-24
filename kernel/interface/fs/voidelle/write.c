@@ -11,83 +11,48 @@ int VoidelleIWrite(const char *path, enum File_Mode mode, const char *buf, unsig
     if (!FindVoidelleByPath(voidom, path, &voidelle))
         return -E_NO_FILE;
 
-    if (!voidelle.content_voidelle)
-    {
-        Voidite content;
-        content.position = get_free_void(voidom);
-        content.next_voidite = 0;
-        memset(content.data, 0, VOIDITE_CONTENT_SIZE);
+    voidelle.content_voidelle_size = offset + size;
+    write_void(voidom, &voidelle, voidelle.position, sizeof(Voidelle));
 
-        voidelle.content_voidelle = content.position;
+    uint64_t first_voidite = offset / VOIDITE_CONTENT_SIZE;
+    uint64_t last_voidite = (offset + size - 1) / VOIDITE_CONTENT_SIZE;
+    uint64_t start = offset % VOIDITE_CONTENT_SIZE;
+    uint64_t end = (offset + size) % VOIDITE_CONTENT_SIZE;
 
-        write_void(voidom, &voidelle, voidelle.position, sizeof(Voidelle));
-        write_void(voidom, &content, content.position, sizeof(Voidite));
-    }
+    const char *current_buf = buf;
 
-    unsigned long new_size = offset + size;
-
-    if (new_size > voidelle.content_voidelle_size)
-    {
-        unsigned long voidites_count = (new_size + (VOIDITE_CONTENT_SIZE - 1)) / VOIDITE_CONTENT_SIZE;
-        Voidite last_voidite;
-
-        voidelle.content_voidelle_size = new_size;
-        write_void(voidom, &voidelle, voidelle.position, sizeof(Voidelle));
-
-        unsigned long pos = voidelle.content_voidelle;
-        while (pos)
-        {
-            read_void(voidom, &last_voidite, pos, sizeof(Voidite));
-            pos = last_voidite.next_voidite;
-            voidites_count--;
-        }
-
-        for (unsigned long i = 0; i < voidites_count; i++)
-        {
-            Voidite next_voidite;
-            next_voidite.next_voidite = 0;
-            next_voidite.position = get_free_void(voidom);
-            memset(next_voidite.data, 0, VOIDITE_CONTENT_SIZE);
-
-            last_voidite.next_voidite = next_voidite.position;
-
-            write_void(voidom, &last_voidite, last_voidite.position, sizeof(Voidite));
-            write_void(voidom, &next_voidite, next_voidite.position, sizeof(Voidite));
-
-            last_voidite = next_voidite;
-        }
-    }
-
-    unsigned long voidite_start = offset / VOIDITE_CONTENT_SIZE;
-    unsigned long voidite_offset = offset % VOIDITE_CONTENT_SIZE;
-    unsigned long voidite_pos = voidite_start;
-
-    int written = 0;
-    while (size)
+    for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
     {
         Voidite voidite;
-        get_content_voidite_at(voidom, voidelle, &voidite, voidite_pos);
 
-        unsigned long bytes_count;
+        if (!get_content_voidite_at(voidom, voidelle, &voidite, voidite_index))
+        {
+            fill_content_voidites(voidom, &voidelle, voidite_index + 1);
+            get_content_voidite_at(voidom, voidelle, &voidite, voidite_index);
+        }
 
-        if (voidite_pos == voidite_start)
-            bytes_count = VOIDITE_CONTENT_SIZE - voidite_offset;
-        else
-            bytes_count = size;
+        uint8_t *cpy_start = voidite.data;
+        uint64_t cpy_len = VOIDITE_CONTENT_SIZE;
 
-        if (bytes_count > size)
-            bytes_count = size;
+        if (voidite_index == first_voidite)
+        {
+            cpy_start += start;
+            cpy_len -= start;
+        }
 
-        memcpy(voidite.data + (voidite_pos == voidite_start ? voidite_offset : 0),
-               buf + written, bytes_count);
+        if (voidite_index == last_voidite)
+            cpy_len = (end == 0) ? size : end;
+
+        if (cpy_len > size)
+            cpy_len = size;
+
+        memcpy(cpy_start, current_buf, cpy_len);
+
+        current_buf += cpy_len;
+        size -= cpy_len;
 
         write_void(voidom, &voidite, voidite.position, sizeof(Voidite));
-
-        written += bytes_count;
-        size -= bytes_count;
-
-        voidite_pos = voidite.next_voidite;
     }
 
-    return written;
+    return current_buf - buf;
 }
