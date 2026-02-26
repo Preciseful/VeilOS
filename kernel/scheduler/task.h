@@ -14,7 +14,7 @@ typedef struct TaskMMUCtx
     unsigned long asid_chunk;
     unsigned char asid;
     unsigned long *pgd;
-    VirtualAddr sp_alloc;
+    VirtualAddr sp_el0_alloc;
     VirtualAddr va;
     PhysicalAddr pa;
 } TaskMMUCtx;
@@ -44,7 +44,7 @@ typedef struct Task
     PID pid;
 } Task;
 
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa);
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv);
 PhysicalAddr GetPagePA(Task *task, VirtualAddr va);
 void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned int size, enum MMU_Flags flags);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length);

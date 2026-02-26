@@ -61,7 +61,7 @@ void kmain()
 
     LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
 
-    MakeElfProcess("/Luna.elf", false, -1);
+    MakeElfProcess("/Luna.elf", false, -1, 0, 0);
     LOG("Created shell.\n");
 
     ConsoleDrop();

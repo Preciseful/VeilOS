@@ -18,12 +18,9 @@ int VoidelleIReadDir(const char *path, void *key)
     {
         read_void(voidom, &voidelle, pos, sizeof(Voidelle));
 
-        char *name = malloc(voidelle.name_voidelle_size);
+        char name[voidelle.name_voidelle_size];
         get_voidelle_name(voidom, voidelle, name);
 
-        // todo: read dir filling
-
-        free(name);
         pos = voidelle.next_voidelle;
     }
 

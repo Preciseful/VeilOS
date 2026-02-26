@@ -61,17 +61,15 @@ bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
             Voidelle child;
             read_void(voidom, &child, child_pos, sizeof(Voidelle));
 
-            char *vname = malloc(child.name_voidelle_size);
+            char vname[child.name_voidelle_size];
             get_voidelle_name(voidom, child, vname);
 
             if (strcmp(vname, filename) == 0)
             {
-                free(vname);
                 parent = child;
                 break;
             }
 
-            free(vname);
             child_pos = child.next_voidelle;
         }
 

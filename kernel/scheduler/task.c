@@ -211,7 +211,36 @@ void *mapped_malloc(Task *task, unsigned int size)
     return data;
 }
 
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa)
+void set_args(Task *task, int argc, char **argv)
+{
+    unsigned long kernel_sp = task->mmu_ctx.sp_el0_alloc + PAGE_SIZE;
+    unsigned long user_argv[argc];
+
+    for (int i = argc - 1; i >= 0; i--)
+    {
+        unsigned long len = strlen(argv[i]) + 1;
+        kernel_sp -= len;
+        task->regs.sp_el0 -= len;
+
+        memcpy((char *)kernel_sp, argv[i], len);
+        user_argv[i] = task->regs.sp_el0;
+    }
+
+    kernel_sp &= ~0xF;
+    task->regs.sp_el0 &= ~0xF;
+
+    for (int i = argc - 1; i >= 0; i--)
+    {
+        kernel_sp -= sizeof(unsigned long);
+        task->regs.sp_el0 -= sizeof(unsigned long);
+        *(unsigned long *)kernel_sp = user_argv[i];
+    }
+
+    task->regs.x0 = argc;
+    task->regs.x1 = task->regs.sp_el0;
+}
+
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv)
 {
     Task *task = malloc(sizeof(Task));
     memset(&task->regs, 0, sizeof(task->regs));
@@ -230,7 +259,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
     task->regs.sp = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
-    task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
+    task->mmu_ctx.sp_el0_alloc = (VirtualAddr)malloc(PAGE_SIZE);
 
     task->mmu_ctx.pa = VIRT_TO_PHYS(malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
@@ -266,7 +295,10 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     if (data_pa != 0 && va < HIGH_VA)
         MapTaskPage(task, task->mmu_ctx.va, data_pa, PAGE_SIZE, user | exec | rw);
-    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_alloc), PAGE_SIZE, user | rw);
+    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_el0_alloc), PAGE_SIZE, user | rw);
+
+    if (argc > 0)
+        set_args(task, argc, argv);
 
     return task;
 }
