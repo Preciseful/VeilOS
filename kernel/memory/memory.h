@@ -38,8 +38,8 @@ void MMInit();
 void *malloc(unsigned int size);
 void *realloc(void *address, unsigned int size);
 unsigned int free(void *data);
-unsigned int memory_size(void *data);
-unsigned long get_memory_used();
+unsigned int MemorySize(void *data);
+unsigned long GetMemoryUsed();
 
 SYSCALL_HANDLER(malloc);
 SYSCALL_HANDLER(free);

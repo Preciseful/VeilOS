@@ -37,7 +37,7 @@ char uartRecv()
     return (char)ReadMMIO(UART0_DR);
 }
 
-void uartRead(unsigned int token, char *buf, unsigned long length)
+unsigned long uartRead(unsigned int token, char *buf, unsigned long length)
 {
     for (unsigned long i = 0; i < length; i++)
     {
@@ -45,16 +45,22 @@ void uartRead(unsigned int token, char *buf, unsigned long length)
         if (buf[i] == '\r')
             buf[i] = '\n';
     }
+
+    return length;
 }
 
-void uartWrite(unsigned int token, const char *str)
+unsigned long uartWrite(unsigned int token, const char *str)
 {
+    const char *s_orig = str;
+
     while (*str)
     {
         if (*str == '\n')
             uartPut('\r');
         uartPut(*str++);
     }
+
+    return str - s_orig;
 }
 
 void UartInit()

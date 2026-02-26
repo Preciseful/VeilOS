@@ -71,8 +71,9 @@ void makeSpaceForLine()
     fbDevice.cursor.yPosition = height - FONT_HEIGHT;
 }
 
-void drawString(const char *s, unsigned char r, unsigned char g, unsigned char b, bool overlay)
+unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsigned char b, bool overlay)
 {
+    const char *s_orig = s;
     while (*s)
     {
         if (*s == '\r')
@@ -101,12 +102,15 @@ void drawString(const char *s, unsigned char r, unsigned char g, unsigned char b
 
         s++;
     }
+
+    return s - s_orig;
 }
 
-void fbWrite(unsigned int token, const char *str)
+unsigned long fbWrite(unsigned int token, const char *str)
 {
-    drawString(str, colors[0], colors[1], colors[2], false);
+    unsigned long amount = drawString(str, colors[0], colors[1], colors[2], false);
     SetIODeviceCursor(token, fbDevice.category, fbDevice.code, fbDevice.cursor);
+    return amount;
 }
 
 bool fbRequest(unsigned int token, unsigned int code, void *data)

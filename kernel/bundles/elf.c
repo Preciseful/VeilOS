@@ -6,29 +6,41 @@
 #include <scheduler/scheduler.h>
 #include <interface/fio.h>
 #include <lib/string.h>
+#include <interface/errno.h>
 
-Task *MakeElfProcess(const char *path, bool kernel, int argc, char **argv, char **environment, long pid)
+Task *MakeElfProcess(const char *path, bool kernel, PID pid)
 {
     FILEHANDLE file = OpenFile(FILE_READ, path);
     if (file == -1)
         return 0;
 
     Elf64_Ehdr eheader;
-    ReadFile(file, &eheader, sizeof(eheader), 0);
+    if (ReadFile(file, &eheader, sizeof(eheader), 0) == -E_NO_FILE)
+    {
+        LOG("ELF file does not exist.\n");
+        CloseFile(file);
+        return 0;
+    }
 
     if (memcmp(eheader.e_ident, ELFMAG, 4) != 0)
     {
-        LOG("ELF file provided is not of the corresponding type.\n");
+        LOG("ELF file provided is not of the corresponding type (%c %c %c %c).\n",
+            eheader.e_ident[0],
+            eheader.e_ident[1],
+            eheader.e_ident[2],
+            eheader.e_ident[3]);
+        CloseFile(file);
         return 0;
     }
 
     if (eheader.e_machine != EM_AARCH64)
     {
         LOG("ELF file is not of type AARCH64.\n");
+        CloseFile(file);
         return 0;
     }
 
-    Task *task = CreateTask(path, kernel, eheader.e_entry, 0, environment, argv, argc);
+    Task *task = CreateTask(path, kernel, eheader.e_entry, 0);
     char user = kernel ? 0 : MMU_USER;
     char exec = kernel ? 0 : MMU_USER_EXEC;
     char rw = kernel ? MMU_NORW : MMU_RWRW;

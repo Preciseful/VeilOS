@@ -13,4 +13,4 @@ int VoidelleIWrite(const char *path, enum File_Mode mode, const char *buf, unsig
 int VoidelleICreateDirectory(const char *path, enum File_Permissions permissions, void *key);
 int VoidelleICreateFile(const char *path, enum File_Permissions permissions, void *key);
 
-FilesystemInterface GetVoidelleInterface();
+FilesystemInterface GetVoidelleInterface(Voidom *voidom);

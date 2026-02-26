@@ -10,7 +10,7 @@
 void SchedulerInit();
 void Schedule();
 PID AddTask(Task *task);
-void SchedulerTick(TaskRegs registers[]);
+void SchedulerTick(InterruptStack registers[]);
 Task *GetRunningTask();
 bool GetTaskByPID(PID pid, Task **btask);
 PID GetCurrentPID();

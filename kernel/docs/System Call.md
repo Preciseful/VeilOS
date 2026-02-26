@@ -7,6 +7,9 @@
 | [Memory size](#memory-size)       |  2   | 
 | [Exit Process](#exit-process)     |  3   | 
 | [Own Device](#own-device)         |  4   |
+| [Read Device](#read-device)       |  5   |
+| [Write Device](#write-device)     |  6   |
+| [Request Device](#request-device) |  7   |
 
 
 ## Malloc
@@ -45,3 +48,38 @@ Attempts to mark an IO device as owned by the current process.
 #### Return value:
 - INT32 : The token that will be used to access it later.
     - The result may be -1, the owning process has been denied.
+
+## Read Device
+Reads data from an IO device and transfers the data into the passed buffer.
+#### Arguments:
+- UINT32 : Token of the IO device owned.
+- UINT64 : Category of the IO device requested.
+- UINT32 : Code of the IO device requested.
+- UINT64 : Pointer to the buffer.
+- UINT64 : Length of the buffer to be read.
+
+#### Return value:
+- UINT64 : The amount of data read.
+
+## Write Device
+Writes data to an IO device from a buffer.
+#### Arguments:
+- UINT32 : Token of the IO device owned.
+- UINT64 : Category of the IO device requested.
+- UINT32 : Code of the IO device requested.
+- UINT64 : Pointer to the buffer, null-terminated.
+
+#### Return value:
+- UINT64 : The amount of data written.
+
+## Request Device
+Requests an action to an IO device.
+#### Arguments:
+- UINT32 : Token of the IO device owned.
+- UINT64 : Category of the IO device requested.
+- UINT32 : Code of the IO device requested.
+- UINT32 : The code of the request message.
+- UINT64 : Buffer to the data. 
+
+#### Return value:
+- BOOL : Whether the operation succeeded or not.

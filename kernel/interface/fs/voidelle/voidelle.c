@@ -89,7 +89,7 @@ bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
     return true;
 }
 
-FilesystemInterface GetVoidelleInterface()
+FilesystemInterface GetVoidelleInterface(Voidom *voidom)
 {
     FilesystemInterface interface;
     interface.fread = VoidelleIRead;
@@ -97,6 +97,7 @@ FilesystemInterface GetVoidelleInterface()
     interface.fwrite = VoidelleIWrite;
     interface.fcreate_directory = VoidelleICreateDirectory;
     interface.fcreate_file = VoidelleICreateFile;
+    interface.key = voidom;
 
     return interface;
 }

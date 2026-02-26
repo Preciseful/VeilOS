@@ -66,7 +66,7 @@ void AddMountPoint(const char *path, FilesystemInterface interface)
     mp->hash_value = hash;
     mp->path = malloc(path_len);
     mp->fs = interface;
-    mp->key = 0;
+    mp->key = interface.key;
     memcpy(mp->path, path, path_len);
 }
 
@@ -133,42 +133,33 @@ FILEHANDLE AddFileReference(FileReference reference)
     FILEHANDLE i;
     for (i = 0; i < vfs->files_count; i++)
     {
-        if (!vfs->files[i])
+        if (!vfs->files[i].used)
             break;
     }
 
     if (i == vfs->files_count)
-    {
-        FileReference **old_files = vfs->files;
-        vfs->files = malloc(sizeof(FileReference *) * vfs->files_count * 2);
-        memcpy(vfs->files, old_files, sizeof(FileReference *) * vfs->files_count);
+        vfs->files = realloc(vfs->files, vfs->files_count * 2);
 
-        vfs->files_count *= 2;
-        free(old_files);
-    }
-
-    vfs->files[i] = malloc(sizeof(FileReference));
-    memcpy(vfs->files[i], &reference, sizeof(FileReference));
+    vfs->files[i] = reference;
 
     MountPoint point;
-    GetMountPoint(reference.path, &point, &vfs->files[i]->cut_path);
+    GetMountPoint(reference.path, &point, &vfs->files[i].cut_path);
 
-    vfs->files[i]->mount_idx = (point.hash_value & (MOUNT_COUNT - 1));
+    vfs->files[i].mount_idx = (point.hash_value & (MOUNT_COUNT - 1));
     return i;
 }
 
 void RemoveFileReference(FILEHANDLE handle)
 {
-    if (!vfs->files[handle])
+    if (!vfs->files[handle].used)
         return;
 
-    free(vfs->files[handle]);
-    vfs->files[handle] = 0;
+    vfs->files[handle].used = false;
 }
 
-bool GetFileReference(FILEHANDLE handle, FileReference **reference)
+bool GetFileReference(FILEHANDLE handle, FileReference *reference)
 {
-    if (!vfs->files[handle])
+    if (!vfs->files[handle].used)
         return false;
 
     *reference = vfs->files[handle];
@@ -177,10 +168,10 @@ bool GetFileReference(FILEHANDLE handle, FileReference **reference)
 
 bool GetFileMount(FILEHANDLE handle, MountPoint *mount)
 {
-    if (!vfs->files[handle])
+    if (!vfs->files[handle].used)
         return false;
 
-    FileReference *reference = vfs->files[handle];
-    *mount = vfs->mounts[reference->mount_idx];
+    FileReference reference = vfs->files[handle];
+    *mount = vfs->mounts[reference.mount_idx];
     return true;
 }

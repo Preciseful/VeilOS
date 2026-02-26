@@ -31,6 +31,8 @@ typedef struct FilesystemInterface
     int (*fopen)(const char *path, enum File_Mode mode, void *key);
     int (*fread)(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key);
     int (*fwrite)(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key);
+
+    void *key;
 } FilesystemInterface;
 
 int CreateFile(const char *path, enum File_Permissions permissions);

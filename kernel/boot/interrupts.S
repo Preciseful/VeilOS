@@ -13,14 +13,6 @@
     mov x29, sp
     pushp x28, x29
 
-    mrs x28, esr_el1
-    mrs x29, far_el1
-    pushp x28, x29
-
-    mrs x28, sctlr_el1
-    mrs x29, tcr_el1
-    pushp x28, x29
-
     pushp x26, x27
     pushp x24, x25
     pushp x22, x23
@@ -52,14 +44,6 @@
     popp x22, x23
     popp x24, x25
     popp x26, x27
-
-    popp x28, x29
-    msr sctlr_el1, x28
-    msr tcr_el1, x29
-
-    popp x28, x29
-    msr esr_el1, x28
-    msr far_el1, x29
 
     popp x28, x29
     msr sp_el0, x28
@@ -162,7 +146,7 @@ el1_vectors:
     b serror_lower_el_aarch32
 
 sync_current_el_sp0:
-    vinvalid 0, 1
+    b irq_el1x
 irq_current_el_sp0:
     vinvalid 1, 1
 fiq_current_el_sp0:

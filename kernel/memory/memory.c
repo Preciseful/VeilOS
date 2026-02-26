@@ -80,7 +80,7 @@ unsigned int free(void *data)
 
 void *realloc(void *address, unsigned int size)
 {
-    if (size < memory_size(address))
+    if (size < MemorySize(address))
         panic("Cannot reallocate with a smaller size than initial.");
 
     void *new_address = malloc(size);
@@ -90,12 +90,12 @@ void *realloc(void *address, unsigned int size)
     return new_address;
 }
 
-unsigned long get_memory_used()
+unsigned long GetMemoryUsed()
 {
     return used_memory;
 }
 
-unsigned int memory_size(void *data)
+unsigned int MemorySize(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     return headers[index].size;
@@ -134,5 +134,5 @@ SYSCALL_HANDLER(memory_size)
     if (!GetPagePA(GetRunningTask(), sp->x0))
         return 0;
 
-    return memory_size((void *)sp->x0);
+    return MemorySize((void *)sp->x0);
 }

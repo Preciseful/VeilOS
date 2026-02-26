@@ -40,8 +40,8 @@ typedef struct IODeviceCursor
 
 typedef struct IODevice
 {
-    void (*read)(unsigned int token, char *buf, unsigned long length);
-    void (*write)(unsigned int token, const char *buf);
+    unsigned long (*read)(unsigned int token, char *buf, unsigned long length);
+    unsigned long (*write)(unsigned int token, const char *buf);
     bool (*request)(unsigned int token, unsigned int code, void *data);
 
     IODeviceCursor cursor;
@@ -58,7 +58,11 @@ int OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permiss
 void AddIODevice(IODevice device);
 void FreeIODevice(int token, enum IO_Category category, DID code);
 void SetIODeviceCursor(int token, enum IO_Category category, DID code, IODeviceCursor cursor);
-void ReadIODevice(int token, enum IO_Category category, DID code, char *buf, unsigned long len);
-void WriteIODevice(int token, enum IO_Category category, DID code, const char *buf);
+unsigned long ReadIODevice(int token, enum IO_Category category, DID code, char *buf, unsigned long len);
+unsigned long WriteIODevice(int token, enum IO_Category category, DID code, const char *buf);
+bool RequestIODevice(int token, enum IO_Category category, DID code, unsigned int requestMessage, void *data);
 
 SYSCALL_HANDLER(own_device);
+SYSCALL_HANDLER(read_device);
+SYSCALL_HANDLER(write_device);
+SYSCALL_HANDLER(request_device);

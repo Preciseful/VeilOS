@@ -22,12 +22,13 @@ typedef struct FileReference
     const char *path;
     unsigned long mount_idx;
     char *cut_path;
+    bool used;
 } FileReference;
 
 typedef struct VFS
 {
     MountPoint mounts[MOUNT_COUNT];
-    FileReference **files;
+    FileReference *files;
     unsigned long files_count;
 } VFS;
 
@@ -37,5 +38,5 @@ bool GetMountPoint(const char *path, MountPoint *point_buf, char **extra_path);
 
 FILEHANDLE AddFileReference(FileReference reference);
 void RemoveFileReference(FILEHANDLE handle);
-bool GetFileReference(FILEHANDLE handle, FileReference **reference);
+bool GetFileReference(FILEHANDLE handle, FileReference *reference);
 bool GetFileMount(FILEHANDLE handle, MountPoint *mount);

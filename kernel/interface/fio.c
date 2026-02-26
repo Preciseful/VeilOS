@@ -1,6 +1,7 @@
 #include <system/vfs.h>
 #include <interface/errno.h>
 #include <scheduler/scheduler.h>
+#include <lib/printf.h>
 
 int createEntry(const char *path, enum File_Permissions permissions, bool dir)
 {
@@ -46,6 +47,7 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
     reference.owner = GetCurrentPID();
     reference.mode = mode;
     reference.path = path;
+    reference.used = true;
 
     MountPoint mount;
     char *extra;
@@ -54,18 +56,12 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
     if (mount.fs.fopen)
     {
         int ret = mount.fs.fopen(extra, mode, mount.key);
-        free(extra);
-
         if (ret != 0)
             return ret;
+    }
 
-        return AddFileReference(reference);
-    }
-    else
-    {
-        free(extra);
-        return -E_INVALID_OPERATION;
-    }
+    free(extra);
+    return AddFileReference(reference);
 }
 
 void CloseFile(FILEHANDLE handle)
@@ -76,29 +72,33 @@ void CloseFile(FILEHANDLE handle)
 int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset)
 {
     MountPoint mount;
-    FileReference *reference;
+    FileReference reference;
 
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
-    GetFileMount(handle, &mount);
+
+    if (!GetFileMount(handle, &mount))
+        return -E_NO_FILE;
 
     if (mount.fs.fread == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fread(reference->cut_path, reference->mode, buf, size, offset, mount.key);
+    return mount.fs.fread(reference.cut_path, reference.mode, buf, size, offset, mount.key);
 }
 
 int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)
 {
     MountPoint mount;
-    FileReference *reference;
+    FileReference reference;
 
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
-    GetFileMount(handle, &mount);
+
+    if (!GetFileMount(handle, &mount))
+        return -E_NO_FILE;
 
     if (mount.fs.fwrite == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fwrite(reference->cut_path, reference->mode, buf, size, offset, mount.key);
+    return mount.fs.fwrite(reference.cut_path, reference.mode, buf, size, offset, mount.key);
 }

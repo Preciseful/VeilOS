@@ -160,14 +160,6 @@ void KillTask(Task *task)
 {
     RemoveMapsFromNode(task, task->map_root);
 
-    for (int i = 0; i < task->environc; i++)
-        free((void *)PHYS_TO_VIRT(task->environ[i]));
-    free(task->environ);
-
-    for (int i = 0; i < task->argc; i++)
-        free((void *)PHYS_TO_VIRT(task->argv[i]));
-    free(task->argv);
-
     free(task->name);
     FreeTable(task->mmu_ctx.pgd, 0);
     free((void *)task->mmu_ctx.pa);
@@ -219,41 +211,10 @@ void *mapped_malloc(Task *task, unsigned int size)
     return data;
 }
 
-void set_args(Task *task, int argc, char **argv, char **environ)
-{
-    unsigned long environ_len = 0;
-    // environ is terminated with zero
-    while (environ && environ[environ_len])
-        environ_len++;
-
-    task->environc = environ_len;
-    task->environ = mapped_malloc(task, (environ_len + 1) * sizeof(char *));
-    task->environ[environ_len] = 0;
-
-    for (unsigned long i = 0; i < environ_len; i++)
-    {
-        unsigned long environ_var_len = strlen(environ[i]) + 1;
-
-        task->environ[i] = (void *)VIRT_TO_PHYS(mapped_malloc(task, environ_var_len));
-        memcpy((void *)PHYS_TO_VIRT(task->environ[i]), environ[i], environ_var_len);
-    }
-
-    task->argc = argc;
-    task->argv = mapped_malloc(task, (argc + 1) * sizeof(char *));
-    task->argv[argc] = 0;
-
-    for (unsigned long i = 0; i < argc; i++)
-    {
-        unsigned long argv_len = strlen(argv[i]) + 1;
-
-        task->argv[i] = (void *)VIRT_TO_PHYS(mapped_malloc(task, argv_len));
-        memcpy((void *)PHYS_TO_VIRT(task->argv[i]), argv[i], argv_len);
-    }
-}
-
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, char **environ, char **argv, int argc)
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa)
 {
     Task *task = malloc(sizeof(Task));
+    memset(&task->regs, 0, sizeof(task->regs));
 
     unsigned long name_len = strlen(name) + 1;
     task->name = malloc(name_len);
@@ -265,8 +226,8 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
     task->regs.x30 = va;
     task->regs.elr_el1 = va;
     task->regs.spsr_el1 = kernel ? EL1H_M : EL0T_M;
-    task->regs.task_sp = GRANULE_1GB * 2 + PAGE_SIZE;
-    task->regs.interrupt_sp = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
+    task->regs.sp_el0 = GRANULE_1GB * 2 + PAGE_SIZE;
+    task->regs.sp = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
     task->mmu_ctx.sp_alloc = (unsigned long)malloc(PAGE_SIZE);
@@ -305,11 +266,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     if (data_pa != 0 && va < HIGH_VA)
         MapTaskPage(task, task->mmu_ctx.va, data_pa, PAGE_SIZE, user | exec | rw);
-    MapTaskPage(task, task->regs.task_sp - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_alloc), PAGE_SIZE, user | rw);
-
-    set_args(task, argc, argv, environ);
-    task->regs.x[0] = task->argc;
-    task->regs.x[1] = VIRT_TO_PHYS(task->argv);
+    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_alloc), PAGE_SIZE, user | rw);
 
     return task;
 }

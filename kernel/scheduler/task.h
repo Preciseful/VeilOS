@@ -9,14 +9,6 @@
 
 typedef long PID;
 
-typedef struct TaskRegs
-{
-    unsigned long x[28];
-    unsigned long task_sp, interrupt_sp;
-    unsigned long elr_el1, spsr_el1;
-    unsigned long x28, x29, x30;
-} TaskRegs;
-
 typedef struct TaskMMUCtx
 {
     unsigned long asid_chunk;
@@ -39,7 +31,7 @@ typedef struct TaskMappingNode
 
 typedef struct Task
 {
-    TaskRegs regs;
+    InterruptStack regs;
     TaskMMUCtx mmu_ctx;
     // denotes va->pa relations with a radix tree
     TaskMappingNode *map_root;
@@ -47,18 +39,12 @@ typedef struct Task
 
     char *name;
     bool kernel;
-    int argc;
-    int environc;
-    // the values within argv are user allocated, accesses must be done with PHYS_TO_VIRT
-    char **argv;
-    // the values within environ are user allocated, accesses must be done with PHYS_TO_VIRT
-    char **environ;
     unsigned long flags;
     long time;
     PID pid;
 } Task;
 
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, char **environ, char **argv, int argc);
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa);
 PhysicalAddr GetPagePA(Task *task, VirtualAddr va);
 void MapTaskPage(Task *task, VirtualAddr va, PhysicalAddr pa, unsigned int size, enum MMU_Flags flags);
 void UnmapTaskPage(Task *task, VirtualAddr va, unsigned int length);

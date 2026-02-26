@@ -17,7 +17,6 @@
 #include <interface/fs/voidelle/voidelle.h>
 #include <drivers/framebuffer.h>
 #include <interface/console.h>
-#include <gdb/dbg.h>
 
 void kboot()
 {
@@ -58,9 +57,12 @@ void kmain()
     LOG("Initialized partitions.\n");
 
     VFSInit();
-    AddMountPoint("/", GetVoidelleInterface());
+    AddMountPoint("/", GetVoidelleInterface(voidom));
 
-    LOG("Used memory (reference): %lu bytes.\n", get_memory_used());
+    LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
+
+    MakeElfProcess("/Luna.elf", false, -1);
+    LOG("Created shell.\n");
 
     ConsoleDrop();
 

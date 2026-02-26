@@ -10,10 +10,10 @@
 #define EL1H_M 0b0101
 
 Task default_task = {0};
-Task *scheduler_current;
 PID last_pid;
 unsigned long last_asid_chunk;
 bool stop;
+Task *scheduler_current;
 
 void printx(unsigned long x)
 {
@@ -22,8 +22,6 @@ void printx(unsigned long x)
 
 Task *GetRunningTask()
 {
-    if (scheduler_current == &default_task)
-        return 0;
     return scheduler_current;
 }
 
@@ -67,7 +65,7 @@ PID AddTask(Task *task)
     return last_pid + 1;
 }
 
-void save_registers(Task *task, TaskRegs registers[])
+void save_registers(Task *task, InterruptStack registers[])
 {
     if (registers == 0)
         return;
@@ -79,9 +77,8 @@ void switch_task(Task *next)
     if (scheduler_current == next)
         return;
 
-    scheduler_current = next;
-
     bool flush = false;
+
     unsigned long baddr = VIRT_TO_PHYS(next->mmu_ctx.pgd) & TTBR_BADDR_MASK;
     unsigned long asid = (unsigned long)next->mmu_ctx.asid << 48;
 
@@ -93,6 +90,8 @@ void switch_task(Task *next)
     last_asid_chunk = next->mmu_ctx.asid_chunk;
     stop = false;
 
+    LOG("Switching to EL%u process: '%s' at 0x%lx.\n", next->kernel, next->name, next->mmu_ctx.va);
+    scheduler_current = next;
     cpu_switch_task(next);
 }
 
@@ -132,10 +131,12 @@ void Schedule()
 {
     Task *task = get_next_task();
     if (task)
+    {
         switch_task(task);
+    }
 }
 
-void SchedulerTick(TaskRegs registers[])
+void SchedulerTick(InterruptStack registers[])
 {
     save_registers(scheduler_current, registers);
 
@@ -156,6 +157,8 @@ void SchedulerTick(TaskRegs registers[])
 PID GetCurrentPID()
 {
     if (GetRunningTask() == 0)
+        return 0;
+    if (GetRunningTask() == &default_task)
         return 0;
     return GetRunningTask()->pid;
 }
