@@ -8,7 +8,7 @@
 #include <lib/string.h>
 #include <interface/errno.h>
 
-Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **argv)
+Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **argv, int envargc, char **envargv)
 {
     FILEHANDLE file = OpenFile(FILE_READ, path);
     if (file == -1)
@@ -40,7 +40,7 @@ Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **ar
         return 0;
     }
 
-    Task *task = CreateTask(path, kernel, eheader.e_entry, 0, argc, argv);
+    Task *task = CreateTask(path, kernel, eheader.e_entry, 0, argc, argv, envargc, envargv);
     char user = kernel ? 0 : MMU_USER;
     char exec = kernel ? 0 : MMU_USER_EXEC;
     char rw = kernel ? MMU_NORW : MMU_RWRW;

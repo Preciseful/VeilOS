@@ -61,7 +61,18 @@ void kmain()
 
     LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
 
-    MakeElfProcess("/Luna.elf", false, -1, 0, 0);
+    char *arguments[3];
+    arguments[0] = "up in hollywood hills\n";
+    arguments[1] = "need your love ill hunt you down\n";
+    arguments[2] = "youd be safer out of town\n";
+
+    char *env[4];
+    env[0] = "jazmin bean\n";
+    env[1] = "cool\n";
+    env[2] = "elita\n";
+    env[3] = "better\n";
+
+    MakeElfProcess("/Luna.elf", false, -1, 3, arguments, 4, env);
     LOG("Created shell.\n");
 
     ConsoleDrop();

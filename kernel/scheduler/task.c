@@ -211,36 +211,32 @@ void *mapped_malloc(Task *task, unsigned int size)
     return data;
 }
 
-void set_args(Task *task, int argc, char **argv)
+void push_args(Task *task, int argc, char **argv)
 {
-    unsigned long kernel_sp = task->mmu_ctx.sp_el0_alloc + PAGE_SIZE;
     unsigned long user_argv[argc];
 
     for (int i = argc - 1; i >= 0; i--)
     {
         unsigned long len = strlen(argv[i]) + 1;
-        kernel_sp -= len;
+        task->mmu_ctx.sp_el0_kernel -= len;
         task->regs.sp_el0 -= len;
 
-        memcpy((char *)kernel_sp, argv[i], len);
+        memcpy((char *)task->mmu_ctx.sp_el0_kernel, argv[i], len);
         user_argv[i] = task->regs.sp_el0;
     }
 
-    kernel_sp &= ~0xF;
+    task->mmu_ctx.sp_el0_kernel &= ~0xF;
     task->regs.sp_el0 &= ~0xF;
 
     for (int i = argc - 1; i >= 0; i--)
     {
-        kernel_sp -= sizeof(unsigned long);
+        task->mmu_ctx.sp_el0_kernel -= sizeof(unsigned long);
         task->regs.sp_el0 -= sizeof(unsigned long);
-        *(unsigned long *)kernel_sp = user_argv[i];
+        *(unsigned long *)task->mmu_ctx.sp_el0_kernel = user_argv[i];
     }
-
-    task->regs.x0 = argc;
-    task->regs.x1 = task->regs.sp_el0;
 }
 
-Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv)
+Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv, int envargc, char **envargv)
 {
     Task *task = malloc(sizeof(Task));
     memset(&task->regs, 0, sizeof(task->regs));
@@ -259,7 +255,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
     task->regs.sp = (unsigned long)malloc(PAGE_SIZE * 4) + PAGE_SIZE * 4;
 
     task->mmu_ctx.pgd = (unsigned long *)malloc(PAGE_SIZE);
-    task->mmu_ctx.sp_el0_alloc = (VirtualAddr)malloc(PAGE_SIZE);
+    task->mmu_ctx.sp_el0_kernel = (VirtualAddr)malloc(PAGE_SIZE) + PAGE_SIZE;
 
     task->mmu_ctx.pa = VIRT_TO_PHYS(malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
@@ -295,10 +291,23 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     if (data_pa != 0 && va < HIGH_VA)
         MapTaskPage(task, task->mmu_ctx.va, data_pa, PAGE_SIZE, user | exec | rw);
-    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_el0_alloc), PAGE_SIZE, user | rw);
+    MapTaskPage(task, task->regs.sp_el0 - PAGE_SIZE, VIRT_TO_PHYS(task->mmu_ctx.sp_el0_kernel - PAGE_SIZE), PAGE_SIZE, user | rw);
+
+    task->regs.x0 = task->regs.x1 = task->regs.x2 = task->regs.x3 = 0;
 
     if (argc > 0)
-        set_args(task, argc, argv);
+    {
+        push_args(task, argc, argv);
+        task->regs.x0 = argc;
+        task->regs.x1 = task->regs.sp_el0;
+    }
+
+    if (envargv != 0 && envargc % 2 == 0)
+    {
+        push_args(task, envargc, envargv);
+        task->regs.x2 = envargc;
+        task->regs.x3 = task->regs.sp_el0;
+    }
 
     return task;
 }
