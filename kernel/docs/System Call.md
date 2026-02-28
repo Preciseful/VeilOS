@@ -39,9 +39,9 @@ Marks the current process as to be killed in the next scheduler run.
 ## Own Device
 Attempts to mark an IO device as owned by the current process.
 #### Arguments:
-- UINT64 : Category of the IO device requested.
-- UINT32 : Code of the IO device requested.
-- UINT64 : Permissions required
+- UINT8 : Category of the IO device requested.
+- UINT8 : Code of the IO device requested.
+- UINT8 : Permissions required
     - 0x1 : READ
     - 0x2 : WRITE
     - 0x4: REQUEST
@@ -52,9 +52,9 @@ Attempts to mark an IO device as owned by the current process.
 ## Read Device
 Reads data from an IO device and transfers the data into the passed buffer.
 #### Arguments:
-- UINT32 : Token of the IO device owned.
-- UINT64 : Category of the IO device requested.
-- UINT32 : Code of the IO device requested.
+- INT32 : Token of the IO device owned.
+- UINT8 : Category of the IO device requested.
+- UINT8 : Code of the IO device requested.
 - UINT64 : Pointer to the buffer.
 - UINT64 : Length of the buffer to be read.
 
@@ -64,9 +64,9 @@ Reads data from an IO device and transfers the data into the passed buffer.
 ## Write Device
 Writes data to an IO device from a buffer.
 #### Arguments:
-- UINT32 : Token of the IO device owned.
-- UINT64 : Category of the IO device requested.
-- UINT32 : Code of the IO device requested.
+- INT32 : Token of the IO device owned.
+- UINT8 : Category of the IO device requested.
+- UINT8 : Code of the IO device requested.
 - UINT64 : Pointer to the buffer, null-terminated.
 
 #### Return value:
@@ -75,9 +75,9 @@ Writes data to an IO device from a buffer.
 ## Request Device
 Requests an action to an IO device.
 #### Arguments:
-- UINT32 : Token of the IO device owned.
-- UINT64 : Category of the IO device requested.
-- UINT32 : Code of the IO device requested.
+- INT32 : Token of the IO device owned.
+- UINT8 : Category of the IO device requested.
+- UINT8 : Code of the IO device requested.
 - UINT32 : The code of the request message.
 - UINT64 : Buffer to the data. 
 

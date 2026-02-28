@@ -156,9 +156,11 @@ IODeviceToken *getToken(unsigned long pid, IODevice device)
     return 0;
 }
 
-void FreeIODevice(int token, enum IO_Category category, DID code)
+void FreeIODevice(TokenID token, enum IO_Category category, DID code)
 {
     IODevice *device = getInternalDevice(category, code);
+    if (token < 0)
+        return;
     if (device == 0)
         return;
     if (token >= device->tokens_length)
@@ -178,8 +180,10 @@ void FreeIODevice(int token, enum IO_Category category, DID code)
     device->tokens[token].available = true;
 }
 
-bool checkDevice(IODevice *device, unsigned int token, enum IO_Permissions permission)
+bool checkDevice(IODevice *device, TokenID token, enum IO_Permissions permission)
 {
+    if (token < 0)
+        return false;
     if (device == 0)
         return false;
     if (token >= device->tokens_length)
@@ -193,7 +197,7 @@ bool checkDevice(IODevice *device, unsigned int token, enum IO_Permissions permi
     return true;
 }
 
-unsigned long ReadIODevice(int token, enum IO_Category category, DID code, char *buf, unsigned long len)
+unsigned long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_READ))
@@ -202,7 +206,7 @@ unsigned long ReadIODevice(int token, enum IO_Category category, DID code, char 
     return device->read(token, buf, len);
 }
 
-unsigned long WriteIODevice(int token, enum IO_Category category, DID code, const char *buf)
+unsigned long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_WRITE))
@@ -211,7 +215,7 @@ unsigned long WriteIODevice(int token, enum IO_Category category, DID code, cons
     return device->write(token, buf);
 }
 
-bool RequestIODevice(int token, enum IO_Category category, DID code, unsigned int requestMessage, void *data)
+bool RequestIODevice(TokenID token, enum IO_Category category, DID code, unsigned int requestMessage, void *data)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_REQUEST))
@@ -220,7 +224,7 @@ bool RequestIODevice(int token, enum IO_Category category, DID code, unsigned in
     return device->request(token, requestMessage, data);
 }
 
-void SetIODeviceCursor(int token, enum IO_Category category, DID code, IODeviceCursor cursor)
+void SetIODeviceCursor(TokenID token, enum IO_Category category, DID code, IODeviceCursor cursor)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_REQUEST))
@@ -241,7 +245,7 @@ SYSCALL_HANDLER(own_device)
 
 SYSCALL_HANDLER(read_device)
 {
-    unsigned int token = sp->x0;
+    TokenID token = sp->x0;
     enum IO_Category category = sp->x1;
     DID code = sp->x2;
 
@@ -254,7 +258,7 @@ SYSCALL_HANDLER(read_device)
 
 SYSCALL_HANDLER(write_device)
 {
-    unsigned int token = sp->x0;
+    TokenID token = sp->x0;
     enum IO_Category category = sp->x1;
     DID code = sp->x2;
 
@@ -266,7 +270,7 @@ SYSCALL_HANDLER(write_device)
 
 SYSCALL_HANDLER(request_device)
 {
-    unsigned int token = sp->x0;
+    TokenID token = sp->x0;
     enum IO_Category category = sp->x1;
     DID code = sp->x2;
 

@@ -106,14 +106,14 @@ unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsign
     return s - s_orig;
 }
 
-unsigned long fbWrite(unsigned int token, const char *str)
+unsigned long fbWrite(TokenID token, const char *str)
 {
     unsigned long amount = drawString(str, colors[0], colors[1], colors[2], false);
     SetIODeviceCursor(token, fbDevice.category, fbDevice.code, fbDevice.cursor);
     return amount;
 }
 
-bool fbRequest(unsigned int token, unsigned int code, void *data)
+bool fbRequest(TokenID token, unsigned int code, void *data)
 {
     switch (code)
     {

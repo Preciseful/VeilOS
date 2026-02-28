@@ -2,13 +2,14 @@
 
 #include <scheduler/task.h>
 
+typedef unsigned int TokenID;
 typedef unsigned int DID;
 
 enum IO_Category
 {
-    IO_CONSOLE,
     IO_UART,
     IO_FRAMEBUFFER,
+    IO_CONSOLE,
 };
 
 enum IO_Flags
@@ -40,13 +41,13 @@ typedef struct IODeviceCursor
 
 typedef struct IODevice
 {
-    unsigned long (*read)(unsigned int token, char *buf, unsigned long length);
-    unsigned long (*write)(unsigned int token, const char *buf);
-    bool (*request)(unsigned int token, unsigned int code, void *data);
+    unsigned long (*read)(TokenID token, char *buf, unsigned long length);
+    unsigned long (*write)(TokenID token, const char *buf);
+    bool (*request)(TokenID token, unsigned int code, void *data);
 
     IODeviceCursor cursor;
     IODeviceToken *tokens;
-    int tokens_length;
+    TokenID tokens_length;
 
     enum IO_Permissions permissions_taken;
     enum IO_Flags flags;
@@ -56,11 +57,11 @@ typedef struct IODevice
 
 int OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission);
 void AddIODevice(IODevice device);
-void FreeIODevice(int token, enum IO_Category category, DID code);
-void SetIODeviceCursor(int token, enum IO_Category category, DID code, IODeviceCursor cursor);
-unsigned long ReadIODevice(int token, enum IO_Category category, DID code, char *buf, unsigned long len);
-unsigned long WriteIODevice(int token, enum IO_Category category, DID code, const char *buf);
-bool RequestIODevice(int token, enum IO_Category category, DID code, unsigned int requestMessage, void *data);
+void FreeIODevice(TokenID token, enum IO_Category category, DID code);
+void SetIODeviceCursor(TokenID token, enum IO_Category category, DID code, IODeviceCursor cursor);
+unsigned long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len);
+unsigned long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf);
+bool RequestIODevice(TokenID token, enum IO_Category category, DID code, unsigned int requestMessage, void *data);
 
 SYSCALL_HANDLER(own_device);
 SYSCALL_HANDLER(read_device);
