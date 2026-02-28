@@ -446,26 +446,24 @@ bool get_name_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigne
     return true;
 }
 
-unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long seek, void *buf, unsigned long size)
+unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long offset, void *buf, unsigned long size)
 {
     if (voidelle.flags & VOIDELLE_DIRECTORY)
         return FILE_IS_DIRECTORY;
 
     uint8_t *current_buf = buf;
 
-    uint64_t first_voidite = seek / VOIDITE_CONTENT_SIZE;
-    uint64_t last_voidite = (seek + size - 1) / VOIDITE_CONTENT_SIZE;
-    uint64_t start = seek % VOIDITE_CONTENT_SIZE;
-    uint64_t end = (seek + size) % VOIDITE_CONTENT_SIZE;
-
-    uint64_t bytes_left = size;
+    uint64_t first_voidite = offset / VOIDITE_CONTENT_SIZE;
+    uint64_t last_voidite = (offset + size - 1) / VOIDITE_CONTENT_SIZE;
+    uint64_t start = offset % VOIDITE_CONTENT_SIZE;
+    uint64_t end = (offset + size) % VOIDITE_CONTENT_SIZE;
 
     for (unsigned long voidite_index = first_voidite; voidite_index <= last_voidite; voidite_index++)
     {
         Voidite voidite;
 
         if (!get_content_voidite_at(voidom, voidelle, &voidite, voidite_index))
-            return current_buf - (uint8_t *)buf;
+            memset(voidite.data, 0, VOIDITE_CONTENT_SIZE);
 
         uint8_t *cpy_start = voidite.data;
         uint64_t cpy_len = VOIDITE_CONTENT_SIZE;
@@ -479,13 +477,13 @@ unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long seek
         if (voidite_index == last_voidite)
             cpy_len = (end == 0) ? size : end;
 
-        if (cpy_len > bytes_left)
-            cpy_len = bytes_left;
+        if (cpy_len > size)
+            cpy_len = size;
 
         memcpy(current_buf, cpy_start, cpy_len);
 
         current_buf += cpy_len;
-        bytes_left -= cpy_len;
+        size -= cpy_len;
     }
 
     return current_buf - (uint8_t *)buf;
