@@ -3,9 +3,9 @@
 #include <memory/mmu.h>
 #include <lib/list.h>
 
-#define USER_TASK 0b1
-#define ACTIVE_TASK 0b10
-#define KILL_TASK 0b100
+#define USER_TASK (1 << 0)
+#define ACTIVE_TASK (1 << 1)
+#define KILL_TASK (1 << 2)
 
 typedef long PID;
 

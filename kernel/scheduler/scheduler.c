@@ -112,15 +112,22 @@ Task *get_next_task()
     {
         if (current->next && (current->next->flags & KILL_TASK))
         {
+            if (current->next == current)
+            {
+                KillTask(current);
+                return 0;
+            }
+
+            Task *next = current->next;
             current->next = current->next->next;
-            KillTask(current->next);
+            KillTask(next);
         }
 
         current = current->next ? current->next : default_task.next;
         if (current == 0)
             return 0;
 
-        if ((current->flags & ACTIVE_TASK) && !(current->flags & KILL_TASK))
+        if (current->flags & ACTIVE_TASK)
             break;
     } while (current != start);
 
@@ -129,10 +136,11 @@ Task *get_next_task()
 
 void Schedule()
 {
-    Task *task = get_next_task();
-    if (task)
+    while (1)
     {
-        switch_task(task);
+        Task *task = get_next_task();
+        if (task)
+            switch_task(task);
     }
 }
 
