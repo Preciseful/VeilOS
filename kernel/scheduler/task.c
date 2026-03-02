@@ -302,7 +302,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
         task->regs.x1 = task->regs.sp_el0;
     }
 
-    if (envargv != 0 && envargc % 2 == 0)
+    if (envargc > 0 && envargc % 2 == 0)
     {
         push_args(task, envargc, envargv);
         task->regs.x2 = envargc;

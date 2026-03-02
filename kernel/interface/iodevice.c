@@ -7,9 +7,9 @@
     if (token.permissions & IO_##perm)                                                            \
     {                                                                                             \
         if (!(intdevice->flags & IO_MULTIPLE_##perm) && intdevice->permissions_taken & IO_##perm) \
-            return false;                                                                         \
+            return -1;                                                                            \
         if (intdevice->func == 0)                                                                 \
-            return false;                                                                         \
+            return -1;                                                                            \
     }
 
 typedef struct IOLink
@@ -83,7 +83,7 @@ int ownIODeviceWithToken(enum IO_Category category, DID code, IODeviceToken toke
     {
         if (intdevice->tokens[i].available)
         {
-            intdevice->tokens[0] = token;
+            intdevice->tokens[i] = token;
             return i;
         }
     }

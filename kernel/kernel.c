@@ -61,7 +61,15 @@ void kmain()
 
     LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
 
-    MakeElfProcess("/Luna.elf", false, -1, 0, 0, 0, 0);
+    char *envargv[6];
+    envargv[0] = "TTY";
+    envargv[1] = "UART";
+    envargv[2] = "TTYNO";
+    envargv[3] = "0";
+    envargv[4] = "TTYPERM";
+    envargv[5] = "RWO";
+
+    MakeElfProcess("/Luna.elf", false, -1, 0, 0, 6, envargv);
     LOG("Created shell.\n");
 
     ConsoleDrop();
