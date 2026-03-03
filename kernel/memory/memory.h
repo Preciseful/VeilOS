@@ -30,7 +30,6 @@
 typedef struct MHeader
 {
     unsigned long size;
-    struct MHeader *next;
     void *data;
     bool used;
 } MHeader;
