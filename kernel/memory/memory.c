@@ -8,7 +8,6 @@
 #include <limits.h>
 
 __attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
-__attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
 unsigned long used_memory = 0;
 
@@ -18,8 +17,7 @@ extern char bss_end[];
 void MMInit()
 {
     // LOG("Zeroing the memory...\n");
-    memset(mem_map, 0, PAGING_PAGES);
-    memset(headers, 0, PAGING_PAGES);
+    memset(headers, 0, PAGING_PAGES * sizeof(MHeader));
     // LOG("Finished zeroing the memory!\n");
 }
 
@@ -27,7 +25,7 @@ bool check_memory(unsigned long index, unsigned int size)
 {
     for (unsigned long i = 0; i < size / PAGE_SIZE; i++)
     {
-        if (mem_map[index + i])
+        if (headers[index + i].used)
             return false;
     }
 
@@ -41,7 +39,7 @@ void *get_free_page(unsigned int size)
         if (check_memory(i, size))
         {
             for (unsigned long j = 0; j < size / PAGE_SIZE; j++)
-                mem_map[i + j] = 1;
+                headers[i + j].used = true;
 
             unsigned long adr = HIGH_VA + LOW_MEMORY + i * PAGE_SIZE;
             return (void *)adr;
@@ -72,7 +70,7 @@ unsigned int free(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
     for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
-        mem_map[index + i] = 0;
+        headers[index + i].used = false;
 
     used_memory -= headers[index].size;
     return headers[index].size;

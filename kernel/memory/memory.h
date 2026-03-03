@@ -32,6 +32,7 @@ typedef struct MHeader
     unsigned long size;
     struct vheader *next;
     void *data;
+    bool used;
 } MHeader;
 
 void MMInit();
