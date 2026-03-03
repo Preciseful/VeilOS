@@ -30,7 +30,7 @@
 typedef struct MHeader
 {
     unsigned long size;
-    struct vheader *next;
+    struct MHeader *next;
     void *data;
     bool used;
 } MHeader;
