@@ -26,6 +26,13 @@ enum IO_Permissions
     IO_REQUEST = 1 << 2,
 };
 
+typedef struct IODeviceOwnership
+{
+    TokenID token;
+    enum IO_Category category;
+    DID code;
+} IODeviceOwnership;
+
 typedef struct IODeviceToken
 {
     enum IO_Permissions permissions;
@@ -67,3 +74,4 @@ SYSCALL_HANDLER(own_device);
 SYSCALL_HANDLER(read_device);
 SYSCALL_HANDLER(write_device);
 SYSCALL_HANDLER(request_device);
+SYSCALL_HANDLER(free_device);

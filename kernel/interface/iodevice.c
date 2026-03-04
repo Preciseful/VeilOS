@@ -240,7 +240,17 @@ SYSCALL_HANDLER(own_device)
     token.process = GetCurrentPID();
     token.available = false;
 
-    return ownIODeviceWithToken(sp->x0, sp->x1, token);
+    int result = ownIODeviceWithToken(sp->x0, sp->x1, token);
+    if (result == -1)
+        return -1;
+
+    IODeviceOwnership *ownership = malloc(sizeof(IODeviceOwnership));
+    ownership->category = sp->x0;
+    ownership->code = sp->x1;
+    ownership->token = result;
+    AddToList(&GetRunningTask()->devices, ownership);
+
+    return result;
 }
 
 SYSCALL_HANDLER(read_device)
@@ -278,4 +288,26 @@ SYSCALL_HANDLER(request_device)
     void *data = (void *)sp->x4;
 
     return RequestIODevice(token, category, code, request_message, data);
+}
+
+SYSCALL_HANDLER(free_device)
+{
+    TokenID token = sp->x0;
+    enum IO_Category category = sp->x1;
+    DID code = sp->x2;
+
+    FreeIODevice(token, category, code);
+
+    List list = GetRunningTask()->devices;
+
+    LIST_FOREACH(IODeviceOwnership, ownership, list)
+    {
+        if (ownership->token == token)
+        {
+            RemoveFromList(&GetRunningTask()->devices, ownership);
+            break;
+        }
+    }
+
+    return 0;
 }

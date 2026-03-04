@@ -17,7 +17,8 @@ enum System_Calls
     SYS_OWN_DEVICE,
     SYS_DEVICE_READ,
     SYS_DEVICE_WRITE,
-    SYS_DEVICE_REQUEST
+    SYS_DEVICE_REQUEST,
+    SYS_DEVICE_FREE,
 };
 
 static int svc_priority[] = {
@@ -29,6 +30,7 @@ static int svc_priority[] = {
     [SYS_DEVICE_READ] = 0,
     [SYS_DEVICE_WRITE] = 0,
     [SYS_DEVICE_REQUEST] = 0,
+    [SYS_DEVICE_FREE] = 0,
 };
 
 static SvcHandler svc_table[] = {
@@ -40,6 +42,7 @@ static SvcHandler svc_table[] = {
     [SYS_DEVICE_READ] = SystemCall_read_device,
     [SYS_DEVICE_WRITE] = SystemCall_write_device,
     [SYS_DEVICE_REQUEST] = SystemCall_request_device,
+    [SYS_DEVICE_FREE] = SystemCall_free_device,
 };
 
 void HandleSystemCall(InterruptStack *sp)

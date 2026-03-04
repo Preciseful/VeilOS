@@ -7,6 +7,7 @@
 #define ACTIVE_TASK (1 << 1)
 #define KILL_TASK (1 << 2)
 
+typedef struct IODeviceOwnership IODeviceOwnership;
 typedef long PID;
 
 typedef struct TaskMMUCtx
@@ -42,6 +43,8 @@ typedef struct Task
     unsigned long flags;
     long time;
     PID pid;
+
+    List devices;
 } Task;
 
 Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv, int envargc, char **envargv);
