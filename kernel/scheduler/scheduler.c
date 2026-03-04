@@ -112,9 +112,18 @@ Task *get_next_task()
     {
         if (current->next && (current->next->flags & KILL_TASK))
         {
+            if (default_task.next == current->next)
+            {
+                if (current->next == current)
+                    default_task.next = 0;
+                else
+                    default_task.next = current->next->next;
+            }
+
             if (current->next == current)
             {
                 KillTask(current);
+                scheduler_current = &default_task;
                 return 0;
             }
 

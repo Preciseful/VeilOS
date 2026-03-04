@@ -7,7 +7,7 @@
 #include <lib/panic.h>
 #include <limits.h>
 
-__attribute__((section(".mmmap"))) static MHeader headers[PAGING_PAGES];
+__attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
 unsigned long used_memory = 0;
 
@@ -17,7 +17,7 @@ extern char bss_end[];
 void MMInit()
 {
     // LOG("Zeroing the memory...\n");
-    memset(headers, 0, PAGING_PAGES * sizeof(MHeader));
+    memset(mem_map, 0, PAGING_PAGES);
     // LOG("Finished zeroing the memory!\n");
 }
 
@@ -25,7 +25,7 @@ bool check_memory(unsigned long index, unsigned int size)
 {
     for (unsigned long i = 0; i < size / PAGE_SIZE; i++)
     {
-        if (headers[index + i].used)
+        if (mem_map[index + i])
             return false;
     }
 
@@ -38,12 +38,31 @@ void *get_free_page(unsigned int size)
     {
         if (check_memory(i, size))
         {
-            for (unsigned long j = 0; j < size / PAGE_SIZE; j++)
-                headers[i + j].used = true;
+            unsigned long pages = size / PAGE_SIZE;
+            for (unsigned long j = 0; j < pages; j++)
+            {
+                if (j < pages - 1)
+                    mem_map[i + j] = true;
+                else
+                    mem_map[i + j] = 2;
+            }
 
             unsigned long adr = HIGH_VA + LOW_MEMORY + i * PAGE_SIZE;
             return (void *)adr;
         }
+    }
+
+    return 0;
+}
+
+MHeader *get_header(unsigned long data_index)
+{
+    for (unsigned long i = data_index; i < PAGING_PAGES; i++)
+    {
+        if (mem_map[i] != 2)
+            continue;
+
+        return (MHeader *)(HIGH_VA + LOW_MEMORY + i * PAGE_SIZE);
     }
 
     return 0;
@@ -56,24 +75,31 @@ void *malloc(unsigned int size)
 
     size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
-    void *page = get_free_page(size);
-    unsigned long index = ((unsigned long)page - LOW_MEMORY - HIGH_VA) / PAGE_SIZE;
+    void *page = get_free_page(PAGE_SIZE + size);
+    MHeader *header = (MHeader *)(page + size);
 
-    headers[index].data = page;
-    headers[index].size = size;
+    header->data = page;
+    header->size = size;
 
-    used_memory += headers[index].size;
-    return headers[index].data;
+    used_memory += header->size;
+    return header->data;
 }
 
 unsigned int free(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
-    for (unsigned long i = 0; i < headers[index].size / PAGE_SIZE; i++)
-        headers[index + i].used = false;
+    MHeader *header = get_header(index);
 
-    used_memory -= headers[index].size;
-    return headers[index].size;
+    if (header == 0)
+        panic("Memory header could not be found.");
+
+    unsigned long size = header->size;
+
+    for (unsigned long i = 0; i < (size / PAGE_SIZE) + 1; i++)
+        mem_map[index + i] = false;
+
+    used_memory -= size;
+    return size;
 }
 
 void *realloc(void *address, unsigned int size)
@@ -96,7 +122,11 @@ unsigned long GetMemoryUsed()
 unsigned int MemorySize(void *data)
 {
     unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
-    return headers[index].size;
+    MHeader *header = get_header(index);
+
+    if (header == 0)
+        panic("Memory header could not be found.");
+    return header->size;
 }
 
 SYSCALL_HANDLER(malloc)
