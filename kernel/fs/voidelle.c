@@ -279,7 +279,7 @@ uint64_t populate_voidite_data(Voidom voidom, Voidite *first_voidite_buf, const 
 {
     uint64_t initial_size = size;
     uint64_t void_count = ((size + VOIDITE_CONTENT_SIZE - 1) / VOIDITE_CONTENT_SIZE);
-    Voidite *sections = malloc(sizeof(Voidite) * void_count);
+    Voidite sections[sizeof(Voidite) * void_count];
 
     for (uint64_t i = 0; i < void_count; i++)
     {
@@ -314,7 +314,6 @@ uint64_t populate_voidite_data(Voidom voidom, Voidite *first_voidite_buf, const 
     }
 
     *first_voidite_buf = sections[0];
-    free(sections);
     return initial_size - size;
 }
 
