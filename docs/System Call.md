@@ -10,6 +10,7 @@
 | [Read Device](#read-device)       |  5   |
 | [Write Device](#write-device)     |  6   |
 | [Request Device](#request-device) |  7   |
+| [Free Device](#free-device)       |  8   |
 
 
 ## Malloc
@@ -83,3 +84,10 @@ Requests an action to an IO device.
 
 #### Return value:
 - BOOL : Whether the operation succeeded or not.
+
+## Free Device
+Frees up an IO device.
+#### Arguments:
+- INT32 : Token of the IO device owned.
+- UINT8 : Category of the IO device requested.
+- UINT8 : Code of the IO device requested.
