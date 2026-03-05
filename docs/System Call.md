@@ -32,7 +32,7 @@ Gets the size of the allocated memory region.
 #### Arguments:
 - UINT64 : The address of the region of memory.
 #### Return value:
-- UINT64 : The amount of memory allocated.
+- UINT32 : The amount of memory allocated.
 
 ## Exit Process
 Marks the current process as to be killed in the next scheduler run.

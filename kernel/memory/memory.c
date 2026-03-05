@@ -73,6 +73,7 @@ void *malloc(unsigned int size)
     if (size == 0)
         return 0;
 
+    unsigned int initial_size = size;
     size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
     void *page = get_free_page(PAGE_SIZE + size);
@@ -80,6 +81,7 @@ void *malloc(unsigned int size)
 
     header->data = page;
     header->size = size;
+    header->initial_size = initial_size;
 
     used_memory += header->size;
     return header->data;
@@ -91,21 +93,22 @@ unsigned int free(void *data)
     MHeader *header = get_header(index);
 
     if (header == 0)
-        panic("Memory header could not be found.");
+        panic("Free: Memory header could not be found.");
 
+    unsigned long initial_size = header->initial_size;
     unsigned long size = header->size;
 
     for (unsigned long i = 0; i < (size / PAGE_SIZE) + 1; i++)
         mem_map[index + i] = false;
 
     used_memory -= size;
-    return size;
+    return initial_size;
 }
 
 void *realloc(void *address, unsigned int size)
 {
-    if (size < MemorySize(address))
-        panic("Cannot reallocate with a smaller size than initial.");
+    if (size <= MemorySize(address))
+        panic("Cannot reallocate with a smaller size or equal than initial.");
 
     void *new_address = malloc(size);
     memcpy(new_address, address, size);
@@ -125,8 +128,8 @@ unsigned int MemorySize(void *data)
     MHeader *header = get_header(index);
 
     if (header == 0)
-        panic("Memory header could not be found.");
-    return header->size;
+        panic("MemorySize: Memory header could not be found.");
+    return header->initial_size;
 }
 
 SYSCALL_HANDLER(malloc)
@@ -159,8 +162,9 @@ SYSCALL_HANDLER(free)
 
 SYSCALL_HANDLER(memory_size)
 {
-    if (!GetPagePA(GetRunningTask(), sp->x0))
+    PhysicalAddr pa = GetPagePA(GetRunningTask(), sp->x0);
+    if (pa == 0)
         return 0;
 
-    return MemorySize((void *)sp->x0);
+    return MemorySize((void *)PHYS_TO_VIRT(pa));
 }

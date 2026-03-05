@@ -29,9 +29,9 @@
 
 typedef struct MHeader
 {
-    unsigned long size;
+    unsigned int size;
     void *data;
-    bool used;
+    unsigned int initial_size;
 } MHeader;
 
 void MMInit();
