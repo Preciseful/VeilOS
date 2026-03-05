@@ -15,6 +15,9 @@
 #define UART0_IMSC (UART0_BASE + 0x38)
 
 static IODevice uartDevice;
+char read_buf[1024];
+unsigned long received;
+unsigned long read;
 
 void uartPut(char c)
 {
@@ -32,9 +35,12 @@ char uartCharacter()
 
 char uartRecv()
 {
-    while (ReadMMIO(UART0_FR) & (1 << 4))
+    while (received == read)
         ;
-    return (char)ReadMMIO(UART0_DR);
+
+    char c = read_buf[read];
+    read = (read + 1) % 512;
+    return c;
 }
 
 unsigned long uartRead(TokenID token, char *buf, unsigned long length)
@@ -65,6 +71,9 @@ unsigned long uartWrite(TokenID token, const char *str)
 
 void UartInit()
 {
+    received = 0;
+    read = 0;
+
     SetAlt0(14);
     SetAlt0(15);
 
@@ -94,5 +103,6 @@ void UartInit()
 
 void UartReceived()
 {
-    LOG("UART: %c\n", uartRecv());
+    read_buf[received] = uartCharacter();
+    received = (received + 1) % 512;
 }

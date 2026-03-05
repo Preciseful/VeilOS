@@ -2,6 +2,7 @@
 #include <lib/string.h>
 #include <scheduler/scheduler.h>
 #include <lib/panic.h>
+#include <lib/printf.h>
 
 #define CHECK_AVAILABILITY(perm, func)                                                            \
     if (token.permissions & IO_##perm)                                                            \
@@ -194,6 +195,7 @@ bool checkDevice(IODevice *device, TokenID token, enum IO_Permissions permission
         return false;
     if (!(device->tokens[token].permissions & permission))
         return false;
+
     return true;
 }
 
@@ -248,7 +250,7 @@ SYSCALL_HANDLER(own_device)
     ownership->category = sp->x0;
     ownership->code = sp->x1;
     ownership->token = result;
-    AddToList(&GetRunningTask()->devices, ownership);
+    // AddToList(&GetRunningTask()->devices, ownership);
 
     return result;
 }
@@ -262,8 +264,7 @@ SYSCALL_HANDLER(read_device)
     char *buf = (char *)sp->x3;
     unsigned long len = sp->x4;
 
-    ReadIODevice(token, category, code, buf, len);
-    return 0;
+    return ReadIODevice(token, category, code, buf, len);
 }
 
 SYSCALL_HANDLER(write_device)
@@ -274,8 +275,7 @@ SYSCALL_HANDLER(write_device)
 
     const char *buf = (const char *)sp->x3;
 
-    WriteIODevice(token, category, code, buf);
-    return 0;
+    return WriteIODevice(token, category, code, buf);
 }
 
 SYSCALL_HANDLER(request_device)

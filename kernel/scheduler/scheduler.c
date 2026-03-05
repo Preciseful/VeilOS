@@ -167,6 +167,9 @@ void SchedulerTick(InterruptStack registers[])
     scheduler_current->time = DEFAULT_TIME;
     stop = true;
 
+    if (get_next_task() == scheduler_current)
+        return;
+
     registers->elr_el1 = (unsigned long)&Schedule;
     registers->spsr_el1 = EL1H_M;
 }

@@ -1,7 +1,7 @@
 RPI_PATH=/run/media/$(USER)/bootfs
 
 ARMGNU ?= aarch64-none-elf
-TTYDEV ?= /dev/ttyUSB0
+TTYDEV ?= "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 
 COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings

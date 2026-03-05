@@ -146,9 +146,9 @@ el1_vectors:
     b serror_lower_el_aarch32
 
 sync_current_el_sp0:
-    b irq_el1x
+    vinvalid 0, 1
 irq_current_el_sp0:
-    vinvalid 1, 1
+    b irq_el1x
 fiq_current_el_sp0:
     vinvalid 2, 1
 serror_current_el_sp0:
