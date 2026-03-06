@@ -246,11 +246,24 @@ SYSCALL_HANDLER(own_device)
     if (result == -1)
         return -1;
 
-    IODeviceOwnership *ownership = malloc(sizeof(IODeviceOwnership));
-    ownership->category = sp->x0;
-    ownership->code = sp->x1;
-    ownership->token = result;
-    // AddToList(&GetRunningTask()->devices, ownership);
+    IODeviceOwnership ownership;
+    ownership.category = sp->x0;
+    ownership.code = sp->x1;
+    ownership.token = result;
+    Task *task = GetRunningTask();
+
+    for (int i = 0; i < task->devices_count; i++)
+    {
+        if (task->devices[i].token == -1)
+        {
+            task->devices[i] = ownership;
+            return result;
+        }
+    }
+
+    task->devices_count++;
+    task->devices = realloc(task->devices, sizeof(IODeviceOwnership) * task->devices_count);
+    task->devices[task->devices_count - 1] = ownership;
 
     return result;
 }
@@ -298,13 +311,14 @@ SYSCALL_HANDLER(free_device)
 
     FreeIODevice(token, category, code);
 
-    List list = GetRunningTask()->devices;
+    Task *task = GetRunningTask();
+    IODeviceOwnership *devices = task->devices;
 
-    LIST_FOREACH(IODeviceOwnership, ownership, list)
+    for (int i = 0; i < task->devices_count; i++)
     {
-        if (ownership->token == token)
+        if (devices[i].token == token)
         {
-            RemoveFromList(&GetRunningTask()->devices, ownership);
+            devices[i].token = -1;
             break;
         }
     }

@@ -2,7 +2,7 @@
 
 #include <scheduler/task.h>
 
-typedef unsigned int TokenID;
+typedef int TokenID;
 typedef unsigned int DID;
 
 enum IO_Category
