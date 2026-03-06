@@ -5,6 +5,7 @@
 #include <lib/string.h>
 #include <bundles/elf.h>
 #include <lib/panic.h>
+#include <interface/iodevice.h>
 
 #define EL0T_M 0b0000
 #define EL1H_M 0b0101
@@ -168,37 +169,23 @@ void KillTask(Task *task)
 
 VirtualAddr GetTaskValidVA(Task *task, unsigned int size)
 {
-    unsigned long va = 0;
+    unsigned long va = PAGE_SIZE;
+    size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
+    unsigned long current_size = 0;
 
-    TaskMappingNode *node = task->map_root;
-    for (unsigned long level = 0; level < MAPPING_LEVELS - 1; level++)
+    // todo : optimize by checking full_children
+    while (va < HIGH_VA)
     {
-        for (unsigned long i = 0; i < MAPPING_VALUE; i++)
+        if (!GetPagePA(task, va))
         {
-            TaskMappingNode *child = node->children[i];
-
-            if (!child)
-            {
-                va += i << ((MAPPING_LEVELS - 1 - level) * MAP_BITS + PAGE_SHIFT);
-                return va;
-            }
-
-            if (child->full_children == MAPPING_VALUE)
-                continue;
-
-            va += i << ((MAPPING_LEVELS - 1 - level) * MAP_BITS + PAGE_SHIFT);
-            node = child;
-            break;
+            current_size += PAGE_SIZE;
+            if (current_size == size)
+                return va - current_size + PAGE_SIZE;
         }
-    }
+        else
+            current_size = 0;
 
-    for (unsigned long i = 1; i < MAPPING_VALUE; i++)
-    {
-        if (node->children[i])
-            continue;
-
-        va += i << PAGE_SHIFT;
-        return va;
+        va += PAGE_SIZE;
     }
 
     return 0;
@@ -259,6 +246,11 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
 
     task->mmu_ctx.pa = VIRT_TO_PHYS(malloc(PAGE_SIZE));
     task->mmu_ctx.va = va;
+
+    task->devices = malloc(sizeof(IODeviceOwnership) * 3);
+    task->devices_count = 3;
+    for (int i = 0; i < 3; i++)
+        task->devices[i].token = -1;
 
     task->map_root = malloc(sizeof(TaskMappingNode));
     memset(task->map_root, 0, sizeof(TaskMappingNode));

@@ -44,7 +44,8 @@ typedef struct Task
     long time;
     PID pid;
 
-    List devices;
+    IODeviceOwnership *devices;
+    unsigned long devices_count;
 } Task;
 
 Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr data_pa, int argc, char **argv, int envargc, char **envargv);
