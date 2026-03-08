@@ -7,8 +7,6 @@
 #include <lib/panic.h>
 #include <interface/iodevice.h>
 
-#define EL0T_M 0b0000
-#define EL1H_M 0b0101
 #define ASID_CHUNKS_NUMBER 256
 
 #define MAP_BITS (sizeof(unsigned char) * 8)
@@ -159,6 +157,12 @@ void RemoveMapsFromNode(Task *task, TaskMappingNode *node)
 
 void KillTask(Task *task)
 {
+    for (int i = 0; i < task->devices_count; i++)
+    {
+        if (task->devices[i].token != -1)
+            FreeIODevice(task->devices[i].token, task->devices[i].category, task->devices[i].code);
+    }
+
     RemoveMapsFromNode(task, task->map_root);
 
     free(task->name);

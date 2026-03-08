@@ -12,6 +12,15 @@
 
 extern unsigned long dbg_regs[37];
 
+void kill_task()
+{
+    GetRunningTask()->time = 0;
+    GetRunningTask()->flags |= KILL_TASK;
+
+    while (1)
+        ;
+}
+
 unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned long elr, unsigned long far, InterruptStack *sp)
 {
     unsigned int ec = esr >> 26;
@@ -22,12 +31,29 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
         return 1;
     }
 
-    LOG("\ninterrupt encountered:"
-        "\n\ttype: %lu"
-        "\n\tesr: %lu"
-        "\n\telr: 0x%x"
-        "\n\tfar: 0x%lx\n",
-        type, esr, elr, far);
+    if (far < HIGH_VA)
+    {
+        Printf("\nApplication exception encountered:"
+               "\n\ttype: %lu"
+               "\n\tesr: %lu"
+               "\n\telr: 0x%x"
+               "\n\tfar: 0x%lx\n",
+               type, esr, elr, far);
+
+        sp->spsr_el1 = EL1H_M;
+        sp->elr_el1 = (unsigned long)&kill_task;
+        return 1;
+    }
+    else
+    {
+        LOG("\nKernel exception encountered:"
+            "\n\ttype: %lu"
+            "\n\tesr: %lu"
+            "\n\telr: 0x%x"
+            "\n\tfar: 0x%lx\n",
+            type, esr, elr, far);
+    }
+
     return 0;
 }
 

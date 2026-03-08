@@ -7,6 +7,9 @@
 #define ACTIVE_TASK (1 << 1)
 #define KILL_TASK (1 << 2)
 
+#define EL0T_M 0b0000
+#define EL1H_M 0b0101
+
 typedef struct IODeviceOwnership IODeviceOwnership;
 typedef long PID;
 

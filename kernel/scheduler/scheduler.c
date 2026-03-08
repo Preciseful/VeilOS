@@ -4,6 +4,7 @@
 #include <scheduler/task.h>
 #include <lib/string.h>
 #include <bundles/elf.h>
+#include <interface/console.h>
 
 // dont use lib/list.h here as that allocates more
 
@@ -124,6 +125,9 @@ Task *get_next_task()
             {
                 KillTask(current);
                 scheduler_current = &default_task;
+
+                ConsoleInit();
+                LOG("No more tasks to run.\n");
                 return 0;
             }
 
