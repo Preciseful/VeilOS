@@ -97,6 +97,7 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
 
 unsigned char *ReadFatNode(FatFSNode node);
 unsigned char *ReadFatNodeAt(FatFSNode node, unsigned long pos);
+unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned int size);
 
 bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size);
 FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name, unsigned char attrs);

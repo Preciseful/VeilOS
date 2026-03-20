@@ -9,8 +9,7 @@
 #include <scheduler/task.h>
 #include <system/syscall.h>
 #include <lib/string.h>
-
-extern unsigned long dbg_regs[37];
+#include <system/trace.h>
 
 void kill_task()
 {
@@ -39,9 +38,9 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
                "\n\telr: 0x%x"
                "\n\tfar: 0x%lx\n",
                type, esr, elr, far);
-
         sp->spsr_el1 = EL1H_M;
         sp->elr_el1 = (unsigned long)&kill_task;
+
         return 1;
     }
     else
@@ -50,8 +49,11 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
             "\n\ttype: %lu"
             "\n\tesr: %lu"
             "\n\telr: 0x%x"
-            "\n\tfar: 0x%lx\n",
+            "\n\tfar: 0x%lx",
             type, esr, elr, far);
+        Printf("\n\tbacktrace: ");
+        Trace(sp->x29);
+        Printf("\n");
     }
 
     return 0;

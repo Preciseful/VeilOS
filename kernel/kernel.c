@@ -15,8 +15,10 @@
 #include <system/vfs.h>
 #include <interface/fio.h>
 #include <interface/fs/voidelle/voidelle.h>
+#include <interface/fs/fat32/fat32.h>
 #include <drivers/framebuffer.h>
 #include <interface/console.h>
+#include <system/trace.h>
 
 void kboot()
 {
@@ -58,6 +60,10 @@ void kmain()
 
     VFSInit();
     AddMountPoint("/", GetVoidelleInterface(voidom));
+    AddMountPoint("/kernel", GetFat32Interface(fatfs));
+
+    // CacheKernelSymbols();
+    // LOG("Kernel symbols cached.\n");
 
     LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
 

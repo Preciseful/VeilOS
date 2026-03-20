@@ -3,13 +3,12 @@ RPI_PATH=/run/media/$(USER)/bootfs
 ARMGNU ?= aarch64-none-elf
 TTYDEV ?= "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
 
-COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -mgeneral-regs-only
+COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
 ASMOPS = -Ikernel -fPIE
 
-BUILD_DIR = build/bin
+BUILD_DIR = build/
 SRC_DIR = kernel
-MODULE_DIRS = $(wildcard modules/*)
 
 all : clean kernel8.img
 

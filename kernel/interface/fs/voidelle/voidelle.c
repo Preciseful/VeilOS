@@ -4,15 +4,6 @@
 #include <lib/string.h>
 #include <memory/memory.h>
 
-const char *GetFilename(const char *path)
-{
-    const char *last = strrchr(path, '/');
-    if (last)
-        return last + 1;
-    else
-        return path;
-}
-
 bool FindParentVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
 {
     char *tmp = malloc(strlen(path) + 1);
@@ -95,6 +86,7 @@ FilesystemInterface GetVoidelleInterface(Voidom *voidom)
     interface.fwrite = VoidelleIWrite;
     interface.fcreate_directory = VoidelleICreateDirectory;
     interface.fcreate_file = VoidelleICreateFile;
+    interface.fsize = VoidelleIFileSize;
     interface.key = voidom;
 
     return interface;

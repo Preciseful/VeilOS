@@ -583,6 +583,48 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
     }
 }
 
+unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned int size)
+{
+    unsigned int cluster = node.content_cluster;
+    unsigned int clsize = FatClusterSize(node.fatfs);
+
+    unsigned char *file = malloc(size);
+    unsigned char *buf = malloc(clsize);
+
+    unsigned int skipped = 0;
+    unsigned int written = 0;
+
+    while (cluster && written < size)
+    {
+        unsigned int bytes = read_cluster(node.fatfs, cluster, buf);
+
+        if (skipped + bytes <= offset)
+            skipped += bytes;
+        else
+        {
+            unsigned int start = 0;
+            if (offset > skipped)
+                start = offset - skipped;
+
+            unsigned int available = bytes - start;
+            unsigned int tocopy = available;
+
+            if (tocopy > size - written)
+                tocopy = size - written;
+
+            memcpy(file + written, buf + start, tocopy);
+
+            written += tocopy;
+            skipped += bytes;
+        }
+
+        cluster = next_cluster(node.fatfs, cluster);
+    }
+
+    free(buf);
+    return file;
+}
+
 unsigned char *ReadFatNode(FatFSNode node)
 {
     unsigned int cluster = node.content_cluster;

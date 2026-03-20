@@ -2,6 +2,7 @@
 #include <interface/errno.h>
 #include <scheduler/scheduler.h>
 #include <lib/printf.h>
+#include <lib/string.h>
 
 int createEntry(const char *path, enum File_Permissions permissions, bool dir)
 {
@@ -101,4 +102,32 @@ int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned l
         return -E_INVALID_OPERATION;
 
     return mount.fs.fwrite(reference.cut_path, reference.mode, buf, size, offset, mount.key);
+}
+
+long GetFileSize(const char *path)
+{
+    MountPoint mount;
+    char *extra;
+    if (!GetMountPoint(path, &mount, &extra))
+        return -E_NO_MOUNT;
+
+    if (mount.fs.fsize == 0)
+    {
+        free(extra);
+        return -E_INVALID_OPERATION;
+    }
+
+    long ret = mount.fs.fsize(extra, mount.key);
+
+    free(extra);
+    return ret;
+}
+
+const char *GetFilename(const char *path)
+{
+    const char *last = strrchr(path, '/');
+    if (last)
+        return last + 1;
+    else
+        return path;
 }
