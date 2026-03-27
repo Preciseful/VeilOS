@@ -54,7 +54,7 @@ typedef struct IODevice
 
     IODeviceCursor cursor;
     IODeviceToken *tokens;
-    TokenID tokens_length;
+    int tokens_length;
 
     enum IO_Permissions permissions_taken;
     enum IO_Flags flags;
@@ -62,7 +62,7 @@ typedef struct IODevice
     DID code;
 } IODevice;
 
-int OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission);
+TokenID OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission);
 void AddIODevice(IODevice device);
 void FreeIODevice(TokenID token, enum IO_Category category, DID code);
 void SetIODeviceCursor(TokenID token, enum IO_Category category, DID code, IODeviceCursor cursor);

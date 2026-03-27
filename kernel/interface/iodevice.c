@@ -52,7 +52,7 @@ IODevice *getInternalDevice(enum IO_Category category, DID code)
     return 0;
 }
 
-int ownIODeviceWithToken(enum IO_Category category, DID code, IODeviceToken token)
+TokenID ownIODeviceWithToken(enum IO_Category category, DID code, IODeviceToken token)
 {
     IODevice *intdevice = getInternalDevice(category, code);
     if (intdevice == 0)
@@ -95,7 +95,7 @@ int ownIODeviceWithToken(enum IO_Category category, DID code, IODeviceToken toke
     return intdevice->tokens_length - 1;
 }
 
-int OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission)
+TokenID OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission)
 {
     IODeviceToken token;
     token.permissions = permission;
