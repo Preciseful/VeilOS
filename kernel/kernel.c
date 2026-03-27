@@ -17,7 +17,6 @@
 #include <interface/fs/voidelle/voidelle.h>
 #include <interface/fs/fat32/fat32.h>
 #include <drivers/framebuffer.h>
-#include <interface/console.h>
 #include <system/trace.h>
 
 void kboot()
@@ -29,7 +28,6 @@ void kmain()
 {
     UartInit();
     FramebufferInit();
-    ConsoleInit();
 
     Printf("\n----- VeilOS -----\n");
     LOG("Console initialized.\n");
@@ -69,16 +67,14 @@ void kmain()
 
     char *envargv[6];
     envargv[0] = "TTY";
-    envargv[1] = "UART";
+    envargv[1] = "FRAMEBUFFER";
     envargv[2] = "TTYNO";
     envargv[3] = "0";
     envargv[4] = "TTYPERM";
-    envargv[5] = "RWO";
+    envargv[5] = "OWQ";
 
     MakeElfProcess("/Luna.elf", false, -1, 0, 0, 6, envargv);
     LOG("Created shell.\n");
-
-    ConsoleDrop();
 
     while (1)
         Schedule();
