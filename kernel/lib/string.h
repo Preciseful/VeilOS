@@ -1,7 +1,5 @@
 #pragma once
 
-#include <lib/list.h>
-
 unsigned long strlen(const char *str);
 unsigned long ustrlen(const unsigned char *str);
 int strcmp(const char *s1, const char *s2);
@@ -15,5 +13,3 @@ char *strrchr(const char *s, int c);
 void memset(void *dest, int value, unsigned long size);
 void memcpy(void *dst, const void *src, unsigned long size);
 int memcmp(const void *m1, const void *m2, unsigned long n);
-
-List GetSubstrings(const char *string, char split);

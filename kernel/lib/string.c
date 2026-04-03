@@ -114,29 +114,3 @@ int memcmp(const void *s1, const void *s2, unsigned long n)
 
     return 0;
 }
-
-List GetSubstrings(const char *string, char split)
-{
-    List list = CreateList(LIST_ARRAY);
-
-    unsigned long len = strlen(string);
-    unsigned long start = 0;
-
-    for (unsigned long i = 0; i <= len; i++)
-    {
-        if (string[i] != split && string[i] != 0)
-            continue;
-
-        unsigned long sub_len = i - start;
-
-        char *sub = malloc(sub_len + 1);
-        memcpy(sub, string + start, sub_len);
-        sub[sub_len] = 0;
-
-        AddToList(&list, sub);
-
-        start = i + 1;
-    }
-
-    return list;
-}

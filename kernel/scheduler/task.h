@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory/mmu.h>
-#include <lib/list.h>
 
 #define USER_TASK (1 << 0)
 #define ACTIVE_TASK (1 << 1)

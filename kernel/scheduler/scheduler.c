@@ -5,8 +5,6 @@
 #include <lib/string.h>
 #include <bundles/elf.h>
 
-// dont use lib/list.h here as that allocates more
-
 #define EL1H_M 0b0101
 
 Task default_task = {0};
