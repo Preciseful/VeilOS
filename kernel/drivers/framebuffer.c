@@ -9,12 +9,48 @@
 #include <lib/string.h>
 
 static IODevice fbDevice;
+static IODeviceCursor lastInvertedCursor;
 
 unsigned char *framebuffer;
 unsigned int width, height;
 unsigned int pitch;
 unsigned int isrgb;
 unsigned char colors[3] = {0, 0, 0};
+
+void invertAtCursor()
+{
+    if (lastInvertedCursor.xPosition > fbDevice.cursor.xPosition ||
+        lastInvertedCursor.yPosition > fbDevice.cursor.yPosition)
+    {
+        for (int i = 0; i < FONT_HEIGHT; i++)
+        {
+            for (int j = 0; j < FONT_WIDTH; j++)
+            {
+                int offs = ((lastInvertedCursor.yPosition + i) * pitch) + ((lastInvertedCursor.xPosition + j) * 4);
+                unsigned char *p = (unsigned char *)framebuffer + offs;
+
+                p[0] = ~p[0];
+                p[1] = ~p[1];
+                p[2] = ~p[2];
+            }
+        }
+    }
+
+    lastInvertedCursor = fbDevice.cursor;
+
+    for (int i = 0; i < FONT_HEIGHT; i++)
+    {
+        for (int j = 0; j < FONT_WIDTH; j++)
+        {
+            int offs = ((fbDevice.cursor.yPosition + i) * pitch) + ((fbDevice.cursor.xPosition + j) * 4);
+            unsigned char *p = (unsigned char *)framebuffer + offs;
+
+            p[0] = ~p[0];
+            p[1] = ~p[1];
+            p[2] = ~p[2];
+        }
+    }
+}
 
 void drawPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
 {
@@ -76,19 +112,26 @@ unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsign
     const char *s_orig = s;
     while (*s)
     {
-        if (*s == '\r')
+        switch (*s)
         {
-            fbDevice.cursor.xPosition = 0;
-        }
-        else if (*s == '\n')
-        {
-            fbDevice.cursor.xPosition = 0;
+        case '\n':
             fbDevice.cursor.yPosition += FONT_HEIGHT;
-        }
-        else
-        {
+            fbDevice.cursor.xPosition = 0;
+            break;
+
+        case '\r':
+            fbDevice.cursor.xPosition = 0;
+            break;
+
+        case '\b':
+            if (fbDevice.cursor.xPosition > 0)
+                fbDevice.cursor.xPosition -= FONT_WIDTH;
+            break;
+
+        default:
             drawChar(*s, fbDevice.cursor.xPosition, fbDevice.cursor.yPosition, r, g, b, overlay);
             fbDevice.cursor.xPosition += FONT_WIDTH;
+            break;
         }
 
         if (fbDevice.cursor.xPosition >= width)
@@ -103,6 +146,7 @@ unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsign
         s++;
     }
 
+    invertAtCursor();
     return s - s_orig;
 }
 
@@ -130,6 +174,9 @@ bool fbRequest(TokenID token, unsigned int code, void *data)
 
 bool FramebufferInit()
 {
+    lastInvertedCursor.xPosition = 0;
+    lastInvertedCursor.yPosition = 0;
+
     framebuffer = 0;
 
     mailbox[0] = 35 * 4;
