@@ -7,7 +7,7 @@ COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ik
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
 ASMOPS = -Ikernel -fPIE
 
-BUILD_DIR = build/
+BUILD_DIR = build
 SRC_DIR = kernel
 
 all : clean kernel8.img
