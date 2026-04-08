@@ -2,5 +2,4 @@ build
 .vscode
 *.img
 dump
-library/libveil.a
-scripts/setting
+conf

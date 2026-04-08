@@ -18,6 +18,12 @@
 #include <interface/fs/fat32/fat32.h>
 #include <drivers/framebuffer.h>
 #include <system/trace.h>
+#include <system/user.h>
+#include <drivers/rng.h>
+
+#if MAINFSFUNC + 0 == 0
+#define MAINFSFUNC 0
+#endif
 
 void kboot()
 {
@@ -49,15 +55,31 @@ void kmain()
     Partition *partitions = PartitionsInit();
 
     FatFS *fatfs = malloc(sizeof(FatFS));
-    Voidom *voidom = malloc(sizeof(Voidom));
-
     FatFSInit(fatfs, partitions[0]);
+
+#if MAINFSFUNC == 1
+    Voidom *voidom = malloc(sizeof(Voidom));
     VoidelleFSInit(voidom, partitions[1]);
+#elif MAINFSFUNC == 2
+    FatFS *fatfs2 = malloc(sizeof(FatFS));
+    FatFSInit(fatfs2, partitions[1]);
+#endif
 
     LOG("Initialized partitions.\n");
 
+    RNGInit();
+    UsersInit();
+
+    LOG("Initialized users.\n");
+
     VFSInit();
+
+#if MAINFSFUNC == 1
     AddMountPoint("/", GetVoidelleInterface(voidom));
+#elif MAINFSFUNC == 2
+    AddMountPoint("/", GetFat32Interface(fatfs2));
+#endif
+
     AddMountPoint("/kernel", GetFat32Interface(fatfs));
 
     // CacheKernelSymbols();

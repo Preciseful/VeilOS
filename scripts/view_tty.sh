@@ -1,35 +1,24 @@
 #!/bin/bash
 
-LOOP=1
-FILE_EXISTS=0
+ANSWER=$2
 
-if [ -f scripts/setting ]; then
-    FILE_EXISTS=1
-    ANSWER=$(head scripts/setting)
-fi
-
-while [ $LOOP -eq 1 ]; do
-    if [ $FILE_EXISTS -eq 0 ]; then
-        echo "View terminal output? [Y/n]: "
-        read ANSWER
-        echo "Save setting? [Y/n]: "
-        read SETTING
+while [ true ]; do
+    if [[ $ANSWER == "" ]]; then
+        read -p "View terminal output? [Y/n]: " ANSWER
+        read -p "Save setting? [Y/n]: " SETTING
     fi
 
-    if [[ $ANSWER == "Y" || $ANSWER == "y" || $ANSWER == "" ]]; then
-        LOOP=0
-
-        if [[ $SETTING == "Y" || $SETTING == "y" || $SETTING == "" ]]; then
-            echo $ANSWER > scripts/setting
+    if [[ $ANSWER == [Yy] ]]; then
+        if [[ $SETTING == [Yy] ]]; then
+            echo "VIEW_TTY=$ANSWER" >> conf
         fi
 
         sudo screen $1 115200
+        exit 0
 
-    elif [[ $ANSWER == "N" || $ANSWER == "n" ]]; then
-        LOOP=0
-
-        if [[ $SETTING == "Y" || $SETTING == "y" || $SETTING == "" ]]; then
-            echo $ANSWER > scripts/setting
+    elif [[ $ANSWER == [Nn] ]]; then
+        if [[ $SETTING == [Yy] ]]; then
+            echo "VIEW_TTY=$ANSWER" >> conf
         fi
 
         exit 0

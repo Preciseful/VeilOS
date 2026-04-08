@@ -1,9 +1,7 @@
-RPI_PATH=/run/media/$(USER)/bootfs
+include conf
 
-ARMGNU ?= aarch64-none-elf
-TTYDEV ?= "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
-
-COPS = -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer
+ARMGNU = aarch64-none-elf
+COPS = -DMAINFSFUNC=$(MAINFSFUNC) -fPIE -Wall -O0 -ffreestanding -nostdlib -nostartfiles -mstrict-align -Ikernel -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer
 CPPOPS = $(COPS) -std=c++20 -fno-exceptions -fno-rtti -Wno-write-strings
 ASMOPS = -Ikernel -fPIE
 
@@ -13,10 +11,7 @@ SRC_DIR = kernel
 all : clean kernel8.img
 
 screen:
-	scripts/view_tty.sh $(TTYDEV)
-
-setup:
-	scripts/setup.sh $(RPI_PATH)
+	scripts/view_tty.sh $(TTYDEV) $(VIEW_TTY)
 
 dump:
 	$(ARMGNU)-objdump -D $(BUILD_DIR)/kernel8.elf > dump
