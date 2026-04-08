@@ -17,7 +17,7 @@ Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **ar
     Elf64_Ehdr eheader;
     if (ReadFile(file, &eheader, sizeof(eheader), 0) == -E_NO_FILE)
     {
-        LOG("ELF file does not exist.\n");
+        LOG("ELF file '%s' does not exist.\n", path);
         CloseFile(file);
         return 0;
     }

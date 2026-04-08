@@ -101,8 +101,9 @@ void kmain()
     envargv[10] = "TTYPERM";
     envargv[11] = "ROO";
 
-    MakeElfProcess("/Luna.elf", false, -1, 0, 0, 12, envargv);
-    LOG("Created shell.\n");
+    Task *shell = MakeElfProcess("/Luna.elf", false, -1, 0, 0, 12, envargv);
+    if (shell)
+        LOG("Created shell.\n");
 
     while (1)
         Schedule();
