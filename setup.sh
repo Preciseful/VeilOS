@@ -6,7 +6,21 @@ echo "TTYDEV=$TTYDEV" > conf
 
 RPI_DISK=""
 while [[ $RPI_DISK == "" ]]; do
+    echo "[ ! WARNING !] The disk will render previous data useless! Ensure the disk you type in is correct."
     read -p "Specify the Raspberry PI MicroSD disk to be used: " RPI_DISK
+
+    if [[ $RPI_DISK != "" ]]; then
+        answer=""
+
+        while [[ $answer != [YyNn] ]]; do
+            read -p "Is $RPI_DISK the right disk? (y/N): " answer
+            answer=${answer:-"N"}
+
+            if [[ $answer == [Nn] ]]; then
+                RPI_DISK=""
+            fi
+        done
+    fi
 done
 
 scripts/create_disk.sh $RPI_DISK > /dev/null
