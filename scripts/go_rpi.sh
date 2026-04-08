@@ -9,5 +9,5 @@ if [ ! -d $1 ]; then
 else
 	/bin/cp -rf kernel8.img $1 || exit -1
 	echo -e "${BGreen}Copied to the raspberry pi microSD. ${Color_Off}"
-	scripts/view_tty.sh $2
+	scripts/view_tty.sh $2 $3
 fi
