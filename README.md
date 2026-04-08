@@ -22,3 +22,5 @@ A simple, bare metal, raspberry pi 4B OS.
     - This generates the kernel8.img that raspberry pi requires to boot. It should automatically copy to the path given during setup.
     - It'll prompt you whether you wish to view the UART output or not.
 4. You can now insert the card into the raspberry pi.
+
+You can modify the variables within the `conf` file without re-doing the whole setup process.
