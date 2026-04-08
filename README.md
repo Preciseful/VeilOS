@@ -16,6 +16,9 @@ A simple, bare metal, raspberry pi 4B OS.
 1. Clone the repository.
 > [!CAUTION]
 > `./setup.sh` will render previous data on the SD card unusable.
-2. Run: `./setup.sh`
-    - Make sure an SD card for raspberry pi is prepared.
-3. Run: `make`
+2. Run: `./setup.sh`.
+    - Make sure an SD card for raspberry pi is prepared, this is to generate the right partitions and filesystems on them.
+3. Run: `make`.
+    - This generates the kernel8.img that raspberry pi requires to boot. It should automatically copy to the path given during setup.
+    - It'll prompt you whether you wish to view the UART output or not.
+4. You can now insert the card into the raspberry pi.
