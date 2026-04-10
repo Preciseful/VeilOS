@@ -331,7 +331,7 @@ bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool c
 
     unsigned int ncluster = next_cluster(fs, parent_cluster);
     if (ncluster != 0)
-        return update_entry(ncluster, target_entry, clean_clusters);
+        return UpdateFatEntry(ncluster, target_entry, clean_clusters);
 
     return false;
 }
@@ -717,7 +717,7 @@ bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size)
     }
 
     node->entry.size = size;
-    update_entry(node->parent_cluster, node, false);
+    UpdateFatEntry(node->parent_cluster, node, false);
 
     free(buf);
     if (padded_buf)
