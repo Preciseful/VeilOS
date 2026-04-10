@@ -127,36 +127,37 @@ $(document).ready(function(){initNavTree('vfs_8h_source.html',''); initResizable
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> mount_idx;</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">char</span> *cut_path;</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">bool</span> used;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>} <a class="code hl_struct" href="structFileReference.html">FileReference</a>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    <span class="keywordtype">void</span> *file_data;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>} <a class="code hl_struct" href="structFileReference.html">FileReference</a>;</div>
 </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="foldopen" id="foldopen00037" data-start="{" data-end="};">
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="structVFS.html">   37</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="structVFS.html">VFS</a></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>{</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> mounts[MOUNT_COUNT];</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_struct" href="structFileReference.html">FileReference</a> *files;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> files_count;</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>} <a class="code hl_struct" href="structVFS.html">VFS</a>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="foldopen" id="foldopen00038" data-start="{" data-end="};">
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="structVFS.html">   38</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="structVFS.html">VFS</a></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>{</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> mounts[MOUNT_COUNT];</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_struct" href="structFileReference.html">FileReference</a> *files;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> files_count;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>} <a class="code hl_struct" href="structVFS.html">VFS</a>;</div>
 </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#a164d7abe393cb7b9a0d4393e7993eddf">VFSInit</a>();</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#aef1ad951b11492114127717c9211d5dd">AddMountPoint</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *path, <a class="code hl_struct" href="structFilesystemInterface.html">FilesystemInterface</a> interface);</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#ab9d84bfc7fe9a6bf161b9895b352f4a8">GetMountPoint</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *path, <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> *point_buf, <span class="keywordtype">char</span> **extra_path);</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>FILEHANDLE <a class="code hl_function" href="vfs_8h.html#a221422b986ab05bc201199f16280f6d9">AddFileReference</a>(<a class="code hl_struct" href="structFileReference.html">FileReference</a> reference);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#ac2e184242a518d503dfaf17b37628740">RemoveFileReference</a>(FILEHANDLE handle);</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#a87b7706edbf8fe0b4c151ef70d3f8cbf">GetFileReference</a>(FILEHANDLE handle, <a class="code hl_struct" href="structFileReference.html">FileReference</a> *reference);</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#ac27ccbfc5f7a6c8f8c7da813edd15772">GetFileMount</a>(FILEHANDLE handle, <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> *mount);</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#a164d7abe393cb7b9a0d4393e7993eddf">VFSInit</a>();</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#aef1ad951b11492114127717c9211d5dd">AddMountPoint</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *path, <a class="code hl_struct" href="structFilesystemInterface.html">FilesystemInterface</a> interface);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#ab9d84bfc7fe9a6bf161b9895b352f4a8">GetMountPoint</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *path, <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> *point_buf, <span class="keywordtype">char</span> **extra_path);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>FILEHANDLE <a class="code hl_function" href="vfs_8h.html#a221422b986ab05bc201199f16280f6d9">AddFileReference</a>(<a class="code hl_struct" href="structFileReference.html">FileReference</a> reference);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keywordtype">void</span> <a class="code hl_function" href="vfs_8h.html#ac2e184242a518d503dfaf17b37628740">RemoveFileReference</a>(FILEHANDLE handle);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#a87b7706edbf8fe0b4c151ef70d3f8cbf">GetFileReference</a>(FILEHANDLE handle, <a class="code hl_struct" href="structFileReference.html">FileReference</a> *reference);</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="keywordtype">bool</span> <a class="code hl_function" href="vfs_8h.html#ac27ccbfc5f7a6c8f8c7da813edd15772">GetFileMount</a>(FILEHANDLE handle, <a class="code hl_struct" href="structMountPoint.html">MountPoint</a> *mount);</div>
 <div class="ttc" id="afio_8h_html"><div class="ttname"><a href="fio_8h.html">fio.h</a></div><div class="ttdoc">General interface of all filesystems for the VFS.</div></div>
 <div class="ttc" id="astructFileReference_html"><div class="ttname"><a href="structFileReference.html">FileReference</a></div><div class="ttdef"><b>Definition</b> vfs.h:28</div></div>
 <div class="ttc" id="astructFilesystemInterface_html"><div class="ttname"><a href="structFilesystemInterface.html">FilesystemInterface</a></div><div class="ttdef"><b>Definition</b> fio.h:37</div></div>
 <div class="ttc" id="astructMountPoint_html"><div class="ttname"><a href="structMountPoint.html">MountPoint</a></div><div class="ttdef"><b>Definition</b> vfs.h:20</div></div>
-<div class="ttc" id="astructVFS_html"><div class="ttname"><a href="structVFS.html">VFS</a></div><div class="ttdef"><b>Definition</b> vfs.h:38</div></div>
+<div class="ttc" id="astructVFS_html"><div class="ttname"><a href="structVFS.html">VFS</a></div><div class="ttdef"><b>Definition</b> vfs.h:39</div></div>
 <div class="ttc" id="atask_8h_html"><div class="ttname"><a href="task_8h.html">task.h</a></div><div class="ttdoc">Scheduler tasks interface.</div></div>
 <div class="ttc" id="avfs_8h_html_a164d7abe393cb7b9a0d4393e7993eddf"><div class="ttname"><a href="vfs_8h.html#a164d7abe393cb7b9a0d4393e7993eddf">VFSInit</a></div><div class="ttdeci">void VFSInit()</div><div class="ttdoc">Initializes the VFS.</div><div class="ttdef"><b>Definition</b> vfs.c:59</div></div>
 <div class="ttc" id="avfs_8h_html_a221422b986ab05bc201199f16280f6d9"><div class="ttname"><a href="vfs_8h.html#a221422b986ab05bc201199f16280f6d9">AddFileReference</a></div><div class="ttdeci">FILEHANDLE AddFileReference(FileReference reference)</div><div class="ttdoc">Adds a file reference in the VFS.</div><div class="ttdef"><b>Definition</b> vfs.c:138</div></div>

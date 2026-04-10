@@ -13,6 +13,7 @@ var searchData=
   ['fio_2eh_10',['fio.h',['../fio_8h.html',1,'']]],
   ['framebuffer_2eh_11',['framebuffer.h',['../framebuffer_8h.html',1,'']]],
   ['framebuffer_5ftags_12',['FRAMEBUFFER_TAGS',['../framebuffer_8h.html#af0f38b3395656dc144a4d3dd8eb76f9c',1,'framebuffer.h']]],
-  ['freeiodevice_13',['FreeIODevice',['../iodevice_8h.html#ab8b627844d180f6802df37b13215de13',1,'iodevice.c']]],
-  ['freetable_14',['FreeTable',['../mmu_8h.html#a1499e5643071de8dc0b514e135f70665',1,'mmu.c']]]
+  ['freecluster_13',['FreeCluster',['../fs_2fat32_8h.html#a4d766178a951a33b42bb79ce655653f8',1,'fat32.c']]],
+  ['freeiodevice_14',['FreeIODevice',['../iodevice_8h.html#ab8b627844d180f6802df37b13215de13',1,'iodevice.c']]],
+  ['freetable_15',['FreeTable',['../mmu_8h.html#a1499e5643071de8dc0b514e135f70665',1,'mmu.c']]]
 ];

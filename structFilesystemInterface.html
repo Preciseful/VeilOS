@@ -105,18 +105,21 @@ int(*&#160;</td><td class="memItemRight" valign="bottom"><b>fcreate_file</b> )(c
 <tr class="memitem:a8944f279795ebed1691b395163bde99c" id="r_a8944f279795ebed1691b395163bde99c"><td class="memItemLeft" align="right" valign="top"><a id="a8944f279795ebed1691b395163bde99c" name="a8944f279795ebed1691b395163bde99c"></a>
 int(*&#160;</td><td class="memItemRight" valign="bottom"><b>fcreate_directory</b> )(const char *path, enum File_Permissions permissions, void *key)</td></tr>
 <tr class="separator:a8944f279795ebed1691b395163bde99c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae29176140f394aec9506b6d683d3918f" id="r_ae29176140f394aec9506b6d683d3918f"><td class="memItemLeft" align="right" valign="top"><a id="ae29176140f394aec9506b6d683d3918f" name="ae29176140f394aec9506b6d683d3918f"></a>
-int(*&#160;</td><td class="memItemRight" valign="bottom"><b>fopen</b> )(const char *path, enum File_Mode mode, void *key)</td></tr>
-<tr class="separator:ae29176140f394aec9506b6d683d3918f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a623da055deaa421b3dc03d12a88a6d2d" id="r_a623da055deaa421b3dc03d12a88a6d2d"><td class="memItemLeft" align="right" valign="top"><a id="a623da055deaa421b3dc03d12a88a6d2d" name="a623da055deaa421b3dc03d12a88a6d2d"></a>
-long(*&#160;</td><td class="memItemRight" valign="bottom"><b>fread</b> )(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key)</td></tr>
-<tr class="separator:a623da055deaa421b3dc03d12a88a6d2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a275a7b5f784df0fabc8bc0f91052c64a" id="r_a275a7b5f784df0fabc8bc0f91052c64a"><td class="memItemLeft" align="right" valign="top"><a id="a275a7b5f784df0fabc8bc0f91052c64a" name="a275a7b5f784df0fabc8bc0f91052c64a"></a>
-long(*&#160;</td><td class="memItemRight" valign="bottom"><b>fwrite</b> )(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key)</td></tr>
-<tr class="separator:a275a7b5f784df0fabc8bc0f91052c64a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66778cb23d4117c3033ed3ff3de08cb6" id="r_a66778cb23d4117c3033ed3ff3de08cb6"><td class="memItemLeft" align="right" valign="top"><a id="a66778cb23d4117c3033ed3ff3de08cb6" name="a66778cb23d4117c3033ed3ff3de08cb6"></a>
+int(*&#160;</td><td class="memItemRight" valign="bottom"><b>fopen</b> )(const char *path, enum File_Mode mode, void **file, void *key)</td></tr>
+<tr class="separator:a66778cb23d4117c3033ed3ff3de08cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54744741e4cb2495becd124e3b4acacd" id="r_a54744741e4cb2495becd124e3b4acacd"><td class="memItemLeft" align="right" valign="top"><a id="a54744741e4cb2495becd124e3b4acacd" name="a54744741e4cb2495becd124e3b4acacd"></a>
+long(*&#160;</td><td class="memItemRight" valign="bottom"><b>fread</b> )(const char *path, char *buf, unsigned long size, unsigned long offset, void *file, void *key)</td></tr>
+<tr class="separator:a54744741e4cb2495becd124e3b4acacd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03f8097703bf8db1ddf6112d77fb5fcb" id="r_a03f8097703bf8db1ddf6112d77fb5fcb"><td class="memItemLeft" align="right" valign="top"><a id="a03f8097703bf8db1ddf6112d77fb5fcb" name="a03f8097703bf8db1ddf6112d77fb5fcb"></a>
+long(*&#160;</td><td class="memItemRight" valign="bottom"><b>fwrite</b> )(const char *path, const char *buf, unsigned long size, unsigned long offset, void *file, void *key)</td></tr>
+<tr class="separator:a03f8097703bf8db1ddf6112d77fb5fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89e1169c8266582eb814e474c2dd1387" id="r_a89e1169c8266582eb814e474c2dd1387"><td class="memItemLeft" align="right" valign="top"><a id="a89e1169c8266582eb814e474c2dd1387" name="a89e1169c8266582eb814e474c2dd1387"></a>
 long(*&#160;</td><td class="memItemRight" valign="bottom"><b>fsize</b> )(const char *path, void *key)</td></tr>
 <tr class="separator:a89e1169c8266582eb814e474c2dd1387"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90fa9cd0aae9c36ab97696b4eb2f7a43" id="r_a90fa9cd0aae9c36ab97696b4eb2f7a43"><td class="memItemLeft" align="right" valign="top"><a id="a90fa9cd0aae9c36ab97696b4eb2f7a43" name="a90fa9cd0aae9c36ab97696b4eb2f7a43"></a>
+int(*&#160;</td><td class="memItemRight" valign="bottom"><b>fpermissions</b> )(const char *path, void *key)</td></tr>
+<tr class="separator:a90fa9cd0aae9c36ab97696b4eb2f7a43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9bf1d6dc32c03fdd65306275a2cffca5" id="r_a9bf1d6dc32c03fdd65306275a2cffca5"><td class="memItemLeft" align="right" valign="top"><a id="a9bf1d6dc32c03fdd65306275a2cffca5" name="a9bf1d6dc32c03fdd65306275a2cffca5"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>key</b></td></tr>
 <tr class="separator:a9bf1d6dc32c03fdd65306275a2cffca5"><td class="memSeparator" colspan="2">&#160;</td></tr>

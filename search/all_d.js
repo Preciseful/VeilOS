@@ -1,20 +1,10 @@
 var searchData=
 [
-  ['schedule_0',['Schedule',['../scheduler_8h.html#aa55ac4ef2eec51c98c51f896b9cd0a69',1,'scheduler.c']]],
-  ['scheduler_2eh_1',['scheduler.h',['../scheduler_8h.html',1,'']]],
-  ['schedulerinit_2',['SchedulerInit',['../scheduler_8h.html#af557be885b52f2c62a2157a738682bc6',1,'scheduler.c']]],
-  ['schedulertick_3',['SchedulerTick',['../scheduler_8h.html#ad87447c6acde78d7d7f82ceacc134abc',1,'scheduler.c']]],
-  ['scr_5fregister_4',['scr_register',['../structscr__register.html',1,'']]],
-  ['seekinemmc_5',['SeekInEMMC',['../emmc_8h.html#a6ede90ec542c5aa416aea36efa6a6fa6',1,'emmc.c']]],
-  ['setalt0_6',['SetAlt0',['../gpio_8h.html#a4a3bd0888d1df2f8d6f45b60dbefb59e',1,'gpio.c']]],
-  ['setalt3_7',['SetAlt3',['../gpio_8h.html#a9a55880249b6834fa020f951b9ef62a7',1,'gpio.c']]],
-  ['setalt5_8',['SetAlt5',['../gpio_8h.html#a22f7d3132646560ca2242e32d8e704f6',1,'gpio.c']]],
-  ['setgpio_9',['SetGPIO',['../gpio_8h.html#a13541c45f41020858c4e5d7b42480e79',1,'gpio.c']]],
-  ['setgpiofunction_10',['SetGPIOFunction',['../gpio_8h.html#a5ebf2c42257361ee1bf863baa9117c8d',1,'gpio.c']]],
-  ['setiodevicecursor_11',['SetIODeviceCursor',['../iodevice_8h.html#aa389bdf10865f10451dc84061886df54',1,'iodevice.c']]],
-  ['setpinoutputbool_12',['SetPinOutputBool',['../gpio_8h.html#a94f6685a2c6fdd1e9cc0dc036e573e9c',1,'gpio.c']]],
-  ['setprintf_13',['SetPrintf',['../printf_8h.html#aad42be8f0ede25f39afcd5b21770df4d',1,'printf.c']]],
-  ['sha256_5fbuff_14',['sha256_buff',['../structsha256__buff.html',1,'']]],
-  ['syscall_2eh_15',['syscall.h',['../syscall_8h.html',1,'']]],
-  ['sysregs_2eh_16',['sysregs.h',['../sysregs_8h.html',1,'']]]
+  ['panic_0',['panic',['../panic_8h.html#ac470b787b0105804bfa499e27d26b31b',1,'panic.c']]],
+  ['panic_2eh_1',['panic.h',['../panic_8h.html',1,'']]],
+  ['partition_2',['Partition',['../structPartition.html',1,'']]],
+  ['partition_2eh_3',['partition.h',['../partition_8h.html',1,'']]],
+  ['partitionsinit_4',['PartitionsInit',['../partition_8h.html#ac7b8763d77f2f4d87b5f5d216cb10c58',1,'partition.c']]],
+  ['printf_2eh_5',['printf.h',['../printf_8h.html',1,'']]],
+  ['pullgpio_6',['PullGPIO',['../gpio_8h.html#a138b9e15194796cb742a4f34d30a58b8',1,'gpio.c']]]
 ];
