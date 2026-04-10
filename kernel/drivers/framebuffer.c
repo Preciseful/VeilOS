@@ -1,3 +1,10 @@
+/**
+ * @author Developful
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include <drivers/framebuffer.h>
 #include <drivers/mailbox.h>
 #include <lib/printf.h>

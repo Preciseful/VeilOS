@@ -1,3 +1,10 @@
+/**
+ * @author Developful
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include <drivers/gpio.h>
 
 void WriteToMMIO(VirtualAddr reg, unsigned int val)

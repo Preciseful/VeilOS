@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author Developful
+ * @brief Interfaces for the interrupt system.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #pragma once
 
 extern void set_vtable();

@@ -1,3 +1,10 @@
+/**
+ * @author Developful
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include "lib/utils.S"
 
 .macro enter_interrupt el

@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author Developful
+ * @brief Interface for MBR.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #pragma once
 
 #define BOOT_SIGNATURE 0xAA55

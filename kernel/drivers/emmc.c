@@ -1,3 +1,11 @@
+/**
+ * @author Developful
+ * @author rockytriton
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include <drivers/mailbox.h>
 #include <drivers/emmc.h>
 #include <drivers/gpio.h>
@@ -659,14 +667,14 @@ static bool set_scr()
     device.block_size = 8;
     device.transfer_blocks = 1;
 
-    if (!emmc_app_command(CTSendSCR, 0, 30000))
+    if (!emmc_app_command(CTSendSCR_EL3, 0, 30000))
     {
-        LOG("Failed to send SCR\n");
+        LOG("Failed to send SCR_EL3\n");
         return false;
     }
 
     if (EMMC_DEBUG)
-        LOG("GOT SRC: SCR0: %X SCR1: %X BWID: %X\n", device.scr.scr[0], device.scr.scr[1], device.scr.bus_widths);
+        LOG("GOT SRC: SCR_EL30: %X SCR_EL31: %X BWID: %X\n", device.scr.scr[0], device.scr.scr[1], device.scr.bus_widths);
 
     device.block_size = 512;
 
@@ -705,7 +713,7 @@ static bool set_scr()
     }
 
     if (EMMC_DEBUG)
-        LOG("SCR Version: %d\n", device.scr.version);
+        LOG("SCR_EL3 Version: %d\n", device.scr.version);
 
     return true;
 }

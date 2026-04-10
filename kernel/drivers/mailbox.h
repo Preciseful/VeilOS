@@ -1,5 +1,13 @@
-#ifndef MAILBOX_H
-#define MAILBOX_H
+/**
+ * @file
+ * @author Developful
+ * @brief Interface for the raspberry pi 4 mailbox.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#pragma once
 
 #include <stdbool.h>
 #include <boot/base.h>
@@ -32,7 +40,7 @@ enum Mailbox_Channels
     VCHIQ_CHANNEL,
     LEDS_CHANNEL,
     BUTTONS_CHANNEL,
-    TOUCH_SCREEN_CHANNEL,
+    TOUCH_SCR_EL3EEN_CHANNEL,
     ARM_TO_GPU,
     GPU_TO_ARM
 };
@@ -57,5 +65,3 @@ unsigned int GetMailboxClockRate(enum Mailbox_Clocks clock);
  * @return `true` if there was a response, otherwise `false`.
  */
 bool CallMailbox(unsigned char channel);
-
-#endif

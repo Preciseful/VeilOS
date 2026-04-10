@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author Developful
+ * @brief MMU interface.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #pragma once
 
 #define MAIR_DEVICE_nGnRnE 0b00000000

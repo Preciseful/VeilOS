@@ -1,5 +1,13 @@
-#ifndef EMMC_H
-#define EMMC_H
+/**
+ * @file
+ * @author Developful
+ * @author rockytriton
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -58,7 +66,7 @@ typedef enum
     CTWriteBlock = 24,
     CTWriteMultiple = 25,
     CTOcrCheck = 41,
-    CTSendSCR = 51,
+    CTSendSCR_EL3 = 51,
     CTApp = 55
 } cmd_type;
 
@@ -154,15 +162,8 @@ typedef struct
 #define SD_CARD_INSERTION (1 << 6)
 #define SD_CARD_REMOVAL (1 << 7)
 #define SD_CARD_INTERRUPT (1 << 8)
+
 #define EMMC_BASE (PERIPHERAL_BASE + 0x00340000)
-
-#define EMMC ((emmc_regs *)EMMC_BASE)
-
-bool EmmcInit();
-int ReadFromEMMC(unsigned char *buffer, unsigned int size);
-int WriteToEMMC(unsigned char *buffer, unsigned int size);
-void SeekInEMMC(unsigned long offset);
-bool CommandEMMC(unsigned int command, unsigned int arg, unsigned int timeout);
 
 #define EMMC_CTRL1_RESET_DATA (1 << 26)
 #define EMMC_CTRL1_RESET_CMD (1 << 25)
@@ -181,4 +182,46 @@ bool CommandEMMC(unsigned int command, unsigned int arg, unsigned int timeout);
 #define EMMC_STATUS_DAT_INHIBIT (1 << 1)
 #define EMMC_STATUS_CMD_INHIBIT (1 << 0)
 
-#endif // EMMC_H
+#define EMMC ((emmc_regs *)EMMC_BASE)
+
+/**
+ * @brief Initialize the EMMC controller.
+ *
+ * @return `true` if the operation succeeded, otherwise `false`.
+ */
+bool EmmcInit();
+
+/**
+ * @brief Read data from the EMMC into a buffer.
+ *
+ * @param[out] buffer The buffer.
+ * @param size The size of the buffer. Must be a multiple of 512.
+ * @return The amount read.
+ */
+int ReadFromEMMC(unsigned char *buffer, unsigned int size);
+
+/**
+ * @brief Write data from a buffer to the EMMC.
+ *
+ * @param buffer The buffer.
+ * @param size The size of the buffer. Must be a multiple of 512.
+ * @return The amount written.
+ */
+int WriteToEMMC(unsigned char *buffer, unsigned int size);
+
+/**
+ * @brief Seeks to an absolute position within the EMMC.
+ *
+ * @param offset The position.
+ */
+void SeekInEMMC(unsigned long offset);
+
+/**
+ * @brief Perform a command on the EMMC.
+ *
+ * @param command The command index.
+ * @param arg The argument for the command.
+ * @param timeout Timeout value for completion.
+ * @return `true` if the operation succeeded, otherwise `false`.
+ */
+bool CommandEMMC(unsigned int command, unsigned int arg, unsigned int timeout);

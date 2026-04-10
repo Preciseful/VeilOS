@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author Developful
+ * @brief Printing with format functions.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #pragma once
 #pragma GCC diagnostic ignored "-Wmultistatement-macros"
 

@@ -1,3 +1,12 @@
+/**
+ * @file
+ * @author Developful
+ * @brief Interface for the GPIO.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #pragma once
 
 #include <boot/base.h>

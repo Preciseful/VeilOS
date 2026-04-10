@@ -1,3 +1,11 @@
+/**
+ * @author Developful
+ * @brief VFS interface for the Voidelle filesystem.
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include <fs/voidelle.h>
 #include <interface/fs/voidelle/voidelle.h>
 #include <interface/fio.h>

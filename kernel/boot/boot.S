@@ -1,3 +1,10 @@
+/**
+ * @author Developful
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include "memory/mmu.h"
 #include "memory/memory.h"
 #include "boot/sysregs.h"
@@ -16,16 +23,16 @@ loop:
     b loop
 
 drop_el1:
-    ldr	x0, =SCTLR_VALUE_MMU_DISABLED
+    ldr	x0, =SCTLR_EL1_VALUE_MMU_DISABLED
 	msr	sctlr_el1, x0
 
-	ldr	x0, =HCR_VALUE
+	ldr	x0, =HCR_EL2_VALUE
 	msr	hcr_el2, x0
 
-	ldr	x0, =SCR_VALUE
+	ldr	x0, =SCR_EL3_VALUE
 	msr	scr_el3, x0
 
-	ldr	x0, =SPSR_VALUE
+	ldr	x0, =SPSR_EL3_VALUE
 	msr	spsr_el3, x0
 
     mrs x0, CPACR_EL1

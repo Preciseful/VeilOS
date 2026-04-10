@@ -1,3 +1,10 @@
+/**
+ * @author LekKit
+ * @date 2026-04-10
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #pragma once
 
 // https://github.com/LekKit/sha256/
