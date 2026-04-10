@@ -3,3 +3,4 @@ build
 *.img
 dump
 conf
+docs/html
