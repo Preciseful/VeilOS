@@ -29,8 +29,8 @@ typedef struct FilesystemInterface
     int (*fcreate_file)(const char *path, enum File_Permissions permissions, void *key);
     int (*fcreate_directory)(const char *path, enum File_Permissions permissions, void *key);
     int (*fopen)(const char *path, enum File_Mode mode, void *key);
-    int (*fread)(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key);
-    int (*fwrite)(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key);
+    long (*fread)(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key);
+    long (*fwrite)(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key);
     long (*fsize)(const char *path, void *key);
 
     void *key;
@@ -38,10 +38,66 @@ typedef struct FilesystemInterface
 
 const char *GetFilename(const char *path);
 
+/**
+ * @brief Create a file at a path.
+ *
+ * @param path The path.
+ * @param permissions The file's permissions.
+ * @return Possible errors.
+ */
 int CreateFile(const char *path, enum File_Permissions permissions);
+
+/**
+ * @brief Create a directory at a path.
+ *
+ * @param path The path.
+ * @param permissions The directory's permissions.
+ * @return Possible errors.
+ */
 int CreateDirectory(const char *path, enum File_Permissions permissions);
+
+/**
+ * @brief Opens a file found at the path in a certain mode.
+ *
+ * @param mode The mode to open the file in.
+ * @param path The path for its location.
+ * @return The file handle.
+ */
 FILEHANDLE OpenFile(enum File_Mode mode, const char *path);
+
+/**
+ * @brief Closes a file.
+ *
+ * @param handle The file handle.
+ */
 void CloseFile(FILEHANDLE handle);
+
+/**
+ * @brief Reads a certain amount of contents from the file into a buffer, starting at an offset.
+ *
+ * @param handle The file handle.
+ * @param buf The buffer.
+ * @param size The size of the buffer.
+ * @param offset The offset in file from which the read starts from.
+ * @return The amount read, or possible errors.
+ */
 int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset);
+
+/**
+ * @brief Writes to a file at a certain offset from a buffer.
+ *
+ * @param handle The file handle.
+ * @param buf The buffer.
+ * @param size The size of the buffer.
+ * @param offset The offset in file from which the write starts from.
+ * @return The amount written, or possible errors.
+ */
 int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset);
+
+/**
+ * @brief Get a file's size.
+ *
+ * @param path The path of the file.
+ * @return The size.
+ */
 long GetFileSize(const char *path);

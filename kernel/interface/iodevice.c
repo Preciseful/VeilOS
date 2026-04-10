@@ -3,6 +3,7 @@
 #include <scheduler/scheduler.h>
 #include <lib/panic.h>
 #include <lib/printf.h>
+#include <interface/errno.h>
 
 #define CHECK_AVAILABILITY(perm, func)                                                            \
     if (token.permissions & IO_##perm)                                                            \
@@ -115,10 +116,11 @@ IOLink *createLink(enum IO_Category category)
     return link;
 }
 
-void AddIODevice(IODevice device)
+bool AddIODevice(IODevice device)
 {
     device.tokens = 0;
     device.tokens_length = 0;
+    device.permissions_taken = 0;
 
     if (start_link == 0)
         start_link = createLink(device.category);
@@ -138,12 +140,23 @@ void AddIODevice(IODevice device)
         start_link->next = link;
     }
 
+    IOLink *neighbour = link->child;
+    while (neighbour)
+    {
+        if (neighbour->device.code == device.code)
+            return false;
+
+        neighbour = neighbour->next;
+    }
+
     IOLink *child = createLink(device.category);
     child->next = link->child;
     child->device = device;
     child->child = 0;
 
     link->child = child;
+
+    return true;
 }
 
 IODeviceToken *getToken(unsigned long pid, IODevice device)
@@ -199,29 +212,29 @@ bool checkDevice(IODevice *device, TokenID token, enum IO_Permissions permission
     return true;
 }
 
-unsigned long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len)
+long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_READ))
-        return 0;
+        return -E_NO_IO_DEVICE;
 
     return device->read(token, buf, len);
 }
 
-unsigned long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf)
+long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf, unsigned long len)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_WRITE))
-        return 0;
+        return -E_NO_IO_DEVICE;
 
-    return device->write(token, buf);
+    return device->write(token, buf, len);
 }
 
 bool RequestIODevice(TokenID token, enum IO_Category category, DID code, unsigned int requestMessage, void *data)
 {
     IODevice *device = getInternalDevice(category, code);
     if (!checkDevice(device, token, IO_REQUEST))
-        return 0;
+        return false;
 
     return device->request(token, requestMessage, data);
 }
@@ -287,8 +300,9 @@ SYSCALL_HANDLER(write_device)
     DID code = sp->x2;
 
     const char *buf = (const char *)sp->x3;
+    unsigned long len = sp->x4;
 
-    return WriteIODevice(token, category, code, buf);
+    return WriteIODevice(token, category, code, buf, len);
 }
 
 SYSCALL_HANDLER(request_device)

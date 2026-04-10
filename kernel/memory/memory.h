@@ -34,11 +34,25 @@ typedef struct MHeader
     unsigned int initial_size;
 } MHeader;
 
+/**
+ * @brief Initialize the memory manager.
+ */
 void MMInit();
 void *malloc(unsigned int size);
 void *realloc(void *address, unsigned int size);
 unsigned int free(void *data);
+
+/**
+ * @brief Get the amount of memory allocated to an address.
+ *
+ * @param data The address.
+ * @return The amount of memory allocated.
+ */
 unsigned int MemorySize(void *data);
+
+/**
+ * @return The amount of memory so far used.
+ */
 unsigned long GetMemoryUsed();
 
 SYSCALL_HANDLER(malloc);

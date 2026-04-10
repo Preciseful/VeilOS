@@ -114,7 +114,7 @@ bool emmc_setup_clock()
 {
     EMMC->control2 = 0;
 
-    unsigned int rate = GetMailboxClock(EMMC_CLOCK);
+    unsigned int rate = GetMailboxClockRate(EMMC_CLOCK);
 
     unsigned int n = EMMC->control[1];
     n |= EMMC_CTRL1_CLK_INT_EN;

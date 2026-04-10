@@ -13,6 +13,9 @@ unsigned long last_asid_chunk;
 bool stop;
 Task *scheduler_current;
 
+extern void cpu_switch_task(Task *next);
+extern void set_task_ttbr(unsigned long pgd, bool flush);
+
 void printx(unsigned long x)
 {
     LOG("x: %u\n", x);

@@ -68,7 +68,7 @@ bool FindFat32ByPath(FatFS *fs, const char *path, FatFSNode *buf)
     return true;
 }
 
-int Fat32IRead(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key)
+long Fat32IRead(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key)
 {
     FatFSNode node;
     FatFS *fs = (FatFS *)key;

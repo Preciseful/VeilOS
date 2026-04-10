@@ -81,30 +81,108 @@ typedef struct __attribute__((packed)) Voidom
     Voidelle root;
 } Voidom;
 
+/**
+ * @brief Writes from a buffer to a void in the filesystem.
+ *
+ * @param voidom The voidom it resides in.
+ * @param buf The buffer.
+ * @param position The position of the void.
+ * @param size The size of the buffer.
+ * @return `true` if the size is less than VOID_SIZE, otherwise false.
+ */
 bool write_void(Voidom voidom, void *buf, uint64_t position, uint64_t size);
+
+/**
+ * @brief Reads to a buffer from a void in the filesystem.
+ *
+ * @param voidom The voidom it resides in.
+ * @param buf The buffer.
+ * @param position The position of the void.
+ * @param size The size of the buffer.
+ * @return `true` if the size is less than VOID_SIZE, otherwise false.
+ */
 bool read_void(Voidom voidom, void *buf, uint64_t position, uint64_t size);
-uint64_t populate_voidite_data(Voidom voidom, Voidite *first_voidite_buf, const void *data, uint64_t size);
-void clear_voidites_after(Voidom voidom, Voidite *start);
-void clear_voidelle_content(Voidom voidom, Voidelle *voidelle);
-void clear_voidelle_name(Voidom voidom, Voidelle *voidelle);
-void fill_content_voidites(Voidom voidom, Voidelle *voidelle, unsigned long count);
-void fill_name_voidites(Voidom voidom, Voidelle *voidelle, unsigned long count);
-uint64_t get_free_void(Voidom voidom);
-verror_t create_voidlet(Voidom *voidom);
-verror_t create_voidelle(Voidom voidom, Voidelle *buf, const char *name, enum Voidelle_Flags flags, uint64_t owner_id, uint8_t owner_perm, uint8_t other_perm);
-verror_t get_voidelle_name(Voidom voidom, Voidelle voidelle, char *buf);
+
+/**
+ * @brief Get a voidite from content at a certain index (not offset).
+ *
+ * @param voidom The voidom it resides in.
+ * @param voidelle The voidelle.
+ * @param[out] buf The voidite.
+ * @param index The index.
+ * @return `true` if it exists, otherwise `false`.
+ */
 bool get_content_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigned long index);
-bool get_name_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigned long index);
+
+/**
+ * @brief Fill the contents links of a voidelle up until a certain amount.
+ *
+ * @param voidom The voidom it resides in.
+ * @param voidelle The voidelle.
+ * @param count The amount to fill.
+ */
+void fill_content_voidites(Voidom voidom, Voidelle *voidelle, unsigned long count);
+
+/**
+ * @brief Creates an entry.
+ *
+ * @param voidom The voidom it resides in.
+ * @param[out] buf The entry.
+ * @param name The name of the entry.
+ * @param flags The flags of the entry.
+ * @param owner_id The ID of the owner.
+ * @param owner_perm The owner's permissions.
+ * @param other_perm Other's permissions.
+ * @return Possible errors.
+ */
+verror_t create_voidelle(Voidom voidom, Voidelle *buf, const char *name, enum Voidelle_Flags flags, uint64_t owner_id, uint8_t owner_perm, uint8_t other_perm);
+
+/**
+ * @brief Get an entry's name.
+ *
+ * @param voidom The voidom it resides in.
+ * @param voidelle The entry.
+ * @param[out] buf The buffer to put the name in.
+ * @return Possible errors.
+ */
+verror_t get_voidelle_name(Voidom voidom, Voidelle voidelle, char *buf);
+
+/**
+ * @brief Reads a certain amount of content from the entry into a buffer, starting from an offset.
+ *
+ * @param voidom The voidom it resides in.
+ * @param voidelle The entry.
+ * @param offset The offset in file from which the write starts from.
+ * @param[out] buf The buffer to read in.
+ * @param size The size of the buffer.
+ * @return The amount read.
+ */
 unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long offset, void *buf, unsigned long size);
+
+/**
+ * @brief Adds an entry to a parent.
+ *
+ * @param voidom The voidom it resides in.
+ * @param parent The parent to add the entry to.
+ * @param voidelle The entry.
+ */
 void add_voidelle(Voidom voidom, Voidelle *parent, Voidelle *voidelle);
-void add_voidelle_with_check(Voidom voidom, Voidelle *parent, Voidelle voidelle);
 
-// swaps = 0x0, do not swap anything but the voidelles
-// swaps = 0x1, swap names
-// swaps = 0x2, swap contents
-// swaps = 0x3, swap both
-void swap_voidelles(Voidom voidom, Voidelle *first, Voidelle *second, int swaps);
-
+/**
+ * @brief Removes an entry from a parent.
+ *
+ * @param voidom The voidom it resides in.
+ * @param parent The parent to add the entry to.
+ * @param voidelle The entry.
+ * @param invalidate Whether the position should be freed.
+ * @return `true` if removing was successful, otherwise `false`.
+ */
 bool remove_voidelle(Voidom voidom, Voidelle *parent, Voidelle voidelle, bool invalidate);
 
+/**
+ * @brief Initialize the Voidelle filesystem from a partition.
+ *
+ * @param[out] voidom The voidom used to track the filesystem.
+ * @param partition The partition the Voidelle filesystem resides in.
+ */
 void VoidelleFSInit(Voidom *voidom, Partition partition);

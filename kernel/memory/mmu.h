@@ -30,10 +30,47 @@ enum MMU_Flags
 typedef unsigned long VirtualAddr;
 typedef unsigned long PhysicalAddr;
 
+/**
+ * @brief Maps to a table a page.
+ *
+ * @param pgd The table.
+ * @param va The page's virtual address.
+ * @param pa The page's physical address.
+ * @param index The MAIR index.
+ * @param flags The MMU flags for the page.
+ */
 void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
+
+/**
+ * @brief Unmaps a page from a table.
+ *
+ * @param pgd The table.
+ * @param va The virtual address of the page.
+ */
 void UnmapTablePage(unsigned long *pgd, VirtualAddr va);
+
+/**
+ * @brief Maps to a table a block.
+ *
+ * @param pgd The table.
+ * @param va The block's virtual address.
+ * @param pa The block's physical address.
+ * @param index The MAIR index.
+ * @param flags The MMU flags for the block.
+ */
 void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
+
+/**
+ * @brief Frees up all allocations done within a table, alongside the table itself at level 0.
+ *
+ * @param table The table.
+ * @param level The level of allocations, 0 = L1 + pgd, 1 = L2, 2 = L3, 3 = PTE. (0 default)
+ */
 void FreeTable(unsigned long *table, unsigned int level);
+
+/**
+ * @brief Initializes the MMU.
+ */
 void MMUInit();
 
 extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);

@@ -137,7 +137,7 @@ void FreeTable(unsigned long *table, unsigned int level)
         unsigned long type = table[i] & 0x3;
         unsigned long *child = (unsigned long *)PHYS_TO_VIRT((table[i] & PAGE_MASK));
 
-        if (type == 0x3 && level < 3)
+        if (type == PD_TABLE && level < 3)
             FreeTable(child, level + 1);
         else
             table[i] = 0;

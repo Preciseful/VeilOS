@@ -76,7 +76,7 @@ void handle_irq(InterruptStack registers[])
 
     // uart0
     case 153:
-        UartReceived();
+        HandleUartReceive();
         WriteToMMIO(GICC_EOIR, iar);
         break;
 

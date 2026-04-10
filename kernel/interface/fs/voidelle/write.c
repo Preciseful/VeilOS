@@ -3,7 +3,7 @@
 #include <interface/errno.h>
 #include <lib/string.h>
 
-int VoidelleIWrite(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key)
+long VoidelleIWrite(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key)
 {
     Voidelle voidelle;
     Voidom voidom = *(Voidom *)key;

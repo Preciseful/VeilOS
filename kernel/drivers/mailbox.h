@@ -37,9 +37,25 @@ enum Mailbox_Channels
     GPU_TO_ARM
 };
 
+/**
+ * @brief The mailbox array used when sending a message to channels.
+ */
 extern volatile unsigned int mailbox[36];
 
-unsigned int GetMailboxClock(enum Mailbox_Clocks clock);
+/**
+ * @brief Get the rate of a clock.
+ *
+ * @param clock The clock value.
+ * @return The rate of the clock.
+ */
+unsigned int GetMailboxClockRate(enum Mailbox_Clocks clock);
+
+/**
+ * @brief Sends a message to a mailbox channel, using the `mailbox` array for the messages.
+ *
+ * @param channel The channel value.
+ * @return `true` if there was a response, otherwise `false`.
+ */
 bool CallMailbox(unsigned char channel);
 
 #endif

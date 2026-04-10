@@ -45,7 +45,7 @@ static SvcHandler svc_table[] = {
     [SYS_DEVICE_FREE] = SystemCall_free_device,
 };
 
-void HandleSystemCall(InterruptStack *sp)
+void HandleSystemCall(InterruptStack sp[])
 {
     unsigned long code = sp->x8;
     if (code >= sizeof(svc_table) / sizeof(svc_table[0]) || !svc_table[code])

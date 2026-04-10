@@ -48,8 +48,8 @@ typedef struct IODeviceCursor
 
 typedef struct IODevice
 {
-    unsigned long (*read)(TokenID token, char *buf, unsigned long length);
-    unsigned long (*write)(TokenID token, const char *buf);
+    long (*read)(TokenID token, char *buf, unsigned long length);
+    long (*write)(TokenID token, const char *buf, unsigned long length);
     bool (*request)(TokenID token, unsigned int code, void *data);
 
     IODeviceCursor cursor;
@@ -62,12 +62,66 @@ typedef struct IODevice
     DID code;
 } IODevice;
 
+/**
+ * @brief Registers an IO device. The only fields that can be filled are: `read`, `write`, `request`, `category`, `cursor`, `flags`, `code`.
+ *
+ * @param device The device to be registered.
+ * @return `true` if no conflicting devices were found, otherwise `false`.
+ */
+bool AddIODevice(IODevice device);
+
+/**
+ * @brief Own an IO device in order to interact with it.
+ *
+ * @param category The category of the IO device.
+ * @param code The code of the IO device.
+ * @param permission The permissions requested.
+ * @return A token for further interactions.
+ */
 TokenID OwnIODevice(enum IO_Category category, DID code, enum IO_Permissions permission);
-void AddIODevice(IODevice device);
+
+/**
+ * @brief Frees up an IO device, removing ownership of it.
+ *
+ * @param token The token.
+ * @param category The category of the device.
+ * @param code The code of the device.
+ */
 void FreeIODevice(TokenID token, enum IO_Category category, DID code);
+
+/**
+ * @brief Sets the cursor of an IODevice.
+ * Request permissions are required.
+ * @param token The token.
+ * @param category The category of the device.
+ * @param code The code of the device.
+ * @param cursor The cursor state to set.
+ */
 void SetIODeviceCursor(TokenID token, enum IO_Category category, DID code, IODeviceCursor cursor);
-unsigned long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len);
-unsigned long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf);
+
+/**
+ * @brief Reads data from an IO device.
+ *
+ * @param token The token.
+ * @param category The category of the device.
+ * @param code The code of the device.
+ * @param buf The buffer to read in.
+ * @param len The size of the buffer.
+ * @return The amount read, or possible errors.
+ */
+long ReadIODevice(TokenID token, enum IO_Category category, DID code, char *buf, unsigned long len);
+
+/**
+ * @brief Writes data to an IO device.
+ *
+ * @param token The token.
+ * @param category The category of the device.
+ * @param code The code of the device.
+ * @param buf The buffer to write.
+ * @param len The size of the buffer.
+ * @return The amount written, or possible errors.
+ */
+long WriteIODevice(TokenID token, enum IO_Category category, DID code, const char *buf, unsigned long len);
 bool RequestIODevice(TokenID token, enum IO_Category category, DID code, unsigned int requestMessage, void *data);
 
 SYSCALL_HANDLER(own_device);

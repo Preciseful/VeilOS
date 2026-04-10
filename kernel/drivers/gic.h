@@ -12,6 +12,12 @@
 
 #ifndef __ASSEMBLER__
 
+/**
+ * @brief Allows a certain interrupt to pass through the GIC.
+ *
+ * @param interrupt The code for the interrupt.
+ * @param core Which core receives the interrupt.
+ */
 void AllowInterruptInGIC(unsigned int interrupt, unsigned int core);
 
 #endif

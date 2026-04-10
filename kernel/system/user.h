@@ -20,8 +20,33 @@ typedef struct User
     struct User *next;
 } User;
 
+/**
+ * @brief Initializes users in memory.
+ */
 void UsersInit();
+
+/**
+ * @brief Gets a user from a UID.
+ *
+ * @param[out] user The user.
+ * @param uid The UID.
+ * @return `true` if found, otherwise `false`.
+ */
 bool GetUser(User *user, UID uid);
 
+/**
+ * @brief Own a process under a user.
+ *
+ * @param user The user.
+ * @param pid The process id.
+ */
 void UserOwnProcess(User user, PID pid);
+
+/**
+ * @brief Check if a user owns a process.
+ *
+ * @param user The user.
+ * @param pid The process id.
+ * @return `true` if the user owns it, otherwise `false`.
+ */
 bool CheckOwnsProcess(User user, PID pid);

@@ -107,12 +107,11 @@ void makeSpaceForLine()
     fbDevice.cursor.yPosition = height - FONT_HEIGHT;
 }
 
-unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsigned char b, bool overlay)
+unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsigned char b, bool overlay, unsigned long len)
 {
-    const char *s_orig = s;
-    while (*s)
+    for (unsigned long i = 0; i < len; i++)
     {
-        switch (*s)
+        switch (s[i])
         {
         case '\n':
             fbDevice.cursor.yPosition += FONT_HEIGHT;
@@ -129,7 +128,7 @@ unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsign
             break;
 
         default:
-            drawChar(*s, fbDevice.cursor.xPosition, fbDevice.cursor.yPosition, r, g, b, overlay);
+            drawChar(s[i], fbDevice.cursor.xPosition, fbDevice.cursor.yPosition, r, g, b, overlay);
             fbDevice.cursor.xPosition += FONT_WIDTH;
             break;
         }
@@ -142,17 +141,15 @@ unsigned long drawString(const char *s, unsigned char r, unsigned char g, unsign
 
         if (fbDevice.cursor.yPosition > height - FONT_HEIGHT)
             makeSpaceForLine();
-
-        s++;
     }
 
     invertAtCursor();
-    return s - s_orig;
+    return len;
 }
 
-unsigned long fbWrite(TokenID token, const char *str)
+long fbWrite(TokenID token, const char *str, unsigned long len)
 {
-    unsigned long amount = drawString(str, colors[0], colors[1], colors[2], false);
+    long amount = drawString(str, colors[0], colors[1], colors[2], false, len);
     SetIODeviceCursor(token, fbDevice.category, fbDevice.code, fbDevice.cursor);
     return amount;
 }

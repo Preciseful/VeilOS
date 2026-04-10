@@ -4,6 +4,10 @@
 
 #define FB_SET_COLOR_REQUEST 0
 
+/**
+ * @brief Mailbox interface tags for the framebuffer.
+ * More on them can be found [here](https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface).
+ */
 enum FRAMEBUFFER_TAGS
 {
     ALLOCATE_BUFFER = 0x40001,

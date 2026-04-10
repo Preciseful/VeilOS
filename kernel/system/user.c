@@ -27,7 +27,7 @@ void register_user(const char *name, const char *password)
     char hash[65];
     hash[64] = 0;
     char salt[21];
-    SPrintf(salt, "%lx", GetRandom());
+    SPrintf(salt, "%lx", GetRandom64());
 
     char *salted_pass = malloc(strlen(salt) + strlen(password) + 1);
     SPrintf(salted_pass, "%s%s", salt, password);
@@ -64,7 +64,7 @@ void register_user(const char *name, const char *password)
 void UsersInit()
 {
     char admin_pass[21];
-    SPrintf(admin_pass, "%lx", GetRandomInteger());
+    SPrintf(admin_pass, "%lx", GetRandom32());
 
     register_user("admin", admin_pass);
     register_user("guest", "");

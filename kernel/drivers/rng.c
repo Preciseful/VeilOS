@@ -19,7 +19,7 @@ void RNGInit()
     WriteToMMIO(RNG_CTRL, val);
 }
 
-unsigned long GetRandomInteger()
+unsigned int GetRandom32()
 {
     while (!(ReadMMIO(RNG_FIFO_COUNT) & RNG_FIFO_MASK))
         ;
@@ -27,7 +27,7 @@ unsigned long GetRandomInteger()
     return ReadMMIO(RNG_FIFO_DATA);
 }
 
-unsigned long GetRandom()
+unsigned long GetRandom64()
 {
-    return ((unsigned long)GetRandomInteger() << 32) | GetRandomInteger();
+    return ((unsigned long)GetRandom32() << 32) | GetRandom32();
 }

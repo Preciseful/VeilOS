@@ -15,7 +15,7 @@
 #define UART0_IMSC (UART0_BASE + 0x38)
 
 static IODevice uartDevice;
-char read_buf[1024];
+char read_buf[READ_BUF_SIZE];
 unsigned long received;
 unsigned long read;
 
@@ -39,11 +39,11 @@ char uartRecv()
         ;
 
     char c = read_buf[read];
-    read = (read + 1) % 512;
+    read = (read + 1) % READ_BUF_SIZE;
     return c;
 }
 
-unsigned long uartRead(TokenID token, char *buf, unsigned long length)
+long uartRead(TokenID token, char *buf, unsigned long length)
 {
     for (unsigned long i = 0; i < length; i++)
     {
@@ -55,18 +55,16 @@ unsigned long uartRead(TokenID token, char *buf, unsigned long length)
     return length;
 }
 
-unsigned long uartWrite(TokenID token, const char *str)
+long uartWrite(TokenID token, const char *str, unsigned long length)
 {
-    const char *s_orig = str;
-
-    while (*str)
+    for (unsigned long i = 0; i < length; i++)
     {
-        if (*str == '\n')
+        if (str[i] == '\n')
             uartPut('\r');
-        uartPut(*str++);
+        uartPut(str[i]);
     }
 
-    return str - s_orig;
+    return length;
 }
 
 void UartInit()
@@ -101,8 +99,8 @@ void UartInit()
     AddIODevice(uartDevice);
 }
 
-void UartReceived()
+void HandleUartReceive()
 {
     read_buf[received] = uartCharacter();
-    received = (received + 1) % 512;
+    received = (received + 1) % READ_BUF_SIZE;
 }

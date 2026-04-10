@@ -138,6 +138,21 @@ void clear_voidites_after(Voidom voidom, Voidite *start)
     write_void(voidom, start, start->position, sizeof(Voidite));
 }
 
+void clear_voidelle_name(Voidom voidom, Voidelle *voidelle)
+{
+    if (voidelle->name_voidelle == 0)
+        return;
+
+    Voidite voidite;
+    read_void(voidom, &voidite, voidelle->name_voidelle, sizeof(Voidite));
+
+    clear_voidites_after(voidom, &voidite);
+    invalidate_section(voidom, voidite.position);
+
+    voidelle->name_voidelle = 0;
+    write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
+}
+
 void clear_voidelle_content(Voidom voidom, Voidelle *voidelle)
 {
     if (voidelle->content_voidelle == 0)
@@ -169,21 +184,6 @@ void clear_voidelle_content(Voidom voidom, Voidelle *voidelle)
     }
 
     voidelle->content_voidelle = 0;
-    write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
-}
-
-void clear_voidelle_name(Voidom voidom, Voidelle *voidelle)
-{
-    if (voidelle->name_voidelle == 0)
-        return;
-
-    Voidite voidite;
-    read_void(voidom, &voidite, voidelle->name_voidelle, sizeof(Voidite));
-
-    clear_voidites_after(voidom, &voidite);
-    invalidate_section(voidom, voidite.position);
-
-    voidelle->name_voidelle = 0;
     write_void(voidom, voidelle, voidelle->position, sizeof(Voidelle));
 }
 
