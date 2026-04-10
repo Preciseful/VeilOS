@@ -24,4 +24,6 @@ enum
     E_INVALID_OPERATION,
     /// @brief The requested IO device cannot be found.
     E_NO_IO_DEVICE,
+    /// @brief The requested file already exists.
+    E_FILE_EXISTS,
 };

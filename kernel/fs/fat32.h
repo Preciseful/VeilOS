@@ -136,6 +136,16 @@ unsigned int FatClusterSize(FatFS *fs);
 unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes);
 
 /**
+ * @brief Updates an entry's data.
+ *
+ * @param parent_cluster The parent cluster.
+ * @param target_entry The entry.
+ * @param clean_clusters Whether to clean contents or not.
+ * @return `true` if the operation was successful, otherwise `false`.
+ */
+bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool clean_clusters);
+
+/**
  * @brief Reads the entire contents of a file entry.
  *
  * @param node The entry to read from.

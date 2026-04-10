@@ -285,7 +285,7 @@ unsigned int link_free_cluster(FatFS *fs, unsigned int cluster)
     return free;
 }
 
-bool update_entry(unsigned int parent_cluster, FatFSNode *target_entry, bool clean_clusters)
+bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool clean_clusters)
 {
     FatFS *fs = target_entry->fatfs;
     unsigned int cluster_sector = (parent_cluster - 2) * fs->bs->sectors_per_cluster + fs->first_data_sector;
@@ -487,7 +487,6 @@ FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name
 
             SeekInEMMC(fs->partition.offset + cluster_sector * 512);
             WriteToEMMC(buf, entries_bytes);
-            LOG("Created file %s.\n", name);
 
             FatFSNode node;
             node.cluster = cluster;

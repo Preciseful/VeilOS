@@ -29,6 +29,8 @@ int VoidelleIReadDir(const char *path, void *key)
         char name[voidelle.name_voidelle_size];
         get_voidelle_name(voidom, voidelle, name);
 
+        // todo : fill
+
         pos = voidelle.next_voidelle;
     }
 

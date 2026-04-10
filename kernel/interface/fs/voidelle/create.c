@@ -26,7 +26,7 @@ int VoidelleICreate(const char *path, enum File_Permissions permissions, void *k
     Voidom voidom = *(Voidom *)key;
 
     if (FindVoidelleByPath(voidom, path, 0))
-        return -E_NO_FILE;
+        return -E_FILE_EXISTS;
 
     enum Voidelle_Flags dir_flag = dir ? VOIDELLE_DIRECTORY : 0;
     uint64_t uid = 0;
