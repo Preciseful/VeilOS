@@ -1,0 +1,28 @@
+var annotated_dup =
+[
+    [ "emmc_cmd", "structemmc__cmd.html", null ],
+    [ "emmc_device", "structemmc__device.html", null ],
+    [ "emmc_regs", "structemmc__regs.html", null ],
+    [ "FatFS", "structFatFS.html", null ],
+    [ "FatFSNode", "structFatFSNode.html", null ],
+    [ "FileReference", "structFileReference.html", null ],
+    [ "FilesystemInterface", "structFilesystemInterface.html", null ],
+    [ "InterruptStack", "structInterruptStack.html", null ],
+    [ "IODevice", "structIODevice.html", null ],
+    [ "IODeviceCursor", "structIODeviceCursor.html", null ],
+    [ "IODeviceOwnership", "structIODeviceOwnership.html", null ],
+    [ "IODeviceToken", "structIODeviceToken.html", null ],
+    [ "IOLink", "structIOLink.html", null ],
+    [ "KernelSymbols", "structKernelSymbols.html", null ],
+    [ "MHeader", "structMHeader.html", null ],
+    [ "MountPoint", "structMountPoint.html", null ],
+    [ "OwnedProcess", "structOwnedProcess.html", null ],
+    [ "Partition", "structPartition.html", "structPartition" ],
+    [ "scr_register", "structscr__register.html", null ],
+    [ "sha256_buff", "structsha256__buff.html", null ],
+    [ "Task", "structTask.html", null ],
+    [ "TaskMappingNode", "structTaskMappingNode.html", null ],
+    [ "TaskMMUCtx", "structTaskMMUCtx.html", null ],
+    [ "User", "structUser.html", null ],
+    [ "VFS", "structVFS.html", null ]
+];
