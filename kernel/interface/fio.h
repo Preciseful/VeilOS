@@ -15,10 +15,9 @@ typedef long FILEHANDLE;
 
 enum File_Mode
 {
-    FILE_CREATE = 1 << 0,
-    FILE_WRITE = 1 << 1,
-    FILE_READ = 1 << 2,
-    FILE_EXECUTE = 1 << 3,
+    FILE_WRITE = 1 << 0,
+    FILE_READ = 1 << 1,
+    FILE_EXECUTE = 1 << 2,
 };
 
 enum File_Permissions
