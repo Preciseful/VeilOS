@@ -71,7 +71,7 @@ void register_user(const char *name, const char *password)
 void UsersInit()
 {
     char admin_pass[21];
-    SPrintf(admin_pass, "%lx", GetRandom32());
+    SPrintf(admin_pass, "%lx", GetRandom64());
 
     register_user("admin", admin_pass);
     register_user("guest", "");
