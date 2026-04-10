@@ -1,5 +1,34 @@
 /**
- * @file
+ * @mainpage VeilOS
+ *
+ * A simple, bare metal, raspberry pi 4B OS.
+ *
+ * # Features
+ * - Display available on @ref uart.h "UART" and @ref framebuffer.h "Framebuffer".
+ * - @ref vfs.h "VFS" with @ref fat32.h "FAT32" and @ref voidelle.h "Voidelle" support.
+ * - Userspace for EL0 and EL1 @ref task.h "programs".
+ * - @ref emmc.h "SD card writing and reading".
+ * - @ref gic.h "GIC" support for @ref scheduler.h "scheduling"/@ref timer.h "timer".
+ * - Hardware @ref rng.h "RNG".
+ * - @ref elf.h "ELF files" support.
+ * - @ref user.h "Users" and groups.
+ *
+ * # Drivers
+ * - @ref emmc.h "EMMC"
+ * - @ref framebuffer.h "Framebuffer"
+ * - @ref gic.h "GIC"
+ * - @ref gpio.h "GPIO"
+ * - @ref mailbox.h "Mailbox"
+ * - @ref rng.h "RNG"
+ * - @ref timer.h "Timer"
+ * - @ref uart.h "UART"
+ *
+ * # Filesystems
+ * - @ref fs/fat32.h "FAT32"
+ * - @ref fs/voidelle.h "Voidelle"
+ */
+
+/**
  * @author Developful
  * @brief Main kernel code.
  * @date 2026-04-10
