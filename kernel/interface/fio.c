@@ -63,12 +63,13 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
 
     if (mount.fs.fopen)
     {
-        int ret = mount.fs.fopen(extra, mode, mount.key);
+        int ret = mount.fs.fopen(extra, mode, &reference.file_data, mount.key);
+        free(extra);
+
         if (ret != 0)
             return ret;
     }
 
-    free(extra);
     return AddFileReference(reference);
 }
 
@@ -85,13 +86,16 @@ int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long off
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
 
+    if (!(reference.mode & FILE_READ))
+        return -E_NO_PERMISSION;
+
     if (!GetFileMount(handle, &mount))
         return -E_NO_FILE;
 
     if (mount.fs.fread == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fread(reference.cut_path, reference.mode, buf, size, offset, mount.key);
+    return mount.fs.fread(reference.cut_path, buf, size, offset, reference.file_data, mount.key);
 }
 
 int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)
@@ -102,13 +106,16 @@ int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned l
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
 
+    if (!(reference.mode & FILE_WRITE))
+        return -E_NO_PERMISSION;
+
     if (!GetFileMount(handle, &mount))
         return -E_NO_FILE;
 
     if (mount.fs.fwrite == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fwrite(reference.cut_path, reference.mode, buf, size, offset, mount.key);
+    return mount.fs.fwrite(reference.cut_path, buf, size, offset, reference.file_data, mount.key);
 }
 
 long GetFileSize(const char *path)

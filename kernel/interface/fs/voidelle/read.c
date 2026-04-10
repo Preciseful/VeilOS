@@ -10,7 +10,7 @@
 #include <interface/fio.h>
 #include <interface/errno.h>
 
-long VoidelleIRead(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key)
+long VoidelleIRead(const char *path, char *buf, unsigned long size, unsigned long offset, void *file, void *key)
 {
     Voidom voidom = *(Voidom *)key;
 

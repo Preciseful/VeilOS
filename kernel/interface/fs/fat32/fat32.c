@@ -94,11 +94,12 @@ FilesystemInterface GetFat32Interface(FatFS *fatfs)
 {
     FilesystemInterface interface;
     interface.fread = Fat32IRead;
-    interface.fopen = 0;
+    interface.fopen = Fat32IOpen;
     interface.fwrite = Fat32IWrite;
     interface.fcreate_directory = Fat32ICreateDirectory;
     interface.fcreate_file = Fat32ICreateFile;
     interface.fsize = Fat32IFileSize;
+    interface.fpermissions = Fat32IPermissions;
     interface.key = fatfs;
 
     return interface;

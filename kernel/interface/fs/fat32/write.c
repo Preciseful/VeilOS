@@ -11,7 +11,7 @@
 #include <fs/fat32.h>
 #include <lib/string.h>
 
-long Fat32IWrite(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key)
+long Fat32IWrite(const char *path, const char *buf, unsigned long size, unsigned long offset, void *file, void *key)
 {
     FatFSNode node;
     FatFS *fatfs = (FatFS *)key;
@@ -23,8 +23,8 @@ long Fat32IWrite(const char *path, enum File_Mode mode, const char *buf, unsigne
 
     if (cluster == 0)
     {
-        cluster = free_cluster(node.fatfs);
-        write_cluster_link(node.fatfs, cluster, 0x0FFFFFFF);
+        cluster = FreeCluster(node.fatfs);
+        WriteClusterLink(node.fatfs, cluster, 0x0FFFFFFF);
 
         node.content_cluster = cluster;
         node.entry.cluster_low = cluster & 0xFFFF;
@@ -38,9 +38,9 @@ long Fat32IWrite(const char *path, enum File_Mode mode, const char *buf, unsigne
 
     for (unsigned long i = 0; i < cluster_index; i++)
     {
-        unsigned int next = next_cluster(node.fatfs, cluster);
+        unsigned int next = NextCluster(node.fatfs, cluster);
         if (next == 0)
-            next = link_free_cluster(node.fatfs, cluster);
+            next = LinkFreeCluster(node.fatfs, cluster);
 
         cluster = next;
     }
@@ -50,7 +50,7 @@ long Fat32IWrite(const char *path, enum File_Mode mode, const char *buf, unsigne
     {
         unsigned char tmp[FatClusterSize(fatfs)];
 
-        read_cluster(node.fatfs, cluster, tmp);
+        ReadCluster(node.fatfs, cluster, tmp);
 
         unsigned long write_start = (written == 0) ? cluster_offset : 0;
         unsigned long write_len = FatClusterSize(fatfs) - write_start;
@@ -59,14 +59,14 @@ long Fat32IWrite(const char *path, enum File_Mode mode, const char *buf, unsigne
             write_len = size - written;
 
         memcpy(tmp + write_start, buf + written, write_len);
-        write_cluster(node.fatfs, cluster, tmp);
+        WriteCluster(node.fatfs, cluster, tmp);
         written += write_len;
 
         if (written < size)
         {
-            unsigned int next = next_cluster(node.fatfs, cluster);
+            unsigned int next = NextCluster(node.fatfs, cluster);
             if (next == 0)
-                next = link_free_cluster(node.fatfs, cluster);
+                next = LinkFreeCluster(node.fatfs, cluster);
 
             cluster = next;
         }

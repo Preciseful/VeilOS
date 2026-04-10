@@ -32,6 +32,7 @@ typedef struct FileReference
     unsigned long mount_idx;
     char *cut_path;
     bool used;
+    void *file_data;
 } FileReference;
 
 typedef struct VFS

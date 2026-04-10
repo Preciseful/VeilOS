@@ -90,11 +90,12 @@ FilesystemInterface GetVoidelleInterface(Voidom *voidom)
 {
     FilesystemInterface interface;
     interface.fread = VoidelleIRead;
-    interface.fopen = 0;
+    interface.fopen = VoidelleIOpen;
     interface.fwrite = VoidelleIWrite;
     interface.fcreate_directory = VoidelleICreateDirectory;
     interface.fcreate_file = VoidelleICreateFile;
     interface.fsize = VoidelleIFileSize;
+    interface.fpermissions = VoidelleIPermissions;
     interface.key = voidom;
 
     return interface;

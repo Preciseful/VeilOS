@@ -37,10 +37,11 @@ typedef struct FilesystemInterface
 {
     int (*fcreate_file)(const char *path, enum File_Permissions permissions, void *key);
     int (*fcreate_directory)(const char *path, enum File_Permissions permissions, void *key);
-    int (*fopen)(const char *path, enum File_Mode mode, void *key);
-    long (*fread)(const char *path, enum File_Mode mode, char *buf, unsigned long size, unsigned long offset, void *key);
-    long (*fwrite)(const char *path, enum File_Mode mode, const char *buf, unsigned long size, unsigned long offset, void *key);
+    int (*fopen)(const char *path, enum File_Mode mode, void **file, void *key);
+    long (*fread)(const char *path, char *buf, unsigned long size, unsigned long offset, void *file, void *key);
+    long (*fwrite)(const char *path, const char *buf, unsigned long size, unsigned long offset, void *file, void *key);
     long (*fsize)(const char *path, void *key);
+    int (*fpermissions)(const char *path, void *key);
 
     void *key;
 } FilesystemInterface;

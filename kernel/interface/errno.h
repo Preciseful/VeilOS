@@ -26,4 +26,6 @@ enum
     E_NO_IO_DEVICE,
     /// @brief The requested file already exists.
     E_FILE_EXISTS,
+    /// @brief Insufficient permissions for this operation.
+    E_NO_PERMISSION,
 };

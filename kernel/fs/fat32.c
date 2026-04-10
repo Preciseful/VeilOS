@@ -181,7 +181,7 @@ bool FatFSInit(FatFS *fs, Partition partition)
     return true;
 }
 
-unsigned int free_cluster(FatFS *fs)
+unsigned int FreeCluster(FatFS *fs)
 {
     unsigned char FAT_table[512];
     unsigned int entries = fs->bs->bytes_per_sector / 4;
@@ -209,7 +209,7 @@ unsigned int free_cluster(FatFS *fs)
     return 0;
 }
 
-unsigned int next_cluster(FatFS *fs, unsigned int cluster_no)
+unsigned int NextCluster(FatFS *fs, unsigned int cluster_no)
 {
     unsigned char FAT_table[512];
 
@@ -229,7 +229,7 @@ unsigned int next_cluster(FatFS *fs, unsigned int cluster_no)
     return table_value;
 }
 
-unsigned int read_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
+unsigned int ReadCluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
 {
     unsigned int cluster_sector = ((cluster - 2) * fs->bs->sectors_per_cluster) + fs->first_data_sector;
     unsigned int entries_bytes = FatClusterSize(fs);
@@ -240,7 +240,7 @@ unsigned int read_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
     return entries_bytes;
 }
 
-unsigned int write_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
+unsigned int WriteCluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
 {
     unsigned int cluster_sector = ((cluster - 2) * fs->bs->sectors_per_cluster) + fs->first_data_sector;
     unsigned int entries_bytes = FatClusterSize(fs);
@@ -251,7 +251,7 @@ unsigned int write_cluster(FatFS *fs, unsigned int cluster, unsigned char *buf)
     return entries_bytes;
 }
 
-void write_cluster_link(FatFS *fs, unsigned int cluster_no, unsigned int value)
+void WriteClusterLink(FatFS *fs, unsigned int cluster_no, unsigned int value)
 {
     unsigned char FAT_table[512];
     unsigned int fat_offset = cluster_no * 4;
@@ -268,20 +268,20 @@ void write_cluster_link(FatFS *fs, unsigned int cluster_no, unsigned int value)
     WriteToEMMC(FAT_table, 512);
 }
 
-unsigned int link_free_cluster(FatFS *fs, unsigned int cluster)
+unsigned int LinkFreeCluster(FatFS *fs, unsigned int cluster)
 {
-    unsigned int free = free_cluster(fs);
+    unsigned int free = FreeCluster(fs);
     unsigned int last = cluster;
     while (true)
     {
-        unsigned int next = next_cluster(fs, last);
+        unsigned int next = NextCluster(fs, last);
         if (!next)
             break;
         last = next;
     }
 
-    write_cluster_link(fs, last, free);
-    write_cluster_link(fs, free, 0x0FFFFFFF);
+    WriteClusterLink(fs, last, free);
+    WriteClusterLink(fs, free, 0x0FFFFFFF);
     return free;
 }
 
@@ -318,8 +318,8 @@ bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool c
 
                 while (content != 0 && clean_clusters)
                 {
-                    write_cluster(fs, content, clean);
-                    content = next_cluster(fs, content);
+                    WriteCluster(fs, content, clean);
+                    content = NextCluster(fs, content);
                 }
 
                 SeekInEMMC(fs->partition.offset + (cluster_sector + sector) * 512);
@@ -329,7 +329,7 @@ bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool c
         }
     }
 
-    unsigned int ncluster = next_cluster(fs, parent_cluster);
+    unsigned int ncluster = NextCluster(fs, parent_cluster);
     if (ncluster != 0)
         return UpdateFatEntry(ncluster, target_entry, clean_clusters);
 
@@ -382,7 +382,7 @@ FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name
 
     while (true)
     {
-        unsigned int entries_bytes = read_cluster(fs, parent_cluster, buf);
+        unsigned int entries_bytes = ReadCluster(fs, parent_cluster, buf);
         bool null_terminated = false;
 
         for (unsigned int i = 0; i < entries_bytes; i += 32)
@@ -505,9 +505,9 @@ FatFSNode CreateFatNode(FatFS *fs, unsigned int parent_cluster, const char *name
             return node;
         }
 
-        unsigned int next = next_cluster(fs, parent_cluster);
+        unsigned int next = NextCluster(fs, parent_cluster);
         if (next == 0)
-            next = link_free_cluster(fs, parent_cluster);
+            next = LinkFreeCluster(fs, parent_cluster);
 
         parent_cluster = next;
     }
@@ -527,7 +527,7 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
 
     while (true)
     {
-        unsigned int entries_bytes = read_cluster(fs, cluster, buf);
+        unsigned int entries_bytes = ReadCluster(fs, cluster, buf);
 
         for (unsigned int i = 0; i < entries_bytes; i += 32)
         {
@@ -579,7 +579,7 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
         }
 
         free(buf);
-        cluster = next_cluster(fs, cluster);
+        cluster = NextCluster(fs, cluster);
 
         if (cluster == 0)
         {
@@ -602,7 +602,7 @@ unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned in
 
     while (cluster && written < size)
     {
-        unsigned int bytes = read_cluster(node.fatfs, cluster, buf);
+        unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
 
         if (skipped + bytes <= offset)
             skipped += bytes;
@@ -624,7 +624,7 @@ unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned in
             skipped += bytes;
         }
 
-        cluster = next_cluster(node.fatfs, cluster);
+        cluster = NextCluster(node.fatfs, cluster);
     }
 
     free(buf);
@@ -641,13 +641,13 @@ unsigned char *ReadFatNode(FatFSNode node)
 
     while (true)
     {
-        unsigned int bytes = read_cluster(node.fatfs, cluster, buf);
+        unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
 
         for (unsigned int i = 0; i < bytes; i++)
             file[count + i] = buf[i];
         count += bytes;
 
-        cluster = next_cluster(node.fatfs, cluster);
+        cluster = NextCluster(node.fatfs, cluster);
         if (cluster == 0)
             break;
     }
@@ -666,12 +666,12 @@ unsigned char *ReadFatNodeAt(FatFSNode node, unsigned long pos)
 
     for (unsigned long i = 0; i < pos; i++)
     {
-        cluster = next_cluster(node.fatfs, cluster);
+        cluster = NextCluster(node.fatfs, cluster);
         if (cluster == 0)
             return 0;
     }
 
-    unsigned int bytes = read_cluster(node.fatfs, cluster, buf);
+    unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
 
     for (unsigned int i = 0; i < bytes; i++)
         file[count + i] = buf[i];
@@ -689,8 +689,8 @@ bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size)
     unsigned int cluster = node->content_cluster;
     if (cluster == 0)
     {
-        cluster = free_cluster(node->fatfs);
-        write_cluster_link(node->fatfs, cluster, 0x0FFFFFFF);
+        cluster = FreeCluster(node->fatfs);
+        WriteClusterLink(node->fatfs, cluster, 0x0FFFFFFF);
         node->content_cluster = cluster;
         node->entry.cluster_low = cluster & 0xFFFF;
         node->entry.cluster_high = (cluster >> 16) & 0xFFFF;
@@ -708,10 +708,10 @@ bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size)
 
     for (unsigned long i = 0; i < padded_size; i += 512)
     {
-        write_cluster(node->fatfs, cluster, buf + i);
-        unsigned int next = next_cluster(node->fatfs, cluster);
+        WriteCluster(node->fatfs, cluster, buf + i);
+        unsigned int next = NextCluster(node->fatfs, cluster);
         if (next == 0)
-            next = link_free_cluster(node->fatfs, cluster);
+            next = LinkFreeCluster(node->fatfs, cluster);
 
         cluster = next;
     }

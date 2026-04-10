@@ -126,6 +126,62 @@ bool FatFSInit(FatFS *fs, Partition partition);
 unsigned int FatClusterSize(FatFS *fs);
 
 /**
+ * @brief Get a free cluster from the filesystem.
+ *
+ * @param fs The filesystem wrapper.
+ * @return The cluster's location.
+ */
+unsigned int FreeCluster(FatFS *fs);
+
+/**
+ * @brief Writes the next link of a cluster.
+ *
+ * @param fs The filesystem wrapper.
+ * @param cluster_no The cluster.
+ * @param value The link value.
+ */
+void WriteClusterLink(FatFS *fs, unsigned int cluster_no, unsigned int value);
+
+/**
+ * @brief Links one more free cluster.
+ *
+ * @param fs The filesystem wrapper.
+ * @param cluster The cluster to link to.
+ * @return The location of the free cluster.
+ */
+
+unsigned int LinkFreeCluster(FatFS *fs, unsigned int cluster);
+
+/**
+ * @brief Gets the next cluster location of a current cluster.
+ *
+ * @param fs The filesystem wrapper.
+ * @param cluster_no The current cluster.
+ * @return The next cluster location.
+ */
+unsigned int NextCluster(FatFS *fs, unsigned int cluster_no);
+
+/**
+ * @brief Reads the cluster into a given buffer.
+ *
+ * @param fs The filesystem wrapper.
+ * @param cluster The cluster to be read.
+ * @param buf The buffer.
+ * @return The amount of bytes read.
+ */
+unsigned int ReadCluster(FatFS *fs, unsigned int cluster, unsigned char *buf);
+
+/**
+ * @brief Writes a cluster from a given buffer.
+ *
+ * @param fs The filesystem wrapper.
+ * @param cluster The cluster to be written.
+ * @param buf The buffer.
+ * @return The amount of bytes written.
+ */
+unsigned int WriteCluster(FatFS *fs, unsigned int cluster, unsigned char *buf);
+
+/**
  * @brief Get the entries from a cluster.
  *
  * @param fs The filesystem wrapper.
