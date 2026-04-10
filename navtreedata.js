@@ -25,6 +25,9 @@
 var NAVTREE =
 [
   [ "VeilOS", "index.html", [
+    [ "Features", "index.html#autotoc_md0", null ],
+    [ "Drivers", "index.html#autotoc_md1", null ],
+    [ "Filesystems", "index.html#autotoc_md2", null ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -51,7 +54,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"vfs_8h_source.html"
+"vfs_8h.html#ac2e184242a518d503dfaf17b37628740"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

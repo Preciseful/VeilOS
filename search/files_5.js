@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['mailbox_2eh_0',['mailbox.h',['../mailbox_8h.html',1,'']]],
-  ['mbr_2eh_1',['mbr.h',['../mbr_8h.html',1,'']]],
-  ['memory_2eh_2',['memory.h',['../memory_8h.html',1,'']]],
-  ['mmu_2eh_3',['mmu.h',['../mmu_8h.html',1,'']]]
+  ['panic_2eh_0',['panic.h',['../panic_8h.html',1,'']]],
+  ['partition_2eh_1',['partition.h',['../partition_8h.html',1,'']]],
+  ['printf_2eh_2',['printf.h',['../printf_8h.html',1,'']]]
 ];
