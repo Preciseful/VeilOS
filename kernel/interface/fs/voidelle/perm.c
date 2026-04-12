@@ -21,6 +21,11 @@
      ((permission & VOIDELLE_PERMISSION_WRITE) ? OTHER_WRITE : 0) |     \
      ((permission & VOIDELLE_PERMISSION_READ) ? OTHER_READ : 0))
 
+int VoidelleIDirectPermissions(Voidelle voidelle)
+{
+    return OTHERS_BITS(voidelle.other_permission) | USER_BITS(voidelle.owner_permission);
+}
+
 int VoidelleIPermissions(const char *path, void *key)
 {
     Voidom voidom = *(Voidom *)key;
@@ -29,6 +34,5 @@ int VoidelleIPermissions(const char *path, void *key)
     if (!FindVoidelleByPath(voidom, path, &voidelle))
         return -E_NO_FILE;
 
-    int perms = OTHERS_BITS(voidelle.other_permission) | USER_BITS(voidelle.owner_permission);
-    return perms;
+    return VoidelleIDirectPermissions(voidelle);
 }

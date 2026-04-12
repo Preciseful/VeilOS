@@ -455,7 +455,7 @@ bool get_name_voidite_at(Voidom voidom, Voidelle voidelle, Voidite *buf, unsigne
 unsigned long read_voidelle(Voidom voidom, Voidelle voidelle, unsigned long offset, void *buf, unsigned long size)
 {
     if (voidelle.flags & VOIDELLE_DIRECTORY)
-        return FILE_IS_DIRECTORY;
+        return 0;
 
     uint8_t *current_buf = buf;
 

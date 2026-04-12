@@ -202,14 +202,6 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
 bool UpdateFatEntry(unsigned int parent_cluster, FatFSNode *target_entry, bool clean_clusters);
 
 /**
- * @brief Reads the entire contents of a file entry.
- *
- * @param node The entry to read from.
- * @return The contents.
- */
-unsigned char *ReadFatNode(FatFSNode node);
-
-/**
  * @brief Reads a certain amount of content of a file entry, starting from an offset.
  *
  * @param node The entry to read from.
@@ -217,7 +209,7 @@ unsigned char *ReadFatNode(FatFSNode node);
  * @param size The amount of characters to read.
  * @return The contents.
  */
-unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned int size);
+unsigned long ReadFatNode(FatFSNode node, unsigned long offset, unsigned long size, char *buf);
 
 /**
  * @brief Writes a buffer to a file entry.

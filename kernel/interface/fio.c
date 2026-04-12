@@ -52,10 +52,14 @@ int CreateDirectory(const char *path, enum File_Permissions permissions)
 FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
 {
     FileReference reference;
-    reference.owner = GetCurrentPID();
+    reference.owner_process = GetCurrentPID();
     reference.mode = mode;
     reference.path = path;
     reference.used = true;
+    reference.meta.file_data = 0;
+    reference.meta.flags = 0;
+    reference.meta.permissions = 0;
+    reference.meta.owner_id = 0;
 
     MountPoint mount;
     char *extra;
@@ -63,13 +67,16 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
 
     if (mount.fs.fopen)
     {
-        int ret = mount.fs.fopen(extra, mode, &reference.file_data, mount.key);
-        free(extra);
+        int ret = mount.fs.fopen(extra, mode, &reference.meta, mount.key);
 
         if (ret != 0)
+        {
+            free(extra);
             return ret;
+        }
     }
 
+    free(extra);
     return AddFileReference(reference);
 }
 
@@ -78,16 +85,13 @@ void CloseFile(FILEHANDLE handle)
     RemoveFileReference(handle);
 }
 
-int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset)
+long ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset)
 {
     MountPoint mount;
     FileReference reference;
 
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
-
-    if (!(reference.mode & FILE_READ))
-        return -E_NO_PERMISSION;
 
     if (!GetFileMount(handle, &mount))
         return -E_NO_FILE;
@@ -95,10 +99,10 @@ int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long off
     if (mount.fs.fread == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fread(reference.cut_path, buf, size, offset, reference.file_data, mount.key);
+    return mount.fs.fread(reference.cut_path, buf, size, offset, reference.meta.file_data, mount.key);
 }
 
-int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)
+long WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)
 {
     MountPoint mount;
     FileReference reference;
@@ -106,16 +110,13 @@ int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned l
     if (!GetFileReference(handle, &reference))
         return -E_NO_FILE;
 
-    if (!(reference.mode & FILE_WRITE))
-        return -E_NO_PERMISSION;
-
     if (!GetFileMount(handle, &mount))
         return -E_NO_FILE;
 
     if (mount.fs.fwrite == 0)
         return -E_INVALID_OPERATION;
 
-    return mount.fs.fwrite(reference.cut_path, buf, size, offset, reference.file_data, mount.key);
+    return mount.fs.fwrite(reference.cut_path, buf, size, offset, reference.meta.file_data, mount.key);
 }
 
 long GetFileSize(const char *path)

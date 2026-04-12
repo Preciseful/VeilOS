@@ -16,13 +16,14 @@ const char *GetFilename(const char *path);
 bool FindParentVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf);
 bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf);
 
-int VoidelleIOpen(const char *path, enum File_Mode mode, void **file, void *key);
+int VoidelleIOpen(const char *path, enum File_Mode mode, FileMeta *meta, void *key);
 long VoidelleIRead(const char *path, char *buf, unsigned long size, unsigned long offset, void *file, void *key);
 long VoidelleIWrite(const char *path, const char *buf, unsigned long size, unsigned long offset, void *file, void *key);
 int VoidelleICreateDirectory(const char *path, enum File_Permissions permissions, void *key);
 int VoidelleICreateFile(const char *path, enum File_Permissions permissions, void *key);
 
 long VoidelleIFileSize(const char *path, void *key);
+int VoidelleIDirectPermissions(Voidelle voidelle);
 int VoidelleIPermissions(const char *path, void *key);
 
 FilesystemInterface GetVoidelleInterface(Voidom *voidom);

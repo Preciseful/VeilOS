@@ -118,7 +118,7 @@ void kmain()
     AddMountPoint("/", GetFat32Interface(fatfs2));
 #endif
 
-    AddMountPoint("/kernel", GetFat32Interface(fatfs));
+    AddMountPoint("/firmware", GetFat32Interface(fatfs));
 
     // CacheKernelSymbols();
     // LOG("Kernel symbols cached.\n");
@@ -139,7 +139,7 @@ void kmain()
     envargv[10] = "TTYPERM";
     envargv[11] = "ROO";
 
-    Task *shell = MakeElfProcess("/Luna.elf", false, -1, 0, 0, 12, envargv);
+    Task *shell = MakeElfProcess("/Kernel/Applications/Luna.elf", false, -1, 0, 0, 12, envargv);
     if (shell)
         LOG("Created shell.\n");
 

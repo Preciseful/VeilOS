@@ -589,96 +589,64 @@ unsigned long GetFatEntries(FatFS *fs, unsigned int cluster, FatFSNode **bnodes)
     }
 }
 
-unsigned char *ReadFatNodeRange(FatFSNode node, unsigned int offset, unsigned int size)
+bool read_fat_node_index(FatFSNode node, unsigned long index, void *buf)
 {
     unsigned int cluster = node.content_cluster;
-    unsigned int clsize = FatClusterSize(node.fatfs);
-
-    unsigned char *file = malloc(size);
-    unsigned char *buf = malloc(clsize);
-
-    unsigned int skipped = 0;
-    unsigned int written = 0;
-
-    while (cluster && written < size)
-    {
-        unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
-
-        if (skipped + bytes <= offset)
-            skipped += bytes;
-        else
-        {
-            unsigned int start = 0;
-            if (offset > skipped)
-                start = offset - skipped;
-
-            unsigned int available = bytes - start;
-            unsigned int tocopy = available;
-
-            if (tocopy > size - written)
-                tocopy = size - written;
-
-            memcpy(file + written, buf + start, tocopy);
-
-            written += tocopy;
-            skipped += bytes;
-        }
-
-        cluster = NextCluster(node.fatfs, cluster);
-    }
-
-    free(buf);
-    return file;
-}
-
-unsigned char *ReadFatNode(FatFSNode node)
-{
-    unsigned int cluster = node.content_cluster;
-    unsigned char *file = malloc(node.entry.size);
-    unsigned int clsize = FatClusterSize(node.fatfs);
-    unsigned char *buf = malloc(clsize);
-    unsigned int count = 0;
-
-    while (true)
-    {
-        unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
-
-        for (unsigned int i = 0; i < bytes; i++)
-            file[count + i] = buf[i];
-        count += bytes;
-
-        cluster = NextCluster(node.fatfs, cluster);
-        if (cluster == 0)
-            break;
-    }
-
-    free(buf);
-    return file;
-}
-
-unsigned char *ReadFatNodeAt(FatFSNode node, unsigned long pos)
-{
-    unsigned int cluster = node.content_cluster;
-    unsigned char *file = malloc(node.entry.size);
-    unsigned int clsize = FatClusterSize(node.fatfs);
-    unsigned char *buf = malloc(clsize);
-    unsigned int count = 0;
-
-    for (unsigned long i = 0; i < pos; i++)
+    for (unsigned long i = 0; i < index; i++)
     {
         cluster = NextCluster(node.fatfs, cluster);
         if (cluster == 0)
             return 0;
     }
 
-    unsigned int bytes = ReadCluster(node.fatfs, cluster, buf);
+    return ReadCluster(node.fatfs, cluster, buf) != 0;
+}
 
-    for (unsigned int i = 0; i < bytes; i++)
-        file[count + i] = buf[i];
-    count += bytes;
+unsigned long ReadFatNode(FatFSNode node, unsigned long offset, unsigned long size, char *buf)
+{
+    if (node.entry.attrs & 0x10)
+        return 0;
 
-    free(buf);
-    return file;
+    if (node.content_cluster == 0)
+        return 0;
+
+    unsigned long clsize = FatClusterSize(node.fatfs);
+    char *current_buf = buf;
+
+    unsigned long first_cluster = offset / clsize;
+    unsigned long last_cluster = (offset + size - 1) / clsize;
+    unsigned long start = offset % clsize;
+    unsigned long end = (offset + size) % clsize;
+
+    for (unsigned long cluster_index = first_cluster; cluster_index <= last_cluster; cluster_index++)
+    {
+        char contentbuf[clsize];
+
+        if (!read_fat_node_index(node, cluster_index, contentbuf))
+            return current_buf - buf;
+
+        char *cpy_start = contentbuf;
+        unsigned long cpy_len = clsize;
+
+        if (cluster_index == first_cluster)
+        {
+            cpy_start += start;
+            cpy_len -= start;
+        }
+
+        if (cluster_index == last_cluster)
+            cpy_len = (end == 0) ? size : end;
+
+        if (cpy_len > size)
+            cpy_len = size;
+
+        memcpy(current_buf, cpy_start, cpy_len);
+
+        current_buf += cpy_len;
+        size -= cpy_len;
+    }
+
+    return current_buf - buf;
 }
 
 bool WriteToFatNode(FatFSNode *node, const char *cbuf, unsigned long size)

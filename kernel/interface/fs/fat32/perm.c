@@ -11,12 +11,18 @@
 #include <fs/fat32.h>
 #include <lib/string.h>
 
+// todo : maybe get permissions from a file ?
+int Fat32IDirectPermissions()
+{
+    return (USER_EXECUTE | USER_READ | USER_WRITE) |
+           (OTHER_EXECUTE | OTHER_READ | OTHER_WRITE);
+}
+
 int Fat32IPermissions(const char *path, void *key)
 {
     FatFS *fatfs = (FatFS *)key;
     if (!FindFat32ByPath(fatfs, path, 0))
         return -E_NO_FILE;
 
-    return (USER_EXECUTE | USER_READ | USER_WRITE) |
-           (OTHER_EXECUTE | OTHER_READ | OTHER_WRITE);
+    return Fat32IDirectPermissions();
 }

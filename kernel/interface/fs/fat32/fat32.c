@@ -53,7 +53,7 @@ bool FindFat32ByPath(FatFS *fs, const char *path, FatFSNode *buf)
 
         unsigned long filename_len = end - beginning;
 
-        char *filename = malloc(filename_len + 1);
+        char filename[filename_len + 1];
         memcpy(filename, beginning, filename_len);
         filename[filename_len] = 0;
 
@@ -69,20 +69,21 @@ bool FindFat32ByPath(FatFS *fs, const char *path, FatFSNode *buf)
 
         if (index == nodes_count)
         {
-            free(filename);
             free(nodes);
             return false;
         }
 
         node = nodes[index];
         free(nodes);
-        free(filename);
 
         if (*end == '\0')
             break;
 
+        if (!(node.entry.attrs & 0x10))
+            return false;
+
         beginning = end + 1;
-        cluster = node.cluster;
+        cluster = node.content_cluster;
     }
 
     if (buf != 0)

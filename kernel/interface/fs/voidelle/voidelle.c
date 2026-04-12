@@ -50,7 +50,7 @@ bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
 
         unsigned long filename_len = end - beginning;
 
-        char *filename = malloc(filename_len + 1);
+        char filename[filename_len + 1];
         memcpy(filename, beginning, filename_len);
         filename[filename_len] = 0;
 
@@ -77,6 +77,9 @@ bool FindVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
 
         if (*end == '\0')
             break;
+
+        if (!(parent.flags & VOIDELLE_DIRECTORY))
+            return false;
 
         beginning = end + 1;
     }

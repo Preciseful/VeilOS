@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <scheduler/task.h>
-
 typedef unsigned long UID;
+
+#include <scheduler/task.h>
 
 typedef struct OwnedProcess
 {
@@ -33,6 +33,11 @@ typedef struct User
  * @brief Initializes users in memory.
  */
 void UsersInit();
+
+/**
+ * @return Gets the current user ID.
+ */
+UID GetCurrentUser();
 
 /**
  * @brief Gets a user from a UID.

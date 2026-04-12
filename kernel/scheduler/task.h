@@ -11,6 +11,10 @@
 
 #include <memory/mmu.h>
 
+typedef long PID;
+
+#include <system/user.h>
+
 #define USER_TASK (1 << 0)
 #define ACTIVE_TASK (1 << 1)
 #define KILL_TASK (1 << 2)
@@ -19,7 +23,6 @@
 #define EL1H_M 0b0101
 
 typedef struct IODeviceOwnership IODeviceOwnership;
-typedef long PID;
 
 typedef struct TaskMMUCtx
 {
@@ -54,6 +57,7 @@ typedef struct Task
     unsigned long flags;
     long time;
     PID pid;
+    UID uid;
 
     IODeviceOwnership *devices;
     unsigned long devices_count;

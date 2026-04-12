@@ -26,13 +26,14 @@ typedef struct MountPoint
 
 typedef struct FileReference
 {
-    PID owner;
+    PID owner_process;
     enum File_Mode mode;
     const char *path;
+    FileMeta meta;
+
     unsigned long mount_idx;
     char *cut_path;
     bool used;
-    void *file_data;
 } FileReference;
 
 typedef struct VFS

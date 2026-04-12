@@ -30,13 +30,26 @@ enum File_Permissions
     OTHER_WRITE = 1 << 5
 };
 
-typedef unsigned char FILEMODE;
+enum File_Flags
+{
+    FFDIRECTORY = 1 << 0,
+    FFHIDDEN = 1 << 1,
+    FFSYSTEM = 1 << 2,
+};
+
+typedef struct FileMeta
+{
+    void *file_data;
+    unsigned short flags;
+    unsigned short permissions;
+    unsigned long owner_id;
+} FileMeta;
 
 typedef struct FilesystemInterface
 {
     int (*fcreate_file)(const char *path, enum File_Permissions permissions, void *key);
     int (*fcreate_directory)(const char *path, enum File_Permissions permissions, void *key);
-    int (*fopen)(const char *path, enum File_Mode mode, void **file, void *key);
+    int (*fopen)(const char *path, enum File_Mode mode, FileMeta *meta, void *key);
     long (*fread)(const char *path, char *buf, unsigned long size, unsigned long offset, void *file, void *key);
     long (*fwrite)(const char *path, const char *buf, unsigned long size, unsigned long offset, void *file, void *key);
     long (*fsize)(const char *path, void *key);
@@ -90,7 +103,7 @@ void CloseFile(FILEHANDLE handle);
  * @param offset The offset in file from which the read starts from.
  * @return The amount read, or possible errors.
  */
-int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset);
+long ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset);
 
 /**
  * @brief Writes to a file at a certain offset from a buffer.
@@ -101,7 +114,7 @@ int ReadFile(FILEHANDLE handle, void *buf, unsigned long size, unsigned long off
  * @param offset The offset in file from which the write starts from.
  * @return The amount written, or possible errors.
  */
-int WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset);
+long WriteFile(FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset);
 
 /**
  * @brief Get a file's size.

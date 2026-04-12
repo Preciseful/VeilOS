@@ -18,13 +18,18 @@
 Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **argv, int envargc, char **envargv)
 {
     FILEHANDLE file = OpenFile(FILE_READ, path);
-    if (file == -1)
+    if (file < 0)
+    {
+        if (file == -E_NO_FILE)
+            LOG("ELF file '%s' does not exist.\n", path);
         return 0;
+    }
 
     Elf64_Ehdr eheader;
-    if (ReadFile(file, &eheader, sizeof(eheader), 0) == -E_NO_FILE)
+    long ret = ReadFile(file, &eheader, sizeof(eheader), 0);
+    if (ret < 0)
     {
-        LOG("ELF file '%s' does not exist.\n", path);
+        LOG("Error encountered while reading file %s: %d", path, ret);
         CloseFile(file);
         return 0;
     }
@@ -55,7 +60,13 @@ Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **ar
     for (unsigned long i = 0; i < eheader.e_phnum; i++)
     {
         Elf64_Phdr phdr;
-        ReadFile(file, &phdr, sizeof(phdr), eheader.e_phoff + i * eheader.e_phentsize);
+        long phdr_amount = ReadFile(file, &phdr, sizeof(phdr), eheader.e_phoff + i * eheader.e_phentsize);
+        if (phdr_amount != sizeof(phdr))
+        {
+            CloseFile(file);
+            LOG("Proper reading failed.\n");
+            return 0;
+        }
 
         if (phdr.p_type != PT_LOAD)
             continue;
@@ -72,7 +83,13 @@ Task *MakeElfProcess(const char *path, bool kernel, PID pid, int argc, char **ar
         unsigned char *read = malloc(phdr_memsz);
         memset(read, 0, phdr_memsz);
 
-        ReadFile(file, read, phdr_filesz, phdr_offset);
+        unsigned long read_amount = ReadFile(file, read, phdr_filesz, phdr_offset);
+        if (read_amount != phdr_filesz)
+        {
+            CloseFile(file);
+            LOG("Proper reading failed.\n");
+            return 0;
+        }
 
         MapTaskPage(task, phdr_vaddr, VIRT_TO_PHYS(read), phdr_memsz, user | exec | rw);
     }

@@ -19,10 +19,5 @@ long Fat32IRead(const char *path, char *buf, unsigned long size, unsigned long o
     if (!FindFat32ByPath(fs, path, &node))
         return -E_NO_FILE;
 
-    unsigned char *tempbuf = ReadFatNodeRange(node, offset, size);
-    memcpy(buf, tempbuf, size);
-
-    free(tempbuf);
-
-    return size;
+    return ReadFatNode(node, offset, size, buf);
 }

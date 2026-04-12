@@ -31,10 +31,10 @@ long Fat32IWrite(const char *path, const char *buf, unsigned long size, unsigned
         node.entry.cluster_high = (cluster >> 16) & 0xFFFF;
     }
 
-    unsigned long cluster_size = FatClusterSize(fatfs);
+    unsigned long clsize = FatClusterSize(fatfs);
 
-    unsigned long cluster_index = offset / cluster_size;
-    unsigned long cluster_offset = offset % cluster_size;
+    unsigned long cluster_index = offset / clsize;
+    unsigned long cluster_offset = offset % clsize;
 
     for (unsigned long i = 0; i < cluster_index; i++)
     {
@@ -48,12 +48,12 @@ long Fat32IWrite(const char *path, const char *buf, unsigned long size, unsigned
     unsigned long written = 0;
     while (written < size)
     {
-        unsigned char tmp[FatClusterSize(fatfs)];
+        unsigned char tmp[clsize];
 
         ReadCluster(node.fatfs, cluster, tmp);
 
         unsigned long write_start = (written == 0) ? cluster_offset : 0;
-        unsigned long write_len = FatClusterSize(fatfs) - write_start;
+        unsigned long write_len = clsize - write_start;
 
         if (write_len > size - written)
             write_len = size - written;

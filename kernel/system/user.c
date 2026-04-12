@@ -12,6 +12,7 @@
 #include <drivers/rng.h>
 
 User *admin;
+User *logged;
 
 UID get_uid()
 {
@@ -75,6 +76,13 @@ void UsersInit()
 
     register_user("admin", admin_pass);
     register_user("guest", "");
+
+    logged = admin->next;
+}
+
+UID GetCurrentUser()
+{
+    return logged->id;
 }
 
 bool GetUser(User *user, UID uid)

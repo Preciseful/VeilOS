@@ -19,5 +19,5 @@ long Fat32IFileSize(const char *path, void *key)
     if (!FindFat32ByPath(fatfs, path, &node))
         return -E_NO_FILE;
 
-    return node.content_cluster;
+    return node.entry.size;
 }

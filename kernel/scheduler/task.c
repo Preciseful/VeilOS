@@ -243,6 +243,7 @@ Task *CreateTask(const char *name, bool kernel, VirtualAddr va, PhysicalAddr dat
     task->name = malloc(name_len);
     memcpy(task->name, name, name_len);
 
+    task->uid = GetCurrentUser();
     task->flags = ACTIVE_TASK;
     task->kernel = kernel;
     task->time = DEFAULT_TIME;
