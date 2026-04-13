@@ -10,6 +10,7 @@
 #include <lib/printf.h>
 #include <lib/crypt/sha256.h>
 #include <drivers/rng.h>
+#include <scheduler/scheduler.h>
 
 User *admin;
 User *logged;
@@ -85,7 +86,23 @@ UID GetCurrentUser()
     return logged->id;
 }
 
-bool GetUser(User *user, UID uid)
+bool GetUserFromProcess(PID pid, User *user)
+{
+    if (pid == 0)
+    {
+        memcpy(user, admin, sizeof(User));
+        return true;
+    }
+
+    Task *task;
+    bool found = GetTaskByPID(pid, &task);
+    if (!found)
+        return false;
+
+    return GetUser(task->uid, user);
+}
+
+bool GetUser(UID uid, User *user)
 {
     User *last = admin;
     while (last)

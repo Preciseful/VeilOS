@@ -59,7 +59,7 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
     reference.meta.file_data = 0;
     reference.meta.flags = 0;
     reference.meta.permissions = 0;
-    reference.meta.owner_id = 0;
+    reference.meta.owner_id = 1;
 
     MountPoint mount;
     char *extra;
@@ -77,6 +77,50 @@ FILEHANDLE OpenFile(enum File_Mode mode, const char *path)
     }
 
     free(extra);
+
+    User owner;
+    if (!GetUser(reference.meta.owner_id, &owner))
+    {
+        LOG("User %lu from file '%s' does not exist.\n", reference.meta.owner_id, path);
+        // treat it as others
+        owner.id = reference.meta.owner_id;
+    }
+
+    User current;
+    if (!GetUserFromProcess(reference.owner_process, &current))
+    {
+        LOG("User from process %lu does not exist.\n", reference.owner_process)
+        return -E_NO_PERMISSION;
+    }
+
+    bool user_executable = reference.meta.permissions & USER_EXECUTE;
+    bool user_writable = reference.meta.permissions & USER_WRITE;
+    bool user_readable = reference.meta.permissions & USER_READ;
+    bool other_executable = reference.meta.permissions & OTHER_EXECUTE;
+    bool other_writable = reference.meta.permissions & OTHER_WRITE;
+    bool other_readable = reference.meta.permissions & OTHER_READ;
+
+    if (current.id == owner.id)
+    {
+        if ((!user_executable && mode & FILE_EXECUTE) ||
+            (!user_readable && mode & FILE_READ) ||
+            (!user_writable && mode & FILE_WRITE))
+        {
+            LOG("User %lu (marked as owner) tried accessing file '%s'.\n", current.id, path);
+            return -E_NO_PERMISSION;
+        }
+    }
+    else
+    {
+        if ((!other_executable && mode & FILE_EXECUTE) ||
+            (!other_readable && mode & FILE_READ) ||
+            (!other_writable && mode & FILE_WRITE))
+        {
+            LOG("User %lu tried accessing file '%s' with owner %lu.\n", current.id, path, owner.id);
+            return -E_NO_PERMISSION;
+        }
+    }
+
     return AddFileReference(reference);
 }
 

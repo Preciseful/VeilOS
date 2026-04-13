@@ -40,13 +40,22 @@ void UsersInit();
 UID GetCurrentUser();
 
 /**
- * @brief Gets a user from a UID.
+ * @brief Gets a user from a process ID.
  *
+ * @param pid The process id.
  * @param[out] user The user.
- * @param uid The UID.
+ * @return `true` if the process and user are found, otherwise `false`.
+ */
+bool GetUserFromProcess(PID pid, User *user);
+
+/**
+ * @brief Gets a user from a user ID.
+ *
+ * @param uid The user ID.
+ * @param[out] user The user.
  * @return `true` if found, otherwise `false`.
  */
-bool GetUser(User *user, UID uid);
+bool GetUser(UID uid, User *user);
 
 /**
  * @brief Own a process under a user.
