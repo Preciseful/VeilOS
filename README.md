@@ -10,7 +10,7 @@ A simple, bare metal, raspberry pi 4B OS.
 - GIC support for scheduling/timer.
 - Hardware RNG.
 - ELF files support.
-- Users and groups.
+- Users for (terrible) security.
 
 ## Building
 1. Clone the repository.
