@@ -11,7 +11,7 @@
  * - @ref gic.h "GIC" support for @ref scheduler.h "scheduling"/@ref timer.h "timer".
  * - Hardware @ref rng.h "RNG".
  * - @ref elf.h "ELF files" support.
- * - @ref user.h "Users" and groups.
+ * - @ref user.h "Users" for (terrible) security.
  *
  * # Drivers
  * - @ref emmc.h "EMMC"
