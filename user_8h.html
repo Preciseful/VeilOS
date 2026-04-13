@@ -129,9 +129,14 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>UsersInit</b> ()</td></tr>
 <tr class="memdesc:aaff90eeb0b0c3d6b0503d853a1c7ab98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes users in memory. <br /></td></tr>
 <tr class="separator:aaff90eeb0b0c3d6b0503d853a1c7ab98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d36338ae2d265401b4348b6627f330f" id="r_a1d36338ae2d265401b4348b6627f330f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8h.html#a1d36338ae2d265401b4348b6627f330f">GetUser</a> (<a class="el" href="structUser.html">User</a> *user, UID uid)</td></tr>
-<tr class="memdesc:a1d36338ae2d265401b4348b6627f330f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a user from a UID.  <br /></td></tr>
-<tr class="separator:a1d36338ae2d265401b4348b6627f330f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3878f4dbf45a514a8daf36bb0bfcdff7" id="r_a3878f4dbf45a514a8daf36bb0bfcdff7"><td class="memItemLeft" align="right" valign="top">UID&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8h.html#a3878f4dbf45a514a8daf36bb0bfcdff7">GetCurrentUser</a> ()</td></tr>
+<tr class="separator:a3878f4dbf45a514a8daf36bb0bfcdff7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae00383b04db3e521a47532bf71496ae2" id="r_ae00383b04db3e521a47532bf71496ae2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8h.html#ae00383b04db3e521a47532bf71496ae2">GetUserFromProcess</a> (PID pid, <a class="el" href="structUser.html">User</a> *user)</td></tr>
+<tr class="memdesc:ae00383b04db3e521a47532bf71496ae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a user from a process ID.  <br /></td></tr>
+<tr class="separator:ae00383b04db3e521a47532bf71496ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68712659b8e70cacd2d1318b8fb82f14" id="r_a68712659b8e70cacd2d1318b8fb82f14"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8h.html#a68712659b8e70cacd2d1318b8fb82f14">GetUser</a> (UID uid, <a class="el" href="structUser.html">User</a> *user)</td></tr>
+<tr class="memdesc:a68712659b8e70cacd2d1318b8fb82f14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a user from a user ID.  <br /></td></tr>
+<tr class="separator:a68712659b8e70cacd2d1318b8fb82f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02769f7d822dfa49eb41c4953a48d0e3" id="r_a02769f7d822dfa49eb41c4953a48d0e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="user_8h.html#a02769f7d822dfa49eb41c4953a48d0e3">UserOwnProcess</a> (<a class="el" href="structUser.html">User</a> user, PID pid)</td></tr>
 <tr class="memdesc:a02769f7d822dfa49eb41c4953a48d0e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Own a process under a user.  <br /></td></tr>
 <tr class="separator:a02769f7d822dfa49eb41c4953a48d0e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,8 +188,26 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>UsersInit</b> ()</td>
 
 </div>
 </div>
-<a id="a1d36338ae2d265401b4348b6627f330f" name="a1d36338ae2d265401b4348b6627f330f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d36338ae2d265401b4348b6627f330f">&#9670;&#160;</a></span>GetUser()</h2>
+<a id="a3878f4dbf45a514a8daf36bb0bfcdff7" name="a3878f4dbf45a514a8daf36bb0bfcdff7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3878f4dbf45a514a8daf36bb0bfcdff7">&#9670;&#160;</a></span>GetCurrentUser()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">UID GetCurrentUser </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Gets the current user ID. </dd></dl>
+
+</div>
+</div>
+<a id="a68712659b8e70cacd2d1318b8fb82f14" name="a68712659b8e70cacd2d1318b8fb82f14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68712659b8e70cacd2d1318b8fb82f14">&#9670;&#160;</a></span>GetUser()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -192,14 +215,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>UsersInit</b> ()</td>
         <tr>
           <td class="memname">bool GetUser </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structUser.html">User</a> *&#160;</td>
-          <td class="paramname"><em>user</em>, </td>
+          <td class="paramtype">UID&#160;</td>
+          <td class="paramname"><em>uid</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">UID&#160;</td>
-          <td class="paramname"><em>uid</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="structUser.html">User</a> *&#160;</td>
+          <td class="paramname"><em>user</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -209,15 +232,53 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>UsersInit</b> ()</td>
       </table>
 </div><div class="memdoc">
 
-<p>Gets a user from a UID. </p>
+<p>Gets a user from a user ID. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">uid</td><td>The user ID. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">user</td><td>The user. </td></tr>
-    <tr><td class="paramdir"></td><td class="paramname">uid</td><td>The UID. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if found, otherwise <code>false</code>. </dd></dl>
+
+</div>
+</div>
+<a id="ae00383b04db3e521a47532bf71496ae2" name="ae00383b04db3e521a47532bf71496ae2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae00383b04db3e521a47532bf71496ae2">&#9670;&#160;</a></span>GetUserFromProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GetUserFromProcess </td>
+          <td>(</td>
+          <td class="paramtype">PID&#160;</td>
+          <td class="paramname"><em>pid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structUser.html">User</a> *&#160;</td>
+          <td class="paramname"><em>user</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets a user from a process ID. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">pid</td><td>The process id. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">user</td><td>The user. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the process and user are found, otherwise <code>false</code>. </dd></dl>
 
 </div>
 </div>

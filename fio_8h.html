@@ -107,6 +107,8 @@ $(document).ready(function(){initNavTree('fio_8h.html',''); initResizable(); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFileMeta.html">FileMeta</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFilesystemInterface.html">FilesystemInterface</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -115,19 +117,18 @@ Typedefs</h2></td></tr>
 <tr class="memitem:af09feb0f796416c9b92cec64175dbfee" id="r_af09feb0f796416c9b92cec64175dbfee"><td class="memItemLeft" align="right" valign="top"><a id="af09feb0f796416c9b92cec64175dbfee" name="af09feb0f796416c9b92cec64175dbfee"></a>
 typedef long&#160;</td><td class="memItemRight" valign="bottom"><b>FILEHANDLE</b></td></tr>
 <tr class="separator:af09feb0f796416c9b92cec64175dbfee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af79dececb408c9f9c34f662bc3086fb1" id="r_af79dececb408c9f9c34f662bc3086fb1"><td class="memItemLeft" align="right" valign="top"><a id="af79dececb408c9f9c34f662bc3086fb1" name="af79dececb408c9f9c34f662bc3086fb1"></a>
-typedef unsigned char&#160;</td><td class="memItemRight" valign="bottom"><b>FILEMODE</b></td></tr>
-<tr class="separator:af79dececb408c9f9c34f662bc3086fb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1545aa6fc7cd079c858c80275a0e06f" id="r_ac1545aa6fc7cd079c858c80275a0e06f"><td class="memItemLeft" align="right" valign="top"><a id="ac1545aa6fc7cd079c858c80275a0e06f" name="ac1545aa6fc7cd079c858c80275a0e06f"></a>
+typedef struct <a class="el" href="structFileMeta.html">FileMeta</a>&#160;</td><td class="memItemRight" valign="bottom"><b>FileMeta</b></td></tr>
+<tr class="separator:ac1545aa6fc7cd079c858c80275a0e06f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3feaa456f9b4582d1001cb3633084772" id="r_a3feaa456f9b4582d1001cb3633084772"><td class="memItemLeft" align="right" valign="top"><a id="a3feaa456f9b4582d1001cb3633084772" name="a3feaa456f9b4582d1001cb3633084772"></a>
 typedef struct <a class="el" href="structFilesystemInterface.html">FilesystemInterface</a>&#160;</td><td class="memItemRight" valign="bottom"><b>FilesystemInterface</b></td></tr>
 <tr class="separator:a3feaa456f9b4582d1001cb3633084772"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a17951df9a6eff7cf088ac06c84accd85" id="r_a17951df9a6eff7cf088ac06c84accd85"><td class="memItemLeft" align="right" valign="top"><a id="a17951df9a6eff7cf088ac06c84accd85" name="a17951df9a6eff7cf088ac06c84accd85"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>File_Mode</b> { <b>FILE_CREATE</b> = 1 &lt;&lt; 0
-, <b>FILE_WRITE</b> = 1 &lt;&lt; 1
-, <b>FILE_READ</b> = 1 &lt;&lt; 2
-, <b>FILE_EXECUTE</b> = 1 &lt;&lt; 3
+<tr class="memitem:a17951df9a6eff7cf088ac06c84accd85" id="r_a17951df9a6eff7cf088ac06c84accd85"><td class="memItemLeft" align="right" valign="top"><a id="a17951df9a6eff7cf088ac06c84accd85" name="a17951df9a6eff7cf088ac06c84accd85"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>File_Mode</b> { <b>FILE_WRITE</b> = 1 &lt;&lt; 0
+, <b>FILE_READ</b> = 1 &lt;&lt; 1
+, <b>FILE_EXECUTE</b> = 1 &lt;&lt; 2
  }</td></tr>
 <tr class="separator:a17951df9a6eff7cf088ac06c84accd85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8102d67b60f5e78627f6160ffa1c01cf" id="r_a8102d67b60f5e78627f6160ffa1c01cf"><td class="memItemLeft" align="right" valign="top"><a id="a8102d67b60f5e78627f6160ffa1c01cf" name="a8102d67b60f5e78627f6160ffa1c01cf"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>File_Permissions</b> { <br />
@@ -141,6 +142,11 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a8102d67b60f5e78627f6160ffa1c01cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7a02d318f07a61c63b9d3b36c4d7345" id="r_aa7a02d318f07a61c63b9d3b36c4d7345"><td class="memItemLeft" align="right" valign="top"><a id="aa7a02d318f07a61c63b9d3b36c4d7345" name="aa7a02d318f07a61c63b9d3b36c4d7345"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>File_Flags</b> { <b>FFDIRECTORY</b> = 1 &lt;&lt; 0
+, <b>FFHIDDEN</b> = 1 &lt;&lt; 1
+, <b>FFSYSTEM</b> = 1 &lt;&lt; 2
+ }</td></tr>
+<tr class="separator:aa7a02d318f07a61c63b9d3b36c4d7345"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -159,12 +165,12 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>GetFilename</
 <tr class="memitem:a4b120ebb7cc9b39403aff442c5427d53" id="r_a4b120ebb7cc9b39403aff442c5427d53"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#a4b120ebb7cc9b39403aff442c5427d53">CloseFile</a> (FILEHANDLE handle)</td></tr>
 <tr class="memdesc:a4b120ebb7cc9b39403aff442c5427d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a file.  <br /></td></tr>
 <tr class="separator:a4b120ebb7cc9b39403aff442c5427d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81832a2cc744418e1e01c08bea10cb82" id="r_a81832a2cc744418e1e01c08bea10cb82"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#a81832a2cc744418e1e01c08bea10cb82">ReadFile</a> (FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset)</td></tr>
-<tr class="memdesc:a81832a2cc744418e1e01c08bea10cb82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a certain amount of contents from the file into a buffer, starting at an offset.  <br /></td></tr>
-<tr class="separator:a81832a2cc744418e1e01c08bea10cb82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d57899ab5849faf29dfc1eb5b98bf3f" id="r_a2d57899ab5849faf29dfc1eb5b98bf3f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#a2d57899ab5849faf29dfc1eb5b98bf3f">WriteFile</a> (FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)</td></tr>
-<tr class="memdesc:a2d57899ab5849faf29dfc1eb5b98bf3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes to a file at a certain offset from a buffer.  <br /></td></tr>
-<tr class="separator:a2d57899ab5849faf29dfc1eb5b98bf3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ba1ab29181a7ec24da9a8b6cb380b7" id="r_ad7ba1ab29181a7ec24da9a8b6cb380b7"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#ad7ba1ab29181a7ec24da9a8b6cb380b7">ReadFile</a> (FILEHANDLE handle, void *buf, unsigned long size, unsigned long offset)</td></tr>
+<tr class="memdesc:ad7ba1ab29181a7ec24da9a8b6cb380b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a certain amount of contents from the file into a buffer, starting at an offset.  <br /></td></tr>
+<tr class="separator:ad7ba1ab29181a7ec24da9a8b6cb380b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a0a9109b0b8444e0df8a8211cae8c11" id="r_a5a0a9109b0b8444e0df8a8211cae8c11"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#a5a0a9109b0b8444e0df8a8211cae8c11">WriteFile</a> (FILEHANDLE handle, const char *buf, unsigned long size, unsigned long offset)</td></tr>
+<tr class="memdesc:a5a0a9109b0b8444e0df8a8211cae8c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes to a file at a certain offset from a buffer.  <br /></td></tr>
+<tr class="separator:a5a0a9109b0b8444e0df8a8211cae8c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81b92b377a8404b264063556f3446a05" id="r_a81b92b377a8404b264063556f3446a05"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fio_8h.html#a81b92b377a8404b264063556f3446a05">GetFileSize</a> (const char *path)</td></tr>
 <tr class="memdesc:a81b92b377a8404b264063556f3446a05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a file's size.  <br /></td></tr>
 <tr class="separator:a81b92b377a8404b264063556f3446a05"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -342,14 +348,14 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>GetFilename</
 
 </div>
 </div>
-<a id="a81832a2cc744418e1e01c08bea10cb82" name="a81832a2cc744418e1e01c08bea10cb82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81832a2cc744418e1e01c08bea10cb82">&#9670;&#160;</a></span>ReadFile()</h2>
+<a id="ad7ba1ab29181a7ec24da9a8b6cb380b7" name="ad7ba1ab29181a7ec24da9a8b6cb380b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7ba1ab29181a7ec24da9a8b6cb380b7">&#9670;&#160;</a></span>ReadFile()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int ReadFile </td>
+          <td class="memname">long ReadFile </td>
           <td>(</td>
           <td class="paramtype">FILEHANDLE&#160;</td>
           <td class="paramname"><em>handle</em>, </td>
@@ -394,14 +400,14 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>GetFilename</
 
 </div>
 </div>
-<a id="a2d57899ab5849faf29dfc1eb5b98bf3f" name="a2d57899ab5849faf29dfc1eb5b98bf3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d57899ab5849faf29dfc1eb5b98bf3f">&#9670;&#160;</a></span>WriteFile()</h2>
+<a id="a5a0a9109b0b8444e0df8a8211cae8c11" name="a5a0a9109b0b8444e0df8a8211cae8c11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a0a9109b0b8444e0df8a8211cae8c11">&#9670;&#160;</a></span>WriteFile()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int WriteFile </td>
+          <td class="memname">long WriteFile </td>
           <td>(</td>
           <td class="paramtype">FILEHANDLE&#160;</td>
           <td class="paramname"><em>handle</em>, </td>

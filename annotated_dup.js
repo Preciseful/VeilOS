@@ -5,6 +5,7 @@ var annotated_dup =
     [ "emmc_regs", "structemmc__regs.html", null ],
     [ "FatFS", "structFatFS.html", null ],
     [ "FatFSNode", "structFatFSNode.html", null ],
+    [ "FileMeta", "structFileMeta.html", null ],
     [ "FileReference", "structFileReference.html", null ],
     [ "FilesystemInterface", "structFilesystemInterface.html", null ],
     [ "InterruptStack", "structInterruptStack.html", null ],

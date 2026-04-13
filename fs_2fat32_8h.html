@@ -161,12 +161,9 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>__attribute__</b> (
 <tr class="memitem:a5ba1d3900773669170e91fb0d7b47da7" id="r_a5ba1d3900773669170e91fb0d7b47da7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fs_2fat32_8h.html#a5ba1d3900773669170e91fb0d7b47da7">UpdateFatEntry</a> (unsigned int parent_cluster, <a class="el" href="structFatFSNode.html">FatFSNode</a> *target_entry, bool clean_clusters)</td></tr>
 <tr class="memdesc:a5ba1d3900773669170e91fb0d7b47da7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates an entry's data.  <br /></td></tr>
 <tr class="separator:a5ba1d3900773669170e91fb0d7b47da7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb24db5612ad52abf028cad40c9ee213" id="r_adb24db5612ad52abf028cad40c9ee213"><td class="memItemLeft" align="right" valign="top">unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fs_2fat32_8h.html#adb24db5612ad52abf028cad40c9ee213">ReadFatNode</a> (<a class="el" href="structFatFSNode.html">FatFSNode</a> node)</td></tr>
-<tr class="memdesc:adb24db5612ad52abf028cad40c9ee213"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the entire contents of a file entry.  <br /></td></tr>
-<tr class="separator:adb24db5612ad52abf028cad40c9ee213"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac12a3d79169b1fce344933ef6f363e85" id="r_ac12a3d79169b1fce344933ef6f363e85"><td class="memItemLeft" align="right" valign="top">unsigned char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fs_2fat32_8h.html#ac12a3d79169b1fce344933ef6f363e85">ReadFatNodeRange</a> (<a class="el" href="structFatFSNode.html">FatFSNode</a> node, unsigned int offset, unsigned int size)</td></tr>
-<tr class="memdesc:ac12a3d79169b1fce344933ef6f363e85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a certain amount of content of a file entry, starting from an offset.  <br /></td></tr>
-<tr class="separator:ac12a3d79169b1fce344933ef6f363e85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a371c8dce5237d1cbf6e961091f78dd6b" id="r_a371c8dce5237d1cbf6e961091f78dd6b"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fs_2fat32_8h.html#a371c8dce5237d1cbf6e961091f78dd6b">ReadFatNode</a> (<a class="el" href="structFatFSNode.html">FatFSNode</a> node, unsigned long offset, unsigned long size, char *buf)</td></tr>
+<tr class="memdesc:a371c8dce5237d1cbf6e961091f78dd6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a certain amount of content of a file entry, starting from an offset.  <br /></td></tr>
+<tr class="separator:a371c8dce5237d1cbf6e961091f78dd6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a309ab7ef45d86e1904f9176268373d3b" id="r_a309ab7ef45d86e1904f9176268373d3b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fs_2fat32_8h.html#a309ab7ef45d86e1904f9176268373d3b">WriteToFatNode</a> (<a class="el" href="structFatFSNode.html">FatFSNode</a> *node, const char *cbuf, unsigned long size)</td></tr>
 <tr class="memdesc:a309ab7ef45d86e1904f9176268373d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a buffer to a file entry.  <br /></td></tr>
 <tr class="separator:a309ab7ef45d86e1904f9176268373d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -508,41 +505,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="adb24db5612ad52abf028cad40c9ee213" name="adb24db5612ad52abf028cad40c9ee213"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb24db5612ad52abf028cad40c9ee213">&#9670;&#160;</a></span>ReadFatNode()</h2>
+<a id="a371c8dce5237d1cbf6e961091f78dd6b" name="a371c8dce5237d1cbf6e961091f78dd6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a371c8dce5237d1cbf6e961091f78dd6b">&#9670;&#160;</a></span>ReadFatNode()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned char * ReadFatNode </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatFSNode.html">FatFSNode</a>&#160;</td>
-          <td class="paramname"><em>node</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Reads the entire contents of a file entry. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">node</td><td>The entry to read from. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The contents. </dd></dl>
-
-</div>
-</div>
-<a id="ac12a3d79169b1fce344933ef6f363e85" name="ac12a3d79169b1fce344933ef6f363e85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac12a3d79169b1fce344933ef6f363e85">&#9670;&#160;</a></span>ReadFatNodeRange()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned char * ReadFatNodeRange </td>
+          <td class="memname">unsigned long ReadFatNode </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structFatFSNode.html">FatFSNode</a>&#160;</td>
           <td class="paramname"><em>node</em>, </td>
@@ -550,14 +520,20 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramtype">unsigned long&#160;</td>
           <td class="paramname"><em>offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
