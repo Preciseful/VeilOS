@@ -36,6 +36,9 @@
 
 #include <system/syscall.h>
 
+typedef unsigned long VirtualAddr;
+typedef unsigned long PhysicalAddr;
+
 typedef struct MHeader
 {
     unsigned int size;
@@ -46,7 +49,10 @@ typedef struct MHeader
 /**
  * @brief Initialize the memory manager.
  */
-void MMInit();
+void MMInit(unsigned long lp);
+
+PhysicalAddr GetPhysicalPage();
+
 void *malloc(unsigned int size);
 void *realloc(void *address, unsigned int size);
 unsigned int free(void *data);

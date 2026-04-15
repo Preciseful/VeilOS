@@ -17,15 +17,21 @@
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
 unsigned long used_memory = 0;
+unsigned long *pgd;
 
 extern char bss_begin[];
 extern char bss_end[];
 
-void MMInit()
+void MMInit(unsigned long lp)
 {
-    // LOG("Zeroing the memory...\n");
     memset(mem_map, 0, PAGING_PAGES);
-    // LOG("Finished zeroing the memory!\n");
+
+    unsigned long lpi = (lp - LOW_MEMORY) / PAGE_SIZE;
+    for (unsigned long i = 0; i <= lpi; i++)
+        mem_map[i] = 1;
+
+    pgd = (unsigned long *)(HIGH_VA + LOW_MEMORY);
+    used_memory += lpi * PAGE_SIZE;
 }
 
 bool check_memory(unsigned long index, unsigned int size)
@@ -39,6 +45,20 @@ bool check_memory(unsigned long index, unsigned int size)
     return true;
 }
 
+PhysicalAddr GetPhysicalPage()
+{
+    for (int i = 0; i < PAGING_PAGES; i++)
+    {
+        if (mem_map[i] == 0)
+        {
+            mem_map[i] = 1;
+            return LOW_MEMORY + i * PAGE_SIZE;
+        }
+    }
+
+    return 0;
+}
+
 void *get_free_page(unsigned int size)
 {
     for (int i = 0; i < PAGING_PAGES; i++)
@@ -48,6 +68,10 @@ void *get_free_page(unsigned int size)
             unsigned long pages = size / PAGE_SIZE;
             for (unsigned long j = 0; j < pages; j++)
             {
+                // todo : allow user too
+                PhysicalAddr caddr = LOW_MEMORY + (i + j) * PAGE_SIZE;
+                MapTablePage(pgd, HIGH_VA + caddr, caddr, MAIR_IDX_NORMAL, MMU_NORW);
+
                 if (j < pages - 1)
                     mem_map[i + j] = true;
                 else
@@ -106,7 +130,14 @@ unsigned int free(void *data)
     unsigned long size = header->size;
 
     for (unsigned long i = 0; i < (size / PAGE_SIZE) + 1; i++)
+    {
+        VirtualAddr va = (VirtualAddr)data + i * PAGE_SIZE;
+
+        UnmapTablePage(pgd, va);
+        reset_va(va >> 12);
+
         mem_map[index + i] = false;
+    }
 
     used_memory -= size;
     return initial_size;

@@ -36,9 +36,6 @@ enum MMU_Flags
     MMU_RR = 0b11
 };
 
-typedef unsigned long VirtualAddr;
-typedef unsigned long PhysicalAddr;
-
 /**
  * @brief Maps to a table a page.
  *
@@ -82,7 +79,8 @@ void FreeTable(unsigned long *table, unsigned int level);
  */
 void MMUInit();
 
-extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i);
+extern void mmu_init_regs(unsigned long pgd, unsigned long high_pgd, unsigned long last_page);
 extern void refresh_ttbr(unsigned long pgd);
+extern void reset_va(unsigned long va);
 
 #endif

@@ -60,3 +60,10 @@ refresh_ttbr:
 	isb
 
     ret
+
+.global reset_va
+reset_va:
+    tlbi vaae1is, x0
+    dsb ish
+    isb
+    ret
