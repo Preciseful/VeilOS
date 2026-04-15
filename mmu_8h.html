@@ -92,7 +92,6 @@ $(document).ready(function(){initNavTree('mmu_8h.html',''); initResizable(); });
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">mmu.h File Reference</div></div>
@@ -138,15 +137,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>TTBR_BADDR_MASK</b>&#160;&#160;&#160;(0x0000FFFFFFFFFFFFUL)</td></tr>
 <tr class="separator:af1198da5ed8f160a31f03f5ad4432ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:aaf4876eac3a88c866f18ae09c7d1ad07" id="r_aaf4876eac3a88c866f18ae09c7d1ad07"><td class="memItemLeft" align="right" valign="top"><a id="aaf4876eac3a88c866f18ae09c7d1ad07" name="aaf4876eac3a88c866f18ae09c7d1ad07"></a>
-typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>VirtualAddr</b></td></tr>
-<tr class="separator:aaf4876eac3a88c866f18ae09c7d1ad07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3102bb081153cda8671476d7381755b8" id="r_a3102bb081153cda8671476d7381755b8"><td class="memItemLeft" align="right" valign="top"><a id="a3102bb081153cda8671476d7381755b8" name="a3102bb081153cda8671476d7381755b8"></a>
-typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>PhysicalAddr</b></td></tr>
-<tr class="separator:a3102bb081153cda8671476d7381755b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a491cc8481205edc9fe572a62cee1c67f" id="r_a491cc8481205edc9fe572a62cee1c67f"><td class="memItemLeft" align="right" valign="top"><a id="a491cc8481205edc9fe572a62cee1c67f" name="a491cc8481205edc9fe572a62cee1c67f"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>MMU_Flags</b> { <br />
@@ -179,12 +169,15 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>MMUInit</b> ()</td></tr>
 <tr class="memdesc:a3a67ed6bee1df998999f599d054f7d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the MMU. <br /></td></tr>
 <tr class="separator:a3a67ed6bee1df998999f599d054f7d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12aab30b782f3067af06259470bef242" id="r_a12aab30b782f3067af06259470bef242"><td class="memItemLeft" align="right" valign="top"><a id="a12aab30b782f3067af06259470bef242" name="a12aab30b782f3067af06259470bef242"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>mmu_init_regs</b> (unsigned long pgd, unsigned long high_pgd, unsigned long high_memory_i)</td></tr>
-<tr class="separator:a12aab30b782f3067af06259470bef242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30d217eff1a504a58c942c83722f5afc" id="r_a30d217eff1a504a58c942c83722f5afc"><td class="memItemLeft" align="right" valign="top"><a id="a30d217eff1a504a58c942c83722f5afc" name="a30d217eff1a504a58c942c83722f5afc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>mmu_init_regs</b> (unsigned long pgd, unsigned long high_pgd, unsigned long last_page)</td></tr>
+<tr class="separator:a30d217eff1a504a58c942c83722f5afc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2b2251996e644025c5d516ee790da63" id="r_ad2b2251996e644025c5d516ee790da63"><td class="memItemLeft" align="right" valign="top"><a id="ad2b2251996e644025c5d516ee790da63" name="ad2b2251996e644025c5d516ee790da63"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>refresh_ttbr</b> (unsigned long pgd)</td></tr>
 <tr class="separator:ad2b2251996e644025c5d516ee790da63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82281ebdeb01c64e0d8b1172dd326ffc" id="r_a82281ebdeb01c64e0d8b1172dd326ffc"><td class="memItemLeft" align="right" valign="top"><a id="a82281ebdeb01c64e0d8b1172dd326ffc" name="a82281ebdeb01c64e0d8b1172dd326ffc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>reset_va</b> (unsigned long va)</td></tr>
+<tr class="separator:a82281ebdeb01c64e0d8b1172dd326ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>MMU interface. </p>

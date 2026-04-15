@@ -9,7 +9,7 @@ var searchData=
   ['memory_2eh_6',['memory.h',['../memory_8h.html',1,'']]],
   ['memorysize_7',['MemorySize',['../memory_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8',1,'memory.c']]],
   ['mheader_8',['MHeader',['../structMHeader.html',1,'']]],
-  ['mminit_9',['MMInit',['../memory_8h.html#adc0c21d6f02d3d1d3868873908d9d4d4',1,'memory.h']]],
+  ['mminit_9',['MMInit',['../memory_8h.html#a42a86728a87b710891c48846e3bd003c',1,'memory.h']]],
   ['mmu_2eh_10',['mmu.h',['../mmu_8h.html',1,'']]],
   ['mmuinit_11',['MMUInit',['../mmu_8h.html#a3a67ed6bee1df998999f599d054f7d7a',1,'mmu.c']]],
   ['mountpoint_12',['MountPoint',['../structMountPoint.html',1,'']]]
