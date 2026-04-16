@@ -13,10 +13,12 @@
 #include <lib/string.h>
 #include <lib/panic.h>
 #include <limits.h>
+#include <drivers/gic.h>
 
 __attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
 
 unsigned long used_memory = 0;
+unsigned long total_memory;
 unsigned long *pgd;
 
 extern char bss_begin[];
@@ -26,9 +28,25 @@ void MMInit(unsigned long lp)
 {
     memset(mem_map, 0, PAGING_PAGES);
 
+    total_memory = PAGING_PAGES * PAGE_SIZE;
+
     unsigned long lpi = (lp - LOW_MEMORY) / PAGE_SIZE;
     for (unsigned long i = 0; i <= lpi; i++)
         mem_map[i] = 1;
+
+    for (unsigned long addr = PERIPHERAL_BASE; addr <= PERIPHERAL_BASE + GRANULE_2MB * 8; addr += GRANULE_4KB)
+    {
+        total_memory -= PAGE_SIZE;
+        unsigned long i = ((unsigned long)addr - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+        mem_map[i] = 1;
+    }
+
+    for (unsigned long addr = GIC_BASE; addr <= GIC_BASE + GRANULE_4KB * 2; addr += GRANULE_4KB)
+    {
+        total_memory -= PAGE_SIZE;
+        unsigned long i = ((unsigned long)addr - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+        mem_map[i] = 1;
+    }
 
     pgd = (unsigned long *)(HIGH_VA + LOW_MEMORY);
     used_memory += lpi * PAGE_SIZE;
@@ -68,7 +86,6 @@ void *get_free_page(unsigned int size)
             unsigned long pages = size / PAGE_SIZE;
             for (unsigned long j = 0; j < pages; j++)
             {
-                // todo : allow user too
                 PhysicalAddr caddr = LOW_MEMORY + (i + j) * PAGE_SIZE;
                 MapTablePage(pgd, HIGH_VA + caddr, caddr, MAIR_IDX_NORMAL, MMU_NORW);
 
@@ -158,6 +175,11 @@ void *realloc(void *address, unsigned int size)
 unsigned long GetMemoryUsed()
 {
     return used_memory;
+}
+
+unsigned long GetTotalMemory()
+{
+    return total_memory;
 }
 
 unsigned int MemorySize(void *data)

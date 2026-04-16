@@ -48,9 +48,14 @@ typedef struct MHeader
 
 /**
  * @brief Initialize the memory manager.
+ *
+ * @param lp The last page used by the MMU initialization.
  */
 void MMInit(unsigned long lp);
 
+/**
+ * @return A free physical page, used by the MMU.
+ */
 PhysicalAddr GetPhysicalPage();
 
 void *malloc(unsigned int size);
@@ -69,6 +74,11 @@ unsigned int MemorySize(void *data);
  * @return The amount of memory so far used.
  */
 unsigned long GetMemoryUsed();
+
+/**
+ * @return The amount of total memory.
+ */
+unsigned long GetTotalMemory();
 
 SYSCALL_HANDLER(malloc);
 SYSCALL_HANDLER(free);

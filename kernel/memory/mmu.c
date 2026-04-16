@@ -134,39 +134,6 @@ void UnmapTablePage(unsigned long *pgd, VirtualAddr va)
     l3[pte_index] = 0;
 }
 
-void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
-{
-    unsigned long l1_index = (va >> 39) & 0x1FF;
-    unsigned long l2_index = (va >> 30) & 0x1FF;
-    unsigned long l3_index = (va >> 21) & 0x1FF;
-
-    if (!(pgd[l1_index] & 1))
-    {
-        unsigned long *l1 = malloc(PAGE_SIZE);
-        memset(l1, 0, PAGE_SIZE);
-        pgd[l1_index] = (VIRT_TO_PHYS(l1) & PAGE_MASK) | PD_TABLE;
-    }
-
-    unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
-
-    if (!(l1[l2_index] & 1))
-    {
-        unsigned long *l2 = malloc(PAGE_SIZE);
-        memset(l2, 0, PAGE_SIZE);
-        l1[l2_index] = (VIRT_TO_PHYS(l2) & PAGE_MASK) | PD_TABLE;
-    }
-
-    unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
-
-    bool uxn = !((flags & MMU_USER_EXEC) >> 2);
-    bool pxn = !uxn;
-    unsigned long perm = flags & 0b11;
-
-    unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | PD_BLOCK;
-
-    l2[l3_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
-}
-
 void FreeTable(unsigned long *table, unsigned int level)
 {
     for (unsigned long i = 0; i < 512; i++)

@@ -123,7 +123,7 @@ void kmain()
     // CacheKernelSymbols();
     // LOG("Kernel symbols cached.\n");
 
-    LOG("Used memory (reference): %lu bytes.\n", GetMemoryUsed());
+    LOG("Used memory (reference): %lu/%lu bytes.\n", GetMemoryUsed(), GetTotalMemory());
 
     char *envargv[12];
     envargv[0] = "TTY";

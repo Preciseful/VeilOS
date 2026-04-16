@@ -56,17 +56,6 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
 void UnmapTablePage(unsigned long *pgd, VirtualAddr va);
 
 /**
- * @brief Maps to a table a block.
- *
- * @param pgd The table.
- * @param va The block's virtual address.
- * @param pa The block's physical address.
- * @param index The MAIR index.
- * @param flags The MMU flags for the block.
- */
-void MapTableBlock(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags);
-
-/**
  * @brief Frees up all allocations done within a table, alongside the table itself at level 0.
  *
  * @param table The table.
