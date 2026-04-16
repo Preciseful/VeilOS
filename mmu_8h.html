@@ -159,9 +159,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ae2e62c361517e32eee5046c6e36ba610" id="r_ae2e62c361517e32eee5046c6e36ba610"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610">UnmapTablePage</a> (unsigned long *pgd, VirtualAddr va)</td></tr>
 <tr class="memdesc:ae2e62c361517e32eee5046c6e36ba610"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unmaps a page from a table.  <br /></td></tr>
 <tr class="separator:ae2e62c361517e32eee5046c6e36ba610"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b3a7d557bc49328ed8a2708a4c3ddb0" id="r_a4b3a7d557bc49328ed8a2708a4c3ddb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mmu_8h.html#a4b3a7d557bc49328ed8a2708a4c3ddb0">MapTableBlock</a> (unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)</td></tr>
-<tr class="memdesc:a4b3a7d557bc49328ed8a2708a4c3ddb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps to a table a block.  <br /></td></tr>
-<tr class="separator:a4b3a7d557bc49328ed8a2708a4c3ddb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1499e5643071de8dc0b514e135f70665" id="r_a1499e5643071de8dc0b514e135f70665"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mmu_8h.html#a1499e5643071de8dc0b514e135f70665">FreeTable</a> (unsigned long *table, unsigned int level)</td></tr>
 <tr class="memdesc:a1499e5643071de8dc0b514e135f70665"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees up all allocations done within a table, alongside the table itself at level 0.  <br /></td></tr>
 <tr class="separator:a1499e5643071de8dc0b514e135f70665"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,64 +213,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>reset_va</b> (unsigne
   <table class="params">
     <tr><td class="paramname">table</td><td>The table. </td></tr>
     <tr><td class="paramname">level</td><td>The level of allocations, 0 = L1 + pgd, 1 = L2, 2 = L3, 3 = PTE. (0 default) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4b3a7d557bc49328ed8a2708a4c3ddb0" name="a4b3a7d557bc49328ed8a2708a4c3ddb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b3a7d557bc49328ed8a2708a4c3ddb0">&#9670;&#160;</a></span>MapTableBlock()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void MapTableBlock </td>
-          <td>(</td>
-          <td class="paramtype">unsigned long *&#160;</td>
-          <td class="paramname"><em>pgd</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">VirtualAddr&#160;</td>
-          <td class="paramname"><em>va</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">PhysicalAddr&#160;</td>
-          <td class="paramname"><em>pa</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned long&#160;</td>
-          <td class="paramname"><em>index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">enum MMU_Flags&#160;</td>
-          <td class="paramname"><em>flags</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Maps to a table a block. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pgd</td><td>The table. </td></tr>
-    <tr><td class="paramname">va</td><td>The block's virtual address. </td></tr>
-    <tr><td class="paramname">pa</td><td>The block's physical address. </td></tr>
-    <tr><td class="paramname">index</td><td>The MAIR index. </td></tr>
-    <tr><td class="paramname">flags</td><td>The MMU flags for the block. </td></tr>
   </table>
   </dd>
 </dl>

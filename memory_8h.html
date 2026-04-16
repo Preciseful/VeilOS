@@ -171,12 +171,10 @@ typedef struct <a class="el" href="structMHeader.html">MHeader</a>&#160;</td><td
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a42a86728a87b710891c48846e3bd003c" id="r_a42a86728a87b710891c48846e3bd003c"><td class="memItemLeft" align="right" valign="top"><a id="a42a86728a87b710891c48846e3bd003c" name="a42a86728a87b710891c48846e3bd003c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>MMInit</b> (unsigned long lp)</td></tr>
-<tr class="memdesc:a42a86728a87b710891c48846e3bd003c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager. <br /></td></tr>
+<tr class="memitem:a42a86728a87b710891c48846e3bd003c" id="r_a42a86728a87b710891c48846e3bd003c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a42a86728a87b710891c48846e3bd003c">MMInit</a> (unsigned long lp)</td></tr>
+<tr class="memdesc:a42a86728a87b710891c48846e3bd003c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager.  <br /></td></tr>
 <tr class="separator:a42a86728a87b710891c48846e3bd003c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0d10e5e0d275867eb960adf845bf8de" id="r_ae0d10e5e0d275867eb960adf845bf8de"><td class="memItemLeft" align="right" valign="top"><a id="ae0d10e5e0d275867eb960adf845bf8de" name="ae0d10e5e0d275867eb960adf845bf8de"></a>
-PhysicalAddr&#160;</td><td class="memItemRight" valign="bottom"><b>GetPhysicalPage</b> ()</td></tr>
+<tr class="memitem:ae0d10e5e0d275867eb960adf845bf8de" id="r_ae0d10e5e0d275867eb960adf845bf8de"><td class="memItemLeft" align="right" valign="top">PhysicalAddr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de">GetPhysicalPage</a> ()</td></tr>
 <tr class="separator:ae0d10e5e0d275867eb960adf845bf8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf85ce5903f3dafbab82c8a3598121ff" id="r_adf85ce5903f3dafbab82c8a3598121ff"><td class="memItemLeft" align="right" valign="top"><a id="adf85ce5903f3dafbab82c8a3598121ff" name="adf85ce5903f3dafbab82c8a3598121ff"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>malloc</b> (unsigned int size)</td></tr>
@@ -192,6 +190,8 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 <tr class="separator:a99873dbc69ba5bf5e1973087f9bb95b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9942a6c82b30eac01d4d785025ecfaee" id="r_a9942a6c82b30eac01d4d785025ecfaee"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a9942a6c82b30eac01d4d785025ecfaee">GetMemoryUsed</a> ()</td></tr>
 <tr class="separator:a9942a6c82b30eac01d4d785025ecfaee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7771960d46a1277acb78f3a118ffd1ca" id="r_a7771960d46a1277acb78f3a118ffd1ca"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a7771960d46a1277acb78f3a118ffd1ca">GetTotalMemory</a> ()</td></tr>
+<tr class="separator:a7771960d46a1277acb78f3a118ffd1ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53f474207d7b000189b2ddc0b4cc3cec" id="r_a53f474207d7b000189b2ddc0b4cc3cec"><td class="memItemLeft" align="right" valign="top"><a id="a53f474207d7b000189b2ddc0b4cc3cec" name="a53f474207d7b000189b2ddc0b4cc3cec"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>SYSCALL_HANDLER</b> (malloc)</td></tr>
 <tr class="separator:a53f474207d7b000189b2ddc0b4cc3cec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -226,6 +226,42 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 
 </div>
 </div>
+<a id="ae0d10e5e0d275867eb960adf845bf8de" name="ae0d10e5e0d275867eb960adf845bf8de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0d10e5e0d275867eb960adf845bf8de">&#9670;&#160;</a></span>GetPhysicalPage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">PhysicalAddr GetPhysicalPage </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A free physical page, used by the MMU. </dd></dl>
+
+</div>
+</div>
+<a id="a7771960d46a1277acb78f3a118ffd1ca" name="a7771960d46a1277acb78f3a118ffd1ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7771960d46a1277acb78f3a118ffd1ca">&#9670;&#160;</a></span>GetTotalMemory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long GetTotalMemory </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The amount of total memory. </dd></dl>
+
+</div>
+</div>
 <a id="a99873dbc69ba5bf5e1973087f9bb95b8" name="a99873dbc69ba5bf5e1973087f9bb95b8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a99873dbc69ba5bf5e1973087f9bb95b8">&#9670;&#160;</a></span>MemorySize()</h2>
 
@@ -250,6 +286,32 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The amount of memory allocated. </dd></dl>
+
+</div>
+</div>
+<a id="a42a86728a87b710891c48846e3bd003c" name="a42a86728a87b710891c48846e3bd003c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42a86728a87b710891c48846e3bd003c">&#9670;&#160;</a></span>MMInit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MMInit </td>
+          <td>(</td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>lp</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the memory manager. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lp</td><td>The last page used by the MMU initialization. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
