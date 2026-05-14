@@ -14,6 +14,7 @@
 
 .global _start
 _start:
+    mov x19, x0
     mrs x1, mpidr_el1
     and x1, x1, #0xFF
     cbz x1, drop_el1
@@ -60,5 +61,6 @@ master_core:
 	bl memzero
 
     // go to boot for MMU
+    mov x0, x19
     bl kboot
     b loop
