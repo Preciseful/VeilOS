@@ -59,6 +59,7 @@
 #include <system/user.h>
 #include <drivers/rng.h>
 #include <interface/dtb.h>
+#include <boot/higher.h>
 
 #if MAINFSFUNC + 0 == 0
 #define MAINFSFUNC 0
@@ -66,7 +67,7 @@
 
 void kboot(void *dtb)
 {
-    MMUInit(dtb);
+    JumpToHigher(dtb);
 }
 
 void kmain()
