@@ -14,8 +14,9 @@
 #include <lib/panic.h>
 #include <limits.h>
 #include <drivers/gic.h>
+#include <interface/dtb.h>
 
-__attribute__((section(".mmmap"))) static unsigned char mem_map[PAGING_PAGES];
+unsigned char *mem_map;
 
 unsigned long used_memory = 0;
 unsigned long total_memory;
@@ -24,32 +25,51 @@ unsigned long *pgd;
 extern char bss_begin[];
 extern char bss_end[];
 
-void MMInit(unsigned long lp)
+void MMInit(void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp)
 {
-    memset(mem_map, 0, PAGING_PAGES);
+    mem_map = (unsigned char *)memmap;
+    memset(mem_map, 1, memsize / GRANULE_4KB);
+    total_memory = memsize;
 
-    total_memory = PAGING_PAGES * PAGE_SIZE;
+    unsigned int *data;
+    unsigned int len = ParseDTB(dtb, "/memory@0/reg", (void **)&data);
 
-    unsigned long lpi = (lp - LOW_MEMORY) / PAGE_SIZE;
-    for (unsigned long i = 0; i <= lpi; i++)
+    for (int i = 0; i < len / 12; i++)
+    {
+        unsigned int *entry = data + i * 3;
+        unsigned long address = ((unsigned long)__builtin_bswap32(entry[0]) << 32) | __builtin_bswap32(entry[1]);
+        unsigned int size = __builtin_bswap32(entry[2]);
+        unsigned long end_address = address + size;
+
+        for (unsigned long addr = address; addr < end_address; addr += GRANULE_4KB)
+            mem_map[addr / PAGE_SIZE] = 0;
+    }
+
+    for (unsigned long addr = HIGH_VA + LOW_MEMORY; addr <= HIGH_VA + lp; addr += GRANULE_4KB)
+    {
+        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
         mem_map[i] = 1;
+    }
+
+    for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + LOW_MEMORY; addr += GRANULE_4KB)
+    {
+        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
+        mem_map[i] = 1;
+    }
 
     for (unsigned long addr = PERIPHERAL_BASE; addr <= PERIPHERAL_BASE + GRANULE_2MB * 8; addr += GRANULE_4KB)
     {
-        total_memory -= PAGE_SIZE;
-        unsigned long i = ((unsigned long)addr - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
         mem_map[i] = 1;
     }
 
     for (unsigned long addr = GIC_BASE; addr <= GIC_BASE + GRANULE_4KB * 2; addr += GRANULE_4KB)
     {
-        total_memory -= PAGE_SIZE;
-        unsigned long i = ((unsigned long)addr - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
         mem_map[i] = 1;
     }
 
     pgd = (unsigned long *)(HIGH_VA + LOW_MEMORY);
-    used_memory += lpi * PAGE_SIZE;
 }
 
 bool check_memory(unsigned long index, unsigned int size)
@@ -65,12 +85,12 @@ bool check_memory(unsigned long index, unsigned int size)
 
 PhysicalAddr GetPhysicalPage()
 {
-    for (int i = 0; i < PAGING_PAGES; i++)
+    for (int i = 0; i < total_memory / GRANULE_4KB; i++)
     {
         if (mem_map[i] == 0)
         {
             mem_map[i] = 1;
-            return LOW_MEMORY + i * PAGE_SIZE;
+            return i * PAGE_SIZE;
         }
     }
 
@@ -79,14 +99,14 @@ PhysicalAddr GetPhysicalPage()
 
 void *get_free_page(unsigned int size)
 {
-    for (int i = 0; i < PAGING_PAGES; i++)
+    for (int i = 0; i < total_memory / GRANULE_4KB; i++)
     {
         if (check_memory(i, size))
         {
             unsigned long pages = size / PAGE_SIZE;
             for (unsigned long j = 0; j < pages; j++)
             {
-                PhysicalAddr caddr = LOW_MEMORY + (i + j) * PAGE_SIZE;
+                PhysicalAddr caddr = (i + j) * PAGE_SIZE;
                 MapTablePage(pgd, HIGH_VA + caddr, caddr, MAIR_IDX_NORMAL, MMU_NORW);
 
                 if (j < pages - 1)
@@ -95,7 +115,7 @@ void *get_free_page(unsigned int size)
                     mem_map[i + j] = 2;
             }
 
-            unsigned long adr = HIGH_VA + LOW_MEMORY + i * PAGE_SIZE;
+            unsigned long adr = HIGH_VA + i * PAGE_SIZE;
             return (void *)adr;
         }
     }
@@ -105,12 +125,12 @@ void *get_free_page(unsigned int size)
 
 MHeader *get_header(unsigned long data_index)
 {
-    for (unsigned long i = data_index; i < PAGING_PAGES; i++)
+    for (unsigned long i = data_index; i < total_memory / GRANULE_4KB; i++)
     {
         if (mem_map[i] != 2)
             continue;
 
-        return (MHeader *)(HIGH_VA + LOW_MEMORY + i * PAGE_SIZE);
+        return (MHeader *)(HIGH_VA + i * PAGE_SIZE);
     }
 
     return 0;
@@ -137,7 +157,7 @@ void *malloc(unsigned int size)
 
 unsigned int free(void *data)
 {
-    unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+    unsigned long index = ((unsigned long)data - HIGH_VA) / PAGE_SIZE;
     MHeader *header = get_header(index);
 
     if (header == 0)
@@ -184,7 +204,7 @@ unsigned long GetTotalMemory()
 
 unsigned int MemorySize(void *data)
 {
-    unsigned long index = ((unsigned long)data - HIGH_VA - LOW_MEMORY) / PAGE_SIZE;
+    unsigned long index = ((unsigned long)data - HIGH_VA) / PAGE_SIZE;
     MHeader *header = get_header(index);
 
     if (header == 0)

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <memory/mmu.h>
 #include <scheduler/task.h>
 #include <system/syscall.h>

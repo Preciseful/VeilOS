@@ -6,7 +6,6 @@
  */
 
 #include "printf.h"
-#include <stdbool.h>
 
 static void (*printf_putc)(char c);
 

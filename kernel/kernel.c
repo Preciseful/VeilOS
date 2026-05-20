@@ -58,19 +58,20 @@
 #include <system/trace.h>
 #include <system/user.h>
 #include <drivers/rng.h>
+#include <interface/dtb.h>
 
 #if MAINFSFUNC + 0 == 0
 #define MAINFSFUNC 0
 #endif
 
-void kboot()
+void kboot(void *dtb)
 {
-    MMUInit();
+    MMUInit(dtb);
 }
 
 void kmain()
 {
-    UartInit();
+    SetUartDevice();
     FramebufferInit();
 
     Printf("\n----- VeilOS -----\n");

@@ -16,6 +16,8 @@
  */
 #define READ_BUF_SIZE 1024
 
+void SetUartDevice();
+
 /**
  * @brief Initialize the UART0.
  */

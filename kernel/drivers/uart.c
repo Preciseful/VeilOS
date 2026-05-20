@@ -92,7 +92,10 @@ void UartInit()
     WriteToMMIO(UART0_IMSC, 1 << 4);
 
     SetPrintf(uartPut);
+}
 
+void SetUartDevice()
+{
     uartDevice.category = IO_UART;
     uartDevice.read = uartRead;
     uartDevice.write = uartWrite;
@@ -101,7 +104,6 @@ void UartInit()
     uartDevice.flags = 0;
     uartDevice.tokens_length = 1;
     uartDevice.tokens = malloc(sizeof(IODeviceToken) * 1);
-
     AddIODevice(uartDevice);
 }
 

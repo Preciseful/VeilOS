@@ -1,6 +1,5 @@
 #include <interface/dtb.h>
 #include <lib/string.h>
-#include <stdbool.h>
 
 #define FDT_MAGIC 0xD00DFEED
 #define FDT_BEGIN_NODE 0x1

@@ -12,6 +12,7 @@
 #include <drivers/uart.h>
 #include <lib/string.h>
 #include <drivers/gic.h>
+#include <interface/dtb.h>
 
 #define PAGE_ENTRIES 512
 
@@ -204,16 +205,41 @@ void mmu_map_temp_page(unsigned long *pgd, unsigned long va, unsigned long pa, u
     l3[pte_index] = (pa & 0xFFFFFFFFF000ULL) | attr;
 }
 
+struct
+{
+    unsigned long memmap;
+    unsigned long memsize;
+    void *dtb;
+} mmdata;
+
 extern char __kernel_start[];
 extern char __kernel_code[];
 extern char __kernel_end[];
 
-void MMUInit()
+void MMUInit(void *dtb)
 {
+    unsigned int *data;
+    unsigned int len = ParseDTB(dtb, "/memory@0/reg", (void **)&data);
+    unsigned long memsize = 0;
+
+    for (int i = 0; i < len / 12; i++)
+    {
+        unsigned int *entry = data + i * 3;
+        unsigned long start_address = ((unsigned long)__builtin_bswap32(entry[0]) << 32) | __builtin_bswap32(entry[1]);
+        unsigned int size = __builtin_bswap32(entry[2]);
+        unsigned long end_address = start_address + size;
+
+        if (end_address > memsize)
+            memsize = end_address;
+    }
+
     last_page = LOW_MEMORY;
     unsigned long *high_pgd = temp_malloc();
 
     for (unsigned long addr = (unsigned long)__kernel_start - HIGH_VA; addr <= LOW_MEMORY; addr += GRANULE_4KB)
+        mmu_map_temp_page(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_NORMAL, true);
+
+    for (unsigned long addr = (unsigned long)dtb; addr < (unsigned long)dtb + GetDTBSize(dtb); addr += GRANULE_4KB)
         mmu_map_temp_page(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_NORMAL, true);
 
     for (unsigned long addr = PERIPHERAL_BASE - HIGH_VA; addr <= (PERIPHERAL_BASE - HIGH_VA) + GRANULE_2MB * 8; addr += GRANULE_4KB)
@@ -223,6 +249,12 @@ void MMUInit()
         mmu_map_temp_page(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_DEVICE, true);
 
     mmu_map_temp_page(high_pgd, HIGH_VA, 0, MAIR_IDX_NORMAL, true);
+
+    mmdata.dtb = HIGH_VA + dtb;
+    mmdata.memmap = HIGH_VA + last_page;
+    mmdata.memsize = memsize;
+    for (unsigned long i = 0; i <= memsize / (GRANULE_4KB * GRANULE_4KB); i++)
+        temp_malloc();
 
     for (unsigned long addr = LOW_MEMORY; addr <= last_page; addr += GRANULE_4KB)
         mmu_map_temp_page(high_pgd, HIGH_VA + addr, addr, MAIR_IDX_DEVICE, true);
@@ -239,7 +271,8 @@ extern void kmain();
 
 void finish_higher(unsigned long lp)
 {
-    MMInit(lp);
+    UartInit();
+    MMInit(mmdata.dtb, mmdata.memmap, mmdata.memsize, lp);
 
     // make ttbr0 invalid, use only ttbr1
     refresh_ttbr(LOW_MEMORY);

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <fs/voidelle.h>
 #include <interface/fio.h>
 

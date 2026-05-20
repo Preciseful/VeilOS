@@ -10,7 +10,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <interface/partition.h>
 
 #define VOID_SIZE 512

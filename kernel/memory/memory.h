@@ -10,7 +10,6 @@
 #pragma once
 
 #include <boot/base.h>
-#include <stdbool.h>
 
 #define PAGE_SHIFT 12
 #define TABLE_SHIFT 9
@@ -51,7 +50,7 @@ typedef struct MHeader
  *
  * @param lp The last page used by the MMU initialization.
  */
-void MMInit(unsigned long lp);
+void MMInit(void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp);
 
 /**
  * @return A free physical page, used by the MMU.

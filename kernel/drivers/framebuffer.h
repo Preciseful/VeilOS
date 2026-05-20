@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <stdbool.h>
-
 #define FB_SET_COLOR_REQUEST 0
 
 /**

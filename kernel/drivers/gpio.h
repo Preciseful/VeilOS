@@ -10,7 +10,6 @@
 #pragma once
 
 #include <boot/base.h>
-#include <stdbool.h>
 #include <memory/mmu.h>
 
 /**

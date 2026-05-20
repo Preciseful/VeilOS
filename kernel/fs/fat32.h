@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <interface/partition.h>
 
 typedef struct __attribute__((packed)) Fat32ExtBS

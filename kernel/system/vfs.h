@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <interface/fio.h>
 #include <scheduler/task.h>
 

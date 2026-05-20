@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <boot/base.h>
 
 #define MAILBOX_BASE PERIPHERAL_BASE + 0xB880
