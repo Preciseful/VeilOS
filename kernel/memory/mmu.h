@@ -64,11 +64,6 @@ void UnmapTablePage(unsigned long *pgd, VirtualAddr va);
  */
 void FreeTable(unsigned long *table, unsigned int level);
 
-/**
- * @brief Initializes the MMU.
- */
-void MMUInit(void *dtb);
-
 extern void refresh_ttbr(unsigned long pgd);
 extern void reset_va(unsigned long va);
 
