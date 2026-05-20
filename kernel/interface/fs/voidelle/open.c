@@ -11,6 +11,7 @@
 #include <interface/errno.h>
 #include <stdint.h>
 #include <lib/printf.h>
+#include <memory/memory.h>
 
 #define FLAGS(v)                                    \
     (((v & VOIDELLE_DIRECTORY) ? FFDIRECTORY : 0) | \

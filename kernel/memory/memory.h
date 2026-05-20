@@ -34,9 +34,8 @@
 #ifndef __ASSEMBLER__
 
 #include <system/syscall.h>
-
-typedef unsigned long VirtualAddr;
-typedef unsigned long PhysicalAddr;
+#include <memory/pmm.h>
+#include <memory/mmu.h>
 
 typedef struct MHeader
 {
@@ -50,7 +49,7 @@ typedef struct MHeader
  *
  * @param lp The last page used by the MMU initialization.
  */
-void MMInit(void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp);
+void MMInit(void *dtb, Page *memmap, unsigned long memsize, unsigned long lp);
 
 /**
  * @return A free physical page, used by the MMU.
@@ -68,16 +67,6 @@ unsigned int free(void *data);
  * @return The amount of memory allocated.
  */
 unsigned int MemorySize(void *data);
-
-/**
- * @return The amount of memory so far used.
- */
-unsigned long GetMemoryUsed();
-
-/**
- * @return The amount of total memory.
- */
-unsigned long GetTotalMemory();
 
 SYSCALL_HANDLER(malloc);
 SYSCALL_HANDLER(free);

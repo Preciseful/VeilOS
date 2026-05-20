@@ -10,6 +10,7 @@
 #pragma once
 
 #include <memory/mmu.h>
+#include <memory/memory.h>
 
 typedef long PID;
 

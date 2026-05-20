@@ -13,6 +13,7 @@
 #include <lib/string.h>
 #include <drivers/gic.h>
 #include <interface/dtb.h>
+#include <memory/pmm.h>
 
 #define PAGE_ENTRIES 512
 
@@ -207,7 +208,7 @@ void mmu_map_temp_page(unsigned long *pgd, unsigned long va, unsigned long pa, u
 
 struct
 {
-    unsigned long memmap;
+    Page *memmap;
     unsigned long memsize;
     void *dtb;
 } mmdata;
@@ -251,9 +252,9 @@ void MMUInit(void *dtb)
     mmu_map_temp_page(high_pgd, HIGH_VA, 0, MAIR_IDX_NORMAL, true);
 
     mmdata.dtb = HIGH_VA + dtb;
-    mmdata.memmap = HIGH_VA + last_page;
+    mmdata.memmap = (Page *)(HIGH_VA + last_page);
     mmdata.memsize = memsize;
-    for (unsigned long i = 0; i <= memsize / (GRANULE_4KB * GRANULE_4KB); i++)
+    for (unsigned long i = 0; i <= (memsize * sizeof(Page)) / (GRANULE_4KB * GRANULE_4KB); i++)
         temp_malloc();
 
     for (unsigned long addr = LOW_MEMORY; addr <= last_page; addr += GRANULE_4KB)

@@ -16,90 +16,31 @@
 #include <drivers/gic.h>
 #include <interface/dtb.h>
 
-unsigned char *mem_map;
-
-unsigned long used_memory = 0;
-unsigned long total_memory;
 unsigned long *pgd;
 
 extern char bss_begin[];
 extern char bss_end[];
 
-void MMInit(void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp)
+void MMInit(void *dtb, Page *memmap, unsigned long memsize, unsigned long lp)
 {
-    mem_map = (unsigned char *)memmap;
-    memset(mem_map, 1, memsize / GRANULE_4KB);
-    total_memory = memsize;
-
-    unsigned int *data;
-    unsigned int len = ParseDTB(dtb, "/memory@0/reg", (void **)&data);
-
-    for (int i = 0; i < len / 12; i++)
-    {
-        unsigned int *entry = data + i * 3;
-        unsigned long address = ((unsigned long)__builtin_bswap32(entry[0]) << 32) | __builtin_bswap32(entry[1]);
-        unsigned int size = __builtin_bswap32(entry[2]);
-        unsigned long end_address = address + size;
-
-        for (unsigned long addr = address; addr < end_address; addr += GRANULE_4KB)
-            mem_map[addr / PAGE_SIZE] = 0;
-    }
-
-    for (unsigned long addr = HIGH_VA + LOW_MEMORY; addr <= HIGH_VA + lp; addr += GRANULE_4KB)
-    {
-        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
-        mem_map[i] = 1;
-    }
-
-    for (unsigned long addr = HIGH_VA; addr <= HIGH_VA + LOW_MEMORY; addr += GRANULE_4KB)
-    {
-        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
-        mem_map[i] = 1;
-    }
-
-    for (unsigned long addr = PERIPHERAL_BASE; addr <= PERIPHERAL_BASE + GRANULE_2MB * 8; addr += GRANULE_4KB)
-    {
-        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
-        mem_map[i] = 1;
-    }
-
-    for (unsigned long addr = GIC_BASE; addr <= GIC_BASE + GRANULE_4KB * 2; addr += GRANULE_4KB)
-    {
-        unsigned long i = ((unsigned long)addr - HIGH_VA) / PAGE_SIZE;
-        mem_map[i] = 1;
-    }
-
+    PMMInit(dtb, memsize, (Page *)memmap, lp);
     pgd = (unsigned long *)(HIGH_VA + LOW_MEMORY);
 }
 
 bool check_memory(unsigned long index, unsigned int size)
 {
-    for (unsigned long i = 0; i < size / PAGE_SIZE; i++)
+    for (unsigned long i = 0; i < size / PAGE_SIZE && index + i < GetAmountOfPages(); i++)
     {
-        if (mem_map[index + i])
+        if (GetPageAtIndex(index + i)->flags != PAGE_FREE)
             return false;
     }
 
     return true;
 }
 
-PhysicalAddr GetPhysicalPage()
-{
-    for (int i = 0; i < total_memory / GRANULE_4KB; i++)
-    {
-        if (mem_map[i] == 0)
-        {
-            mem_map[i] = 1;
-            return i * PAGE_SIZE;
-        }
-    }
-
-    return 0;
-}
-
 void *get_free_page(unsigned int size)
 {
-    for (int i = 0; i < total_memory / GRANULE_4KB; i++)
+    for (int i = 0; i < GetAmountOfPages(); i++)
     {
         if (check_memory(i, size))
         {
@@ -110,9 +51,9 @@ void *get_free_page(unsigned int size)
                 MapTablePage(pgd, HIGH_VA + caddr, caddr, MAIR_IDX_NORMAL, MMU_NORW);
 
                 if (j < pages - 1)
-                    mem_map[i + j] = true;
+                    GetPageAtIndex(i + j)->flags = PAGE_OCCUPIED;
                 else
-                    mem_map[i + j] = 2;
+                    GetPageAtIndex(i + j)->flags = PAGE_HEADER;
             }
 
             unsigned long adr = HIGH_VA + i * PAGE_SIZE;
@@ -125,9 +66,9 @@ void *get_free_page(unsigned int size)
 
 MHeader *get_header(unsigned long data_index)
 {
-    for (unsigned long i = data_index; i < total_memory / GRANULE_4KB; i++)
+    for (unsigned long i = data_index; i < GetAmountOfPages(); i++)
     {
-        if (mem_map[i] != 2)
+        if (GetPageAtIndex(i)->flags != PAGE_HEADER)
             continue;
 
         return (MHeader *)(HIGH_VA + i * PAGE_SIZE);
@@ -151,7 +92,6 @@ void *malloc(unsigned int size)
     header->size = size;
     header->initial_size = initial_size;
 
-    used_memory += header->size;
     return header->data;
 }
 
@@ -173,10 +113,9 @@ unsigned int free(void *data)
         UnmapTablePage(pgd, va);
         reset_va(va >> 12);
 
-        mem_map[index + i] = false;
+        GetPageAtIndex(index + i)->flags = false;
     }
 
-    used_memory -= size;
     return initial_size;
 }
 
@@ -190,16 +129,6 @@ void *realloc(void *address, unsigned int size)
     free(address);
 
     return new_address;
-}
-
-unsigned long GetMemoryUsed()
-{
-    return used_memory;
-}
-
-unsigned long GetTotalMemory()
-{
-    return total_memory;
 }
 
 unsigned int MemorySize(void *data)

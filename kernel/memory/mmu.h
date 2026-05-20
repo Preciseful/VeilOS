@@ -19,7 +19,8 @@
 
 #ifndef __ASSEMBLER__
 
-#include <memory/memory.h>
+typedef unsigned long VirtualAddr;
+typedef unsigned long PhysicalAddr;
 
 #define GRANULE_4KB 0x1000
 #define GRANULE_2MB 0x200000
