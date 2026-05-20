@@ -102,7 +102,6 @@ $(document).ready(function(){initNavTree('memory_8h.html',''); initResizable(); 
 <p>Memory allocation interface.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;boot/base.h&gt;</code><br />
-<code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="syscall_8h_source.html">system/syscall.h</a>&gt;</code><br />
 </div>
 <p><a href="memory_8h_source.html">Go to the source code of this file.</a></p>
@@ -171,9 +170,9 @@ typedef struct <a class="el" href="structMHeader.html">MHeader</a>&#160;</td><td
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a42a86728a87b710891c48846e3bd003c" id="r_a42a86728a87b710891c48846e3bd003c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a42a86728a87b710891c48846e3bd003c">MMInit</a> (unsigned long lp)</td></tr>
-<tr class="memdesc:a42a86728a87b710891c48846e3bd003c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager.  <br /></td></tr>
-<tr class="separator:a42a86728a87b710891c48846e3bd003c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a110cfdca1cdf7af68a7c9d55bc6700a0" id="r_a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a110cfdca1cdf7af68a7c9d55bc6700a0">MMInit</a> (void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp)</td></tr>
+<tr class="memdesc:a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager.  <br /></td></tr>
+<tr class="separator:a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0d10e5e0d275867eb960adf845bf8de" id="r_ae0d10e5e0d275867eb960adf845bf8de"><td class="memItemLeft" align="right" valign="top">PhysicalAddr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de">GetPhysicalPage</a> ()</td></tr>
 <tr class="separator:ae0d10e5e0d275867eb960adf845bf8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf85ce5903f3dafbab82c8a3598121ff" id="r_adf85ce5903f3dafbab82c8a3598121ff"><td class="memItemLeft" align="right" valign="top"><a id="adf85ce5903f3dafbab82c8a3598121ff" name="adf85ce5903f3dafbab82c8a3598121ff"></a>
@@ -289,8 +288,8 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 
 </div>
 </div>
-<a id="a42a86728a87b710891c48846e3bd003c" name="a42a86728a87b710891c48846e3bd003c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42a86728a87b710891c48846e3bd003c">&#9670;&#160;</a></span>MMInit()</h2>
+<a id="a110cfdca1cdf7af68a7c9d55bc6700a0" name="a110cfdca1cdf7af68a7c9d55bc6700a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a110cfdca1cdf7af68a7c9d55bc6700a0">&#9670;&#160;</a></span>MMInit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -298,9 +297,31 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
         <tr>
           <td class="memname">void MMInit </td>
           <td>(</td>
-          <td class="paramtype">unsigned long&#160;</td>
-          <td class="paramname"><em>lp</em></td><td>)</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>dtb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>memmap</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>memsize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramname"><em>lp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -101,28 +101,27 @@ $(document).ready(function(){initNavTree('scheduler_8h_source.html',''); initRes
 <a href="scheduler_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;<a class="code" href="mmu_8h.html">memory/mmu.h</a>&gt;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;<a class="code" href="task_8h.html">scheduler/task.h</a>&gt;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &lt;<a class="code" href="syscall_8h.html">system/syscall.h</a>&gt;</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="scheduler_8h.html#a7b7a6b774a78bf2034b3b9ba5702da15">   20</a></span><span class="preprocessor">#define DEFAULT_TIME 5</span></div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#af557be885b52f2c62a2157a738682bc6">SchedulerInit</a>();</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#aa55ac4ef2eec51c98c51f896b9cd0a69">Schedule</a>();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>PID <a class="code hl_function" href="scheduler_8h.html#a8b658a767cff7dc8e28db0b9ce306767">AddTask</a>(<a class="code hl_struct" href="structTask.html">Task</a> *task);</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#ad87447c6acde78d7d7f82ceacc134abc">SchedulerTick</a>(<a class="code hl_struct" href="structInterruptStack.html">InterruptStack</a> registers[]);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><a class="code hl_struct" href="structTask.html">Task</a> *<a class="code hl_function" href="scheduler_8h.html#a9abd83ae66ac11860f17f97b9ef98e9d">GetRunningTask</a>();</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">bool</span> <a class="code hl_function" href="scheduler_8h.html#a087abfcaf557b945c5b3a605ad3119d4">GetTaskByPID</a>(PID pid, <a class="code hl_struct" href="structTask.html">Task</a> **btask);</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>PID <a class="code hl_function" href="scheduler_8h.html#ad83767952a6f5a151f8ec3362f708edb">GetCurrentPID</a>();</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>SYSCALL_HANDLER(exit_process);</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;<a class="code" href="mmu_8h.html">memory/mmu.h</a>&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &lt;<a class="code" href="task_8h.html">scheduler/task.h</a>&gt;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &lt;<a class="code" href="syscall_8h.html">system/syscall.h</a>&gt;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="scheduler_8h.html#a7b7a6b774a78bf2034b3b9ba5702da15">   19</a></span><span class="preprocessor">#define DEFAULT_TIME 5</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#af557be885b52f2c62a2157a738682bc6">SchedulerInit</a>();</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#aa55ac4ef2eec51c98c51f896b9cd0a69">Schedule</a>();</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>PID <a class="code hl_function" href="scheduler_8h.html#a8b658a767cff7dc8e28db0b9ce306767">AddTask</a>(<a class="code hl_struct" href="structTask.html">Task</a> *task);</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keywordtype">void</span> <a class="code hl_function" href="scheduler_8h.html#ad87447c6acde78d7d7f82ceacc134abc">SchedulerTick</a>(<a class="code hl_struct" href="structInterruptStack.html">InterruptStack</a> registers[]);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><a class="code hl_struct" href="structTask.html">Task</a> *<a class="code hl_function" href="scheduler_8h.html#a9abd83ae66ac11860f17f97b9ef98e9d">GetRunningTask</a>();</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keywordtype">bool</span> <a class="code hl_function" href="scheduler_8h.html#a087abfcaf557b945c5b3a605ad3119d4">GetTaskByPID</a>(PID pid, <a class="code hl_struct" href="structTask.html">Task</a> **btask);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>PID <a class="code hl_function" href="scheduler_8h.html#ad83767952a6f5a151f8ec3362f708edb">GetCurrentPID</a>();</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>SYSCALL_HANDLER(exit_process);</div>
 <div class="ttc" id="ammu_8h_html"><div class="ttname"><a href="mmu_8h.html">mmu.h</a></div><div class="ttdoc">MMU interface.</div></div>
 <div class="ttc" id="ascheduler_8h_html_a087abfcaf557b945c5b3a605ad3119d4"><div class="ttname"><a href="scheduler_8h.html#a087abfcaf557b945c5b3a605ad3119d4">GetTaskByPID</a></div><div class="ttdeci">bool GetTaskByPID(PID pid, Task **btask)</div><div class="ttdoc">Gets a task by the process id.</div><div class="ttdef"><b>Definition</b> scheduler.c:36</div></div>
 <div class="ttc" id="ascheduler_8h_html_a8b658a767cff7dc8e28db0b9ce306767"><div class="ttname"><a href="scheduler_8h.html#a8b658a767cff7dc8e28db0b9ce306767">AddTask</a></div><div class="ttdeci">PID AddTask(Task *task)</div><div class="ttdoc">Adds a task to scheduling.</div><div class="ttdef"><b>Definition</b> scheduler.c:55</div></div>

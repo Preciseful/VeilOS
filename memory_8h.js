@@ -5,5 +5,5 @@ var memory_8h =
     [ "GetPhysicalPage", "memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de", null ],
     [ "GetTotalMemory", "memory_8h.html#a7771960d46a1277acb78f3a118ffd1ca", null ],
     [ "MemorySize", "memory_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8", null ],
-    [ "MMInit", "memory_8h.html#a42a86728a87b710891c48846e3bd003c", null ]
+    [ "MMInit", "memory_8h.html#a110cfdca1cdf7af68a7c9d55bc6700a0", null ]
 ];
