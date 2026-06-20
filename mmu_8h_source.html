@@ -111,41 +111,37 @@ $(document).ready(function(){initNavTree('mmu_8h_source.html',''); initResizable
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#ifndef __ASSEMBLER__</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &lt;<a class="code" href="memory_8h.html">memory/memory.h</a>&gt;</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#define GRANULE_4KB 0x1000</span></div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define GRANULE_2MB 0x200000</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define GRANULE_1GB 0x40000000UL</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#define TTBR_BADDR_MASK (0x0000FFFFFFFFFFFFUL)</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">enum</span> MMU_Flags</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>{</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    MMU_USER = 0b1000,</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    MMU_USER_EXEC = 0b100,</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    MMU_NORW = 0b00,</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    MMU_RWRW = 0b01,</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    MMU_NOR = 0b10,</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    MMU_RR = 0b11</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>};</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#a9f6dd0950edb815d53b02349be913e0f">MapTablePage</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *pgd, VirtualAddr va, PhysicalAddr pa, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> index, <span class="keyword">enum</span> MMU_Flags flags);</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610">UnmapTablePage</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *pgd, VirtualAddr va);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#a1499e5643071de8dc0b514e135f70665">FreeTable</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *table, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> level);</div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#a1c5fb4420d7b2edc517581ba48f651f4">MMUInit</a>(<span class="keywordtype">void</span> *dtb);</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keyword">extern</span> <span class="keywordtype">void</span> mmu_init_regs(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> pgd, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> high_pgd, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> last_page);</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="keyword">extern</span> <span class="keywordtype">void</span> refresh_ttbr(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> pgd);</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="keyword">extern</span> <span class="keywordtype">void</span> reset_va(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> va);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="amemory_8h_html"><div class="ttname"><a href="memory_8h.html">memory.h</a></div><div class="ttdoc">Memory allocation interface.</div></div>
-<div class="ttc" id="ammu_8h_html_a1499e5643071de8dc0b514e135f70665"><div class="ttname"><a href="mmu_8h.html#a1499e5643071de8dc0b514e135f70665">FreeTable</a></div><div class="ttdeci">void FreeTable(unsigned long *table, unsigned int level)</div><div class="ttdoc">Frees up all allocations done within a table, alongside the table itself at level 0.</div><div class="ttdef"><b>Definition</b> mmu.c:138</div></div>
-<div class="ttc" id="ammu_8h_html_a1c5fb4420d7b2edc517581ba48f651f4"><div class="ttname"><a href="mmu_8h.html#a1c5fb4420d7b2edc517581ba48f651f4">MMUInit</a></div><div class="ttdeci">void MMUInit(void *dtb)</div><div class="ttdoc">Initializes the MMU.</div><div class="ttdef"><b>Definition</b> mmu.c:219</div></div>
-<div class="ttc" id="ammu_8h_html_a9f6dd0950edb815d53b02349be913e0f"><div class="ttname"><a href="mmu_8h.html#a9f6dd0950edb815d53b02349be913e0f">MapTablePage</a></div><div class="ttdeci">void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)</div><div class="ttdoc">Maps to a table a page.</div><div class="ttdef"><b>Definition</b> mmu.c:40</div></div>
-<div class="ttc" id="ammu_8h_html_ae2e62c361517e32eee5046c6e36ba610"><div class="ttname"><a href="mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610">UnmapTablePage</a></div><div class="ttdeci">void UnmapTablePage(unsigned long *pgd, VirtualAddr va)</div><div class="ttdoc">Unmaps a page from a table.</div><div class="ttdef"><b>Definition</b> mmu.c:101</div></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> VirtualAddr;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> PhysicalAddr;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#define GRANULE_4KB 0x1000</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define GRANULE_2MB 0x200000</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="preprocessor">#define GRANULE_1GB 0x40000000UL</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#define TTBR_BADDR_MASK (0x0000FFFFFFFFFFFFUL)</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">enum</span> MMU_Flags</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>{</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    MMU_USER = 0b1000,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    MMU_USER_EXEC = 0b100,</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    MMU_NORW = 0b00,</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    MMU_RWRW = 0b01,</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    MMU_NOR = 0b10,</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    MMU_RR = 0b11</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>};</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#a9f6dd0950edb815d53b02349be913e0f">MapTablePage</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *pgd, VirtualAddr va, PhysicalAddr pa, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> index, <span class="keyword">enum</span> MMU_Flags flags);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610">UnmapTablePage</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *pgd, VirtualAddr va);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keywordtype">void</span> <a class="code hl_function" href="mmu_8h.html#a1499e5643071de8dc0b514e135f70665">FreeTable</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> *table, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> level);</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="keyword">extern</span> <span class="keywordtype">void</span> refresh_ttbr(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> pgd);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="keyword">extern</span> <span class="keywordtype">void</span> reset_va(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> va);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="ammu_8h_html_a1499e5643071de8dc0b514e135f70665"><div class="ttname"><a href="mmu_8h.html#a1499e5643071de8dc0b514e135f70665">FreeTable</a></div><div class="ttdeci">void FreeTable(unsigned long *table, unsigned int level)</div><div class="ttdoc">Frees up all allocations done within a table, alongside the table itself at level 0.</div><div class="ttdef"><b>Definition</b> mmu.c:135</div></div>
+<div class="ttc" id="ammu_8h_html_a9f6dd0950edb815d53b02349be913e0f"><div class="ttname"><a href="mmu_8h.html#a9f6dd0950edb815d53b02349be913e0f">MapTablePage</a></div><div class="ttdeci">void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)</div><div class="ttdoc">Maps to a table a page.</div><div class="ttdef"><b>Definition</b> mmu.c:37</div></div>
+<div class="ttc" id="ammu_8h_html_ae2e62c361517e32eee5046c6e36ba610"><div class="ttname"><a href="mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610">UnmapTablePage</a></div><div class="ttdeci">void UnmapTablePage(unsigned long *pgd, VirtualAddr va)</div><div class="ttdoc">Unmaps a page from a table.</div><div class="ttdef"><b>Definition</b> mmu.c:98</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

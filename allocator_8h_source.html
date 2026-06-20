@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VeilOS: kernel/memory/memory.h Source File</title>
+<title>VeilOS: kernel/memory/allocator.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,7 +69,7 @@ $(document).ready(function() { init_codefold(0); });
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('memory_8h_source.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('allocator_8h_source.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -95,10 +95,10 @@ $(document).ready(function(){initNavTree('memory_8h_source.html',''); initResiza
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">memory.h</div></div>
+  <div class="headertitle"><div class="title">allocator.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="memory_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="allocator_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;boot/base.h&gt;</span></div>
@@ -126,51 +126,43 @@ $(document).ready(function(){initNavTree('memory_8h_source.html',''); initResiza
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">#ifndef __ASSEMBLER__</span></div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="preprocessor">#include &lt;<a class="code" href="syscall_8h.html">system/syscall.h</a>&gt;</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> VirtualAddr;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> PhysicalAddr;</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="foldopen" id="foldopen00041" data-start="{" data-end="};">
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="structMHeader.html">   41</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="structMHeader.html">MHeader</a></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>{</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size;</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordtype">void</span> *data;</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> initial_size;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>} <a class="code hl_struct" href="structMHeader.html">MHeader</a>;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="preprocessor">#include &lt;memory/pmm.h&gt;</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#include &lt;<a class="code" href="mmu_8h.html">memory/mmu.h</a>&gt;</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="};">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structMHeader.html">   40</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="structMHeader.html">MHeader</a></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>{</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordtype">void</span> *data;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> initial_size;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>} <a class="code hl_struct" href="structMHeader.html">MHeader</a>;</div>
 </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keywordtype">void</span> <a class="code hl_function" href="memory_8h.html#a110cfdca1cdf7af68a7c9d55bc6700a0">MMInit</a>(<span class="keywordtype">void</span> *dtb, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> memmap, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> memsize, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> lp);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>PhysicalAddr <a class="code hl_function" href="memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de">GetPhysicalPage</a>();</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keywordtype">void</span> *malloc(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keywordtype">void</span> *realloc(<span class="keywordtype">void</span> *address, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> free(<span class="keywordtype">void</span> *data);</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code hl_function" href="memory_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a>(<span class="keywordtype">void</span> *data);</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code hl_function" href="memory_8h.html#a9942a6c82b30eac01d4d785025ecfaee">GetMemoryUsed</a>();</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code hl_function" href="memory_8h.html#a7771960d46a1277acb78f3a118ffd1ca">GetTotalMemory</a>();</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>SYSCALL_HANDLER(malloc);</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>SYSCALL_HANDLER(free);</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>SYSCALL_HANDLER(memory_size);</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="amemory_8h_html_a110cfdca1cdf7af68a7c9d55bc6700a0"><div class="ttname"><a href="memory_8h.html#a110cfdca1cdf7af68a7c9d55bc6700a0">MMInit</a></div><div class="ttdeci">void MMInit(void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp)</div><div class="ttdoc">Initialize the memory manager.</div><div class="ttdef"><b>Definition</b> memory.c:28</div></div>
-<div class="ttc" id="amemory_8h_html_a7771960d46a1277acb78f3a118ffd1ca"><div class="ttname"><a href="memory_8h.html#a7771960d46a1277acb78f3a118ffd1ca">GetTotalMemory</a></div><div class="ttdeci">unsigned long GetTotalMemory()</div><div class="ttdef"><b>Definition</b> memory.c:200</div></div>
-<div class="ttc" id="amemory_8h_html_a9942a6c82b30eac01d4d785025ecfaee"><div class="ttname"><a href="memory_8h.html#a9942a6c82b30eac01d4d785025ecfaee">GetMemoryUsed</a></div><div class="ttdeci">unsigned long GetMemoryUsed()</div><div class="ttdef"><b>Definition</b> memory.c:195</div></div>
-<div class="ttc" id="amemory_8h_html_a99873dbc69ba5bf5e1973087f9bb95b8"><div class="ttname"><a href="memory_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a></div><div class="ttdeci">unsigned int MemorySize(void *data)</div><div class="ttdoc">Get the amount of memory allocated to an address.</div><div class="ttdef"><b>Definition</b> memory.c:205</div></div>
-<div class="ttc" id="amemory_8h_html_ae0d10e5e0d275867eb960adf845bf8de"><div class="ttname"><a href="memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de">GetPhysicalPage</a></div><div class="ttdeci">PhysicalAddr GetPhysicalPage()</div><div class="ttdef"><b>Definition</b> memory.c:86</div></div>
-<div class="ttc" id="astructMHeader_html"><div class="ttname"><a href="structMHeader.html">MHeader</a></div><div class="ttdef"><b>Definition</b> memory.h:42</div></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">void</span> <a class="code hl_function" href="allocator_8h.html#ada408eed11b42d2c02d01a9ebe34174d">MMInit</a>(<span class="keywordtype">void</span> *dtb, <a class="code hl_struct" href="structPage.html">Page</a> *memmap, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> memsize, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> lp);</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">void</span> *malloc(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keywordtype">void</span> *realloc(<span class="keywordtype">void</span> *address, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> free(<span class="keywordtype">void</span> *data);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code hl_function" href="allocator_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a>(<span class="keywordtype">void</span> *data);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>SYSCALL_HANDLER(malloc);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>SYSCALL_HANDLER(free);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>SYSCALL_HANDLER(memory_size);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aallocator_8h_html_a99873dbc69ba5bf5e1973087f9bb95b8"><div class="ttname"><a href="allocator_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a></div><div class="ttdeci">unsigned int MemorySize(void *data)</div><div class="ttdoc">Get the amount of memory allocated to an address.</div><div class="ttdef"><b>Definition</b> allocator.c:134</div></div>
+<div class="ttc" id="aallocator_8h_html_ada408eed11b42d2c02d01a9ebe34174d"><div class="ttname"><a href="allocator_8h.html#ada408eed11b42d2c02d01a9ebe34174d">MMInit</a></div><div class="ttdeci">void MMInit(void *dtb, Page *memmap, unsigned long memsize, unsigned long lp)</div><div class="ttdoc">Initialize the memory manager.</div><div class="ttdef"><b>Definition</b> allocator.c:24</div></div>
+<div class="ttc" id="ammu_8h_html"><div class="ttname"><a href="mmu_8h.html">mmu.h</a></div><div class="ttdoc">MMU interface.</div></div>
+<div class="ttc" id="astructMHeader_html"><div class="ttname"><a href="structMHeader.html">MHeader</a></div><div class="ttdef"><b>Definition</b> allocator.h:41</div></div>
+<div class="ttc" id="astructPage_html"><div class="ttname"><a href="structPage.html">Page</a></div><div class="ttdef"><b>Definition</b> pmm.h:21</div></div>
 <div class="ttc" id="asyscall_8h_html"><div class="ttname"><a href="syscall_8h.html">syscall.h</a></div><div class="ttdoc">System calls for ARM interface.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_dc43877d82dd332f9fb2071fcca799d6.html">kernel</a></li><li class="navelem"><a class="el" href="dir_b441c67f0e4a3dbd0ffac019137899e0.html">memory</a></li><li class="navelem"><a class="el" href="memory_8h.html">memory.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dc43877d82dd332f9fb2071fcca799d6.html">kernel</a></li><li class="navelem"><a class="el" href="dir_b441c67f0e4a3dbd0ffac019137899e0.html">memory</a></li><li class="navelem"><a class="el" href="allocator_8h.html">allocator.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>VeilOS: kernel/memory/memory.h File Reference</title>
+<title>VeilOS: kernel/memory/allocator.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -64,7 +64,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('memory_8h.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('allocator_8h.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('memory_8h.html',''); initResizable(); 
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
-  <div class="headertitle"><div class="title">memory.h File Reference</div></div>
+  <div class="headertitle"><div class="title">allocator.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -103,8 +103,10 @@ $(document).ready(function(){initNavTree('memory_8h.html',''); initResizable(); 
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;boot/base.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="syscall_8h_source.html">system/syscall.h</a>&gt;</code><br />
+<code>#include &lt;memory/pmm.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="mmu_8h_source.html">memory/mmu.h</a>&gt;</code><br />
 </div>
-<p><a href="memory_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="allocator_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -158,23 +160,15 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:aaf4876eac3a88c866f18ae09c7d1ad07" id="r_aaf4876eac3a88c866f18ae09c7d1ad07"><td class="memItemLeft" align="right" valign="top"><a id="aaf4876eac3a88c866f18ae09c7d1ad07" name="aaf4876eac3a88c866f18ae09c7d1ad07"></a>
-typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>VirtualAddr</b></td></tr>
-<tr class="separator:aaf4876eac3a88c866f18ae09c7d1ad07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3102bb081153cda8671476d7381755b8" id="r_a3102bb081153cda8671476d7381755b8"><td class="memItemLeft" align="right" valign="top"><a id="a3102bb081153cda8671476d7381755b8" name="a3102bb081153cda8671476d7381755b8"></a>
-typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><b>PhysicalAddr</b></td></tr>
-<tr class="separator:a3102bb081153cda8671476d7381755b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac468ea0b890b4d63ee19f8416899128" id="r_aac468ea0b890b4d63ee19f8416899128"><td class="memItemLeft" align="right" valign="top"><a id="aac468ea0b890b4d63ee19f8416899128" name="aac468ea0b890b4d63ee19f8416899128"></a>
 typedef struct <a class="el" href="structMHeader.html">MHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><b>MHeader</b></td></tr>
 <tr class="separator:aac468ea0b890b4d63ee19f8416899128"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a110cfdca1cdf7af68a7c9d55bc6700a0" id="r_a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a110cfdca1cdf7af68a7c9d55bc6700a0">MMInit</a> (void *dtb, unsigned long memmap, unsigned long memsize, unsigned long lp)</td></tr>
-<tr class="memdesc:a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager.  <br /></td></tr>
-<tr class="separator:a110cfdca1cdf7af68a7c9d55bc6700a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0d10e5e0d275867eb960adf845bf8de" id="r_ae0d10e5e0d275867eb960adf845bf8de"><td class="memItemLeft" align="right" valign="top">PhysicalAddr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#ae0d10e5e0d275867eb960adf845bf8de">GetPhysicalPage</a> ()</td></tr>
-<tr class="separator:ae0d10e5e0d275867eb960adf845bf8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada408eed11b42d2c02d01a9ebe34174d" id="r_ada408eed11b42d2c02d01a9ebe34174d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="allocator_8h.html#ada408eed11b42d2c02d01a9ebe34174d">MMInit</a> (void *dtb, <a class="el" href="structPage.html">Page</a> *memmap, unsigned long memsize, unsigned long lp)</td></tr>
+<tr class="memdesc:ada408eed11b42d2c02d01a9ebe34174d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the memory manager.  <br /></td></tr>
+<tr class="separator:ada408eed11b42d2c02d01a9ebe34174d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf85ce5903f3dafbab82c8a3598121ff" id="r_adf85ce5903f3dafbab82c8a3598121ff"><td class="memItemLeft" align="right" valign="top"><a id="adf85ce5903f3dafbab82c8a3598121ff" name="adf85ce5903f3dafbab82c8a3598121ff"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>malloc</b> (unsigned int size)</td></tr>
 <tr class="separator:adf85ce5903f3dafbab82c8a3598121ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -184,13 +178,9 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><b>realloc</b> (void *
 <tr class="memitem:a9e7d42e4e807a74ba4c78102d5986302" id="r_a9e7d42e4e807a74ba4c78102d5986302"><td class="memItemLeft" align="right" valign="top"><a id="a9e7d42e4e807a74ba4c78102d5986302" name="a9e7d42e4e807a74ba4c78102d5986302"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (void *data)</td></tr>
 <tr class="separator:a9e7d42e4e807a74ba4c78102d5986302"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99873dbc69ba5bf5e1973087f9bb95b8" id="r_a99873dbc69ba5bf5e1973087f9bb95b8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a> (void *data)</td></tr>
+<tr class="memitem:a99873dbc69ba5bf5e1973087f9bb95b8" id="r_a99873dbc69ba5bf5e1973087f9bb95b8"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="allocator_8h.html#a99873dbc69ba5bf5e1973087f9bb95b8">MemorySize</a> (void *data)</td></tr>
 <tr class="memdesc:a99873dbc69ba5bf5e1973087f9bb95b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the amount of memory allocated to an address.  <br /></td></tr>
 <tr class="separator:a99873dbc69ba5bf5e1973087f9bb95b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9942a6c82b30eac01d4d785025ecfaee" id="r_a9942a6c82b30eac01d4d785025ecfaee"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a9942a6c82b30eac01d4d785025ecfaee">GetMemoryUsed</a> ()</td></tr>
-<tr class="separator:a9942a6c82b30eac01d4d785025ecfaee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7771960d46a1277acb78f3a118ffd1ca" id="r_a7771960d46a1277acb78f3a118ffd1ca"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memory_8h.html#a7771960d46a1277acb78f3a118ffd1ca">GetTotalMemory</a> ()</td></tr>
-<tr class="separator:a7771960d46a1277acb78f3a118ffd1ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53f474207d7b000189b2ddc0b4cc3cec" id="r_a53f474207d7b000189b2ddc0b4cc3cec"><td class="memItemLeft" align="right" valign="top"><a id="a53f474207d7b000189b2ddc0b4cc3cec" name="a53f474207d7b000189b2ddc0b4cc3cec"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>SYSCALL_HANDLER</b> (malloc)</td></tr>
 <tr class="separator:a53f474207d7b000189b2ddc0b4cc3cec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,60 +197,6 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 <dl class="section date"><dt>Date</dt><dd>2026-04-10</dd></dl>
 <p>SPDX-License-Identifier: GPL-3.0-or-later </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a9942a6c82b30eac01d4d785025ecfaee" name="a9942a6c82b30eac01d4d785025ecfaee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9942a6c82b30eac01d4d785025ecfaee">&#9670;&#160;</a></span>GetMemoryUsed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long GetMemoryUsed </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The amount of memory so far used. </dd></dl>
-
-</div>
-</div>
-<a id="ae0d10e5e0d275867eb960adf845bf8de" name="ae0d10e5e0d275867eb960adf845bf8de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0d10e5e0d275867eb960adf845bf8de">&#9670;&#160;</a></span>GetPhysicalPage()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">PhysicalAddr GetPhysicalPage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>A free physical page, used by the MMU. </dd></dl>
-
-</div>
-</div>
-<a id="a7771960d46a1277acb78f3a118ffd1ca" name="a7771960d46a1277acb78f3a118ffd1ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7771960d46a1277acb78f3a118ffd1ca">&#9670;&#160;</a></span>GetTotalMemory()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long GetTotalMemory </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The amount of total memory. </dd></dl>
-
-</div>
-</div>
 <a id="a99873dbc69ba5bf5e1973087f9bb95b8" name="a99873dbc69ba5bf5e1973087f9bb95b8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a99873dbc69ba5bf5e1973087f9bb95b8">&#9670;&#160;</a></span>MemorySize()</h2>
 
@@ -288,8 +224,8 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 
 </div>
 </div>
-<a id="a110cfdca1cdf7af68a7c9d55bc6700a0" name="a110cfdca1cdf7af68a7c9d55bc6700a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a110cfdca1cdf7af68a7c9d55bc6700a0">&#9670;&#160;</a></span>MMInit()</h2>
+<a id="ada408eed11b42d2c02d01a9ebe34174d" name="ada408eed11b42d2c02d01a9ebe34174d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada408eed11b42d2c02d01a9ebe34174d">&#9670;&#160;</a></span>MMInit()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -303,7 +239,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned long&#160;</td>
+          <td class="paramtype"><a class="el" href="structPage.html">Page</a> *&#160;</td>
           <td class="paramname"><em>memmap</em>, </td>
         </tr>
         <tr>
@@ -341,7 +277,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>free</b> (voi
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_dc43877d82dd332f9fb2071fcca799d6.html">kernel</a></li><li class="navelem"><a class="el" href="dir_b441c67f0e4a3dbd0ffac019137899e0.html">memory</a></li><li class="navelem"><a class="el" href="memory_8h.html">memory.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dc43877d82dd332f9fb2071fcca799d6.html">kernel</a></li><li class="navelem"><a class="el" href="dir_b441c67f0e4a3dbd0ffac019137899e0.html">memory</a></li><li class="navelem"><a class="el" href="allocator_8h.html">allocator.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

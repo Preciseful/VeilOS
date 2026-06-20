@@ -19,6 +19,7 @@ var annotated_dup =
     [ "MHeader", "structMHeader.html", null ],
     [ "MountPoint", "structMountPoint.html", null ],
     [ "OwnedProcess", "structOwnedProcess.html", null ],
+    [ "Page", "structPage.html", null ],
     [ "Partition", "structPartition.html", "structPartition" ],
     [ "scr_register", "structscr__register.html", null ],
     [ "sha256_buff", "structsha256__buff.html", null ],
