@@ -6,7 +6,7 @@
  */
 
 #include <lib/string.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 
 unsigned long strlen(const char *str)
 {

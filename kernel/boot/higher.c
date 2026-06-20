@@ -1,5 +1,5 @@
 #include <memory/pmm.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <drivers/gic.h>
 #include <boot/higher.h>
 #include <drivers/uart.h>

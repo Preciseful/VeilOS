@@ -6,7 +6,7 @@
  */
 
 #include <memory/mmu.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <boot/base.h>
 #include <lib/printf.h>
 #include <drivers/uart.h>

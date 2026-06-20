@@ -10,7 +10,7 @@
 #include <interface/fio.h>
 #include <interface/errno.h>
 #include <lib/string.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 
 int VoidelleIReadDir(const char *path, void *key)
 {

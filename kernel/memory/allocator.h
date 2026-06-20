@@ -51,11 +51,6 @@ typedef struct MHeader
  */
 void MMInit(void *dtb, Page *memmap, unsigned long memsize, unsigned long lp);
 
-/**
- * @return A free physical page, used by the MMU.
- */
-PhysicalAddr GetPhysicalPage();
-
 void *malloc(unsigned int size);
 void *realloc(void *address, unsigned int size);
 unsigned int free(void *data);

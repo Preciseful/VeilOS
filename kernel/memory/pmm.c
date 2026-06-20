@@ -1,5 +1,12 @@
+/**
+ * @author Developful
+ * @date 2026-06-20
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 #include <memory/pmm.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <drivers/gic.h>
 #include <lib/string.h>
 #include <interface/dtb.h>
@@ -53,12 +60,12 @@ void PMMInit(void *dtb, unsigned long memsize, Page *allocated_memmap, unsigned 
     pages_count = memsize / PAGE_SIZE;
 }
 
-Page *GetPageAtAddress(unsigned long address)
+Page *GetPageAtAddress(PhysicalAddr address)
 {
-    if (address - HIGH_VA / PAGE_SIZE >= GetAmountOfPages())
+    if (address / PAGE_SIZE >= GetAmountOfPages())
         return 0;
 
-    return &mem_map[(address - HIGH_VA) / PAGE_SIZE];
+    return &mem_map[address / PAGE_SIZE];
 }
 
 Page *GetPageAtIndex(unsigned long index)

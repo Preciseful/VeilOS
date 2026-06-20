@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <lib/printf.h>
 #include <memory/mmu.h>
 #include <scheduler/task.h>

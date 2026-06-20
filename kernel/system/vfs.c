@@ -6,7 +6,7 @@
  */
 
 #include <system/vfs.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <lib/string.h>
 #include <limits.h>
 #include <lib/printf.h>

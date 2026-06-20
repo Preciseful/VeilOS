@@ -1,5 +1,5 @@
 #include "memory/mmu.h"
-#include "memory/memory.h"
+#include "memory/allocator.h"
 
 .global jump_high
 jump_high:

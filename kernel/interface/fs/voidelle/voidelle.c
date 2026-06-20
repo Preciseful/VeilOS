@@ -10,7 +10,7 @@
 #include <interface/fs/voidelle/voidelle.h>
 #include <interface/fio.h>
 #include <lib/string.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 
 bool FindParentVoidelleByPath(Voidom voidom, const char *path, Voidelle *buf)
 {

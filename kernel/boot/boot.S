@@ -6,7 +6,7 @@
  */
 
 #include "memory/mmu.h"
-#include "memory/memory.h"
+#include "memory/allocator.h"
 #include "boot/sysregs.h"
 #include "drivers/gic.h"
 

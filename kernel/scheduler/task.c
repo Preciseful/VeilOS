@@ -6,7 +6,7 @@
  */
 
 #include <scheduler/task.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <lib/printf.h>
 #include <scheduler/scheduler.h>
 #include <lib/string.h>

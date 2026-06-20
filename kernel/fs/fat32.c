@@ -8,7 +8,7 @@
 #include <fs/fat32.h>
 #include <fs/mbr.h>
 #include <drivers/emmc.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <lib/printf.h>
 #include <lib/string.h>
 

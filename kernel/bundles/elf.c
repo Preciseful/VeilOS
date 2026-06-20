@@ -7,7 +7,7 @@
 
 #include <elf.h>
 #include <memory/mmu.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <lib/printf.h>
 #include <scheduler/task.h>
 #include <scheduler/scheduler.h>

@@ -45,7 +45,7 @@
 #include <scheduler/scheduler.h>
 #include <fs/fat32.h>
 #include <drivers/emmc.h>
-#include <memory/memory.h>
+#include <memory/allocator.h>
 #include <memory/mmu.h>
 #include <lib/string.h>
 #include <bundles/elf.h>
