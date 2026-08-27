@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Enter your password in order to be added to the dialout group to be able to read TTY."
+sudo usermod -G dialout "$USER"
+
 read -p "Specify UART path to be used (default /dev/ttyUSB0): " TTYDEV
 TTYDEV=${TTYDEV:-"/dev/ttyUSB0"}
 echo "TTYDEV=$TTYDEV" > conf

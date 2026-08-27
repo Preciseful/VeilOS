@@ -15,7 +15,7 @@ screen:
 dump:
 	$(ARMGNU)-objdump -D $(BUILD_DIR)/kernel8.elf > dump
 
-clean :
+clean:
 	@rm -rf $(BUILD_DIR) *.img dump
 
 $(BUILD_DIR)/%_c.o: $(SRC_DIR)/%.c
@@ -26,7 +26,6 @@ $(BUILD_DIR)/%_s.o: $(SRC_DIR)/%.S
 	@mkdir -p $(@D)
 	@$(ARMGNU)-gcc $(ASMOPS) -MMD -c $< -o $@
 
-
 C_FILES = $(shell find . \( -path ./library -o -path ./modules \) -prune -o -type f -name "*.c" -print | cut -d'/' -f2-)
 ASM_FILES = $(shell find . \( -path ./library -o -path ./modules \) -prune -o -type f -name "*.S" -print | cut -d'/' -f2-)
 
@@ -36,7 +35,14 @@ OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
+debug: COPS += -g
+debug: ASMOPS += -DDEBUG_WAIT -g
+debug: clean linker.ld $(OBJ_FILES)
+	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
+	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY)
+
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	scripts/go_rpi.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY)
+	scripts/go_rpi.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) "view"

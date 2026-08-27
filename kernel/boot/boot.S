@@ -14,6 +14,12 @@
 
 .global _start
 _start:
+#ifdef DEBUG_WAIT
+    mov x1, #1
+1:
+    wfe
+    cbnz x1, 1b 
+#endif
     mov x19, x0
     mrs x1, mpidr_el1
     and x1, x1, #0xFF

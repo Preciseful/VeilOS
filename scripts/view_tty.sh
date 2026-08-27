@@ -19,7 +19,7 @@ while [ true ]; do
             sleep 0.1
         done
 
-        sudo screen "$1" 115200
+        picocom -b 115200 "$1"
 
         exit 0
 
