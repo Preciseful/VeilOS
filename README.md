@@ -17,10 +17,12 @@ A simple, bare metal, raspberry pi 4B OS.
 > [!CAUTION]
 > `./setup.sh` will render previous data on the SD card unusable.
 2. Run: `./setup.sh`.
+    - This script will add you to the dialout group.
     - Make sure an SD card for raspberry pi is prepared, this is to generate the right partitions and filesystems on them.
-3. Run: `make`.
+3. Install the following packages: `tmux`, `picocom`
+4. Run: `make`.
     - This generates the kernel8.img that raspberry pi requires to boot. It should automatically copy to the path given during setup.
     - It'll prompt you whether you wish to view the UART output or not.
-4. You can now insert the card into the raspberry pi.
+5. You can now insert the card into the raspberry pi.
 
 You can modify the variables within the `conf` file without re-doing the whole setup process.
