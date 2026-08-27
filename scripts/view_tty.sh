@@ -13,7 +13,7 @@ while [ true ]; do
             echo "VIEW_TTY=$ANSWER" >> conf
         fi
 
-        sudo screen $1 115200
+        screen $1 115200
         exit 0
 
     elif [[ $ANSWER == [Nn] ]]; then
