@@ -16,7 +16,7 @@
 #include <scheduler/task.h>
 #include <system/syscall.h>
 #include <lib/string.h>
-#include <system/trace.h>
+#include <system/debug/trace.h>
 
 void kill_task()
 {

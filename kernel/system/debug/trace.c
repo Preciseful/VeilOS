@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <system/debug/trace.h>
 #include <interface/fio.h>
 #include <elf.h>
 #include <interface/errno.h>

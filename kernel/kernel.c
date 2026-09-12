@@ -55,7 +55,7 @@
 #include <interface/fs/voidelle/voidelle.h>
 #include <interface/fs/fat32/fat32.h>
 #include <drivers/framebuffer.h>
-#include <system/trace.h>
+#include <system/debug/trace.h>
 #include <system/user.h>
 #include <drivers/rng.h>
 #include <interface/dtb.h>
