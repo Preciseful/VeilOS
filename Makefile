@@ -35,19 +35,19 @@ OBJ_FILES += $(ASM_FILES:$(SRC_DIR)/%.S=$(BUILD_DIR)/%_s.o)
 DEP_FILES = $(OBJ_FILES:%.o=%.d)
 -include $(DEP_FILES)
 
-jlink: COPS += -DDEBUG -g
-jlink: ASMOPS += -DDEBUG -g
-jlink: clean linker.ld $(OBJ_FILES)
-	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
-	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) "jlink"
-
 debug: COPS += -DDEBUG -g
 debug: ASMOPS += -DDEBUG -g
 debug: clean linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
-	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) "debug"
+	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) ""
+
+debugscreen: COPS += -DDEBUG -g
+debugscreen: ASMOPS += -DDEBUG -g
+debugscreen: clean linker.ld $(OBJ_FILES)
+	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
+	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) "screen"
 
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)

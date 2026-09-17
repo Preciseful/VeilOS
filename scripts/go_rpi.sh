@@ -6,8 +6,9 @@ Color_Off="\033[0m"
 
 if [ ! -d $1 ]; then
 	echo -e "${BRed}Raspberry pi microSD wasn't connected. ${Color_Off}"
+	exit 2
 else
-	/bin/cp -rf kernel8.img $1 || exit -1
+	/bin/cp -rf kernel8.img $1 || exit 3
 	echo -e "${BGreen}Copied to the raspberry pi microSD. ${Color_Off}"
 	if [[ $4 == "view" ]]; then
 		scripts/view_tty.sh $2 $3
