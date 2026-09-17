@@ -236,7 +236,13 @@ static unsigned int vsprintf(char *dst, char *fmt, va_list args)
 
     if (dst != 0)
         *dst = 0;
+
     return dst - orig;
+}
+
+unsigned int SPrintfList(char *dst, char *fmt, va_list va)
+{
+    return vsprintf(dst, fmt, va);
 }
 
 unsigned int SPrintf(char *dst, char *fmt, ...)

@@ -14,7 +14,7 @@
 
 .global _start
 _start:
-#ifdef DEBUG_WAIT
+#ifdef DEBUG
     mov x1, #1
 1:
     wfe

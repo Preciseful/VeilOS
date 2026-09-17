@@ -11,10 +11,17 @@
 #pragma GCC diagnostic ignored "-Wmultistatement-macros"
 
 #include <stdarg.h>
+#include <system/debug/dcc.h>
+
+#ifdef DEBUG
+#define LOG_FUNCTION DebugWrite
+#else
+#define LOG_FUNCTION Printf
+#endif
 
 #define PRINTF_MAGIC_PADDING "                                       "
-#define LOG(x, ...)                                                                                                                           \
-    Printf("[%s/%s]%s" x, __FILE_NAME__, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1 + sizeof(__FILE_NAME__) - 1), ##__VA_ARGS__); \
+#define LOG(x, ...)                                                                                                                                 \
+    LOG_FUNCTION("[%s/%s]%s" x, __FILE_NAME__, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1 + sizeof(__FILE_NAME__) - 1), ##__VA_ARGS__); \
     _Static_assert(sizeof(__FILE_NAME__) - 1 + sizeof(__func__) - 1 <= sizeof(PRINTF_MAGIC_PADDING), "Function and file name too long for printing.");
 
 /**
@@ -22,5 +29,6 @@
  * @param p The function pointer.
  */
 void SetPrintf(void (*p)(char c));
+unsigned int SPrintfList(char *dst, char *fmt, va_list va);
 unsigned int SPrintf(char *dst, char *fmt, ...);
 void Printf(char *fmt, ...);
