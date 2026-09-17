@@ -1,11 +1,7 @@
 var searchData=
 [
-  ['page_0',['Page',['../structPage.html',1,'']]],
-  ['panic_1',['panic',['../panic_8h.html#ac470b787b0105804bfa499e27d26b31b',1,'panic.c']]],
-  ['panic_2eh_2',['panic.h',['../panic_8h.html',1,'']]],
-  ['partition_3',['Partition',['../structPartition.html',1,'']]],
-  ['partition_2eh_4',['partition.h',['../partition_8h.html',1,'']]],
-  ['partitionsinit_5',['PartitionsInit',['../partition_8h.html#ac7b8763d77f2f4d87b5f5d216cb10c58',1,'partition.c']]],
-  ['printf_2eh_6',['printf.h',['../printf_8h.html',1,'']]],
-  ['pullgpio_7',['PullGPIO',['../gpio_8h.html#a138b9e15194796cb742a4f34d30a58b8',1,'gpio.c']]]
+  ['offset_0',['offset',['../structPartition.html#a2e31deb4a069bc8fcd1d8706338dbf73',1,'Partition']]],
+  ['openfile_1',['OpenFile',['../fio_8h.html#a11c843b07fc63afdc8a6a2f9fd285973',1,'fio.c']]],
+  ['ownedprocess_2',['OwnedProcess',['../structOwnedProcess.html',1,'']]],
+  ['owniodevice_3',['OwnIODevice',['../iodevice_8h.html#a262aa65e4968aa64e5ac7937b91336b9',1,'iodevice.c']]]
 ];

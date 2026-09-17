@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['scheduler_2eh_0',['scheduler.h',['../scheduler_8h.html',1,'']]],
-  ['syscall_2eh_1',['syscall.h',['../syscall_8h.html',1,'']]],
-  ['sysregs_2eh_2',['sysregs.h',['../sysregs_8h.html',1,'']]]
+  ['panic_2eh_0',['panic.h',['../panic_8h.html',1,'']]],
+  ['partition_2eh_1',['partition.h',['../partition_8h.html',1,'']]],
+  ['printf_2eh_2',['printf.h',['../printf_8h.html',1,'']]]
 ];

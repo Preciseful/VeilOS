@@ -54,7 +54,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocator_8h.html",
-"user_8h.html"
+"uart_8h.html#a30f837beebf701bbc71ec5208f90fd58"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

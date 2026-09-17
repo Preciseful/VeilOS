@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['emmcinit_0',['EmmcInit',['../emmc_8h.html#a685ad5caf3e00990b643135f2163ced1',1,'emmc.c']]]
+  ['debugwrite_0',['DebugWrite',['../dcc_8h.html#a1f45f2497fd23c3ba2a0b9b45c60c8ca',1,'dcc.c']]]
 ];

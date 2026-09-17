@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['linkfreecluster_0',['LinkFreeCluster',['../fs_2fat32_8h.html#aba10a88006c195a7d3af4fbebf916f30',1,'fat32.c']]]
+  ['handlesystemcall_0',['HandleSystemCall',['../syscall_8h.html#af95692a86ba1e42a96c1a6f8e2ac1d35',1,'syscall.c']]],
+  ['handleuartreceive_1',['HandleUartReceive',['../uart_8h.html#a30f837beebf701bbc71ec5208f90fd58',1,'uart.c']]]
 ];

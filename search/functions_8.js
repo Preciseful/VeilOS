@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nextcluster_0',['NextCluster',['../fs_2fat32_8h.html#ad927872d1594ec89b62513ea21379f37',1,'fat32.c']]]
+  ['linkfreecluster_0',['LinkFreeCluster',['../fs_2fat32_8h.html#aba10a88006c195a7d3af4fbebf916f30',1,'fat32.c']]]
 ];

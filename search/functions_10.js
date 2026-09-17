@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['write_5fvoid_0',['write_void',['../fs_2voidelle_8h.html#aaf3f0a3eab49335ac1787083f01493ea',1,'voidelle.c']]],
-  ['writecluster_1',['WriteCluster',['../fs_2fat32_8h.html#a5eb7e87a9d4b346de80632c04d925e27',1,'fat32.c']]],
-  ['writeclusterlink_2',['WriteClusterLink',['../fs_2fat32_8h.html#a0e43d450e394feaa084cd97db849dcf4',1,'fat32.c']]],
-  ['writefile_3',['WriteFile',['../fio_8h.html#a5a0a9109b0b8444e0df8a8211cae8c11',1,'fio.c']]],
-  ['writeiodevice_4',['WriteIODevice',['../iodevice_8h.html#a4765927f6a8d53f54fef4641b1d7c9de',1,'iodevice.c']]],
-  ['writetoemmc_5',['WriteToEMMC',['../emmc_8h.html#a320367c7bc573ad27d49f03dd965a2b0',1,'emmc.c']]],
-  ['writetofatnode_6',['WriteToFatNode',['../fs_2fat32_8h.html#a309ab7ef45d86e1904f9176268373d3b',1,'fat32.c']]],
-  ['writetommio_7',['WriteToMMIO',['../gpio_8h.html#a163cbdcf5c5ab45c93d5a2c2b47fcc6a',1,'gpio.c']]]
+  ['uartinit_0',['UartInit',['../uart_8h.html#a6799bde041372df18664db8020029105',1,'uart.c']]],
+  ['unmaptablepage_1',['UnmapTablePage',['../mmu_8h.html#ae2e62c361517e32eee5046c6e36ba610',1,'mmu.c']]],
+  ['updatefatentry_2',['UpdateFatEntry',['../fs_2fat32_8h.html#a5ba1d3900773669170e91fb0d7b47da7',1,'fat32.c']]],
+  ['userownprocess_3',['UserOwnProcess',['../user_8h.html#a02769f7d822dfa49eb41c4953a48d0e3',1,'user.c']]],
+  ['usersinit_4',['UsersInit',['../user_8h.html#aaff90eeb0b0c3d6b0503d853a1c7ab98',1,'user.c']]]
 ];
