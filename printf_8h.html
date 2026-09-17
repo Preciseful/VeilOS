@@ -100,11 +100,15 @@ $(document).ready(function(){initNavTree('printf_8h.html',''); initResizable(); 
 <p>Printing with format functions.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdarg.h&gt;</code><br />
+<code>#include &lt;system/debug/dcc.h&gt;</code><br />
 </div>
 <p><a href="printf_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:af1f01dc1779c99a67ef978b2e17a12f5" id="r_af1f01dc1779c99a67ef978b2e17a12f5"><td class="memItemLeft" align="right" valign="top"><a id="af1f01dc1779c99a67ef978b2e17a12f5" name="af1f01dc1779c99a67ef978b2e17a12f5"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>LOG_FUNCTION</b>&#160;&#160;&#160;Printf</td></tr>
+<tr class="separator:af1f01dc1779c99a67ef978b2e17a12f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfc2a3cd226bd9ae3311e3b5c4e64b3e" id="r_acfc2a3cd226bd9ae3311e3b5c4e64b3e"><td class="memItemLeft" align="right" valign="top"><a id="acfc2a3cd226bd9ae3311e3b5c4e64b3e" name="acfc2a3cd226bd9ae3311e3b5c4e64b3e"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>PRINTF_MAGIC_PADDING</b>&#160;&#160;&#160;&quot;                                       &quot;</td></tr>
 <tr class="separator:acfc2a3cd226bd9ae3311e3b5c4e64b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,6 +120,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aad42be8f0ede25f39afcd5b21770df4d" id="r_aad42be8f0ede25f39afcd5b21770df4d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="printf_8h.html#aad42be8f0ede25f39afcd5b21770df4d">SetPrintf</a> (void(*p)(char c))</td></tr>
 <tr class="memdesc:aad42be8f0ede25f39afcd5b21770df4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the function that printf uses to print.  <br /></td></tr>
 <tr class="separator:aad42be8f0ede25f39afcd5b21770df4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ae3365fa223591523d170a5dcb57382" id="r_a2ae3365fa223591523d170a5dcb57382"><td class="memItemLeft" align="right" valign="top"><a id="a2ae3365fa223591523d170a5dcb57382" name="a2ae3365fa223591523d170a5dcb57382"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>SPrintfList</b> (char *dst, char *fmt, va_list va)</td></tr>
+<tr class="separator:a2ae3365fa223591523d170a5dcb57382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bfbb4ada4e2ee8b687b38affab4fd53" id="r_a4bfbb4ada4e2ee8b687b38affab4fd53"><td class="memItemLeft" align="right" valign="top"><a id="a4bfbb4ada4e2ee8b687b38affab4fd53" name="a4bfbb4ada4e2ee8b687b38affab4fd53"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>SPrintf</b> (char *dst, char *fmt,...)</td></tr>
 <tr class="separator:a4bfbb4ada4e2ee8b687b38affab4fd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,7 +161,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>Printf</b> (char *fmt
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    Printf(<span class="stringliteral">&quot;[%s/%s]%s&quot;</span> x, __FILE_NAME__, __func__, PRINTF_MAGIC_PADDING + (<span class="keyword">sizeof</span>(__func__) - 1 + <span class="keyword">sizeof</span>(__FILE_NAME__) - 1), ##__VA_ARGS__); \</div>
+<b>Value:</b><div class="fragment"><div class="line">    LOG_FUNCTION(<span class="stringliteral">&quot;[%s/%s]%s&quot;</span> x, __FILE_NAME__, __func__, PRINTF_MAGIC_PADDING + (<span class="keyword">sizeof</span>(__func__) - 1 + <span class="keyword">sizeof</span>(__FILE_NAME__) - 1), ##__VA_ARGS__); \</div>
 <div class="line">    _Static_assert(<span class="keyword">sizeof</span>(__FILE_NAME__) - 1 + <span class="keyword">sizeof</span>(__func__) - 1 &lt;= <span class="keyword">sizeof</span>(PRINTF_MAGIC_PADDING), <span class="stringliteral">&quot;Function and file name too long for printing.&quot;</span>);</div>
 </div><!-- fragment -->
 </div>

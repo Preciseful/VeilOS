@@ -23,6 +23,7 @@ var annotated_dup =
     [ "Partition", "structPartition.html", "structPartition" ],
     [ "scr_register", "structscr__register.html", null ],
     [ "sha256_buff", "structsha256__buff.html", null ],
+    [ "StdWriteParameter", "structStdWriteParameter.html", null ],
     [ "Task", "structTask.html", null ],
     [ "TaskMappingNode", "structTaskMappingNode.html", null ],
     [ "TaskMMUCtx", "structTaskMMUCtx.html", null ],

@@ -15,6 +15,7 @@ var searchData=
   ['setpinoutputbool_12',['SetPinOutputBool',['../gpio_8h.html#a94f6685a2c6fdd1e9cc0dc036e573e9c',1,'gpio.c']]],
   ['setprintf_13',['SetPrintf',['../printf_8h.html#aad42be8f0ede25f39afcd5b21770df4d',1,'printf.c']]],
   ['sha256_5fbuff_14',['sha256_buff',['../structsha256__buff.html',1,'']]],
-  ['syscall_2eh_15',['syscall.h',['../syscall_8h.html',1,'']]],
-  ['sysregs_2eh_16',['sysregs.h',['../sysregs_8h.html',1,'']]]
+  ['stdwriteparameter_15',['StdWriteParameter',['../structStdWriteParameter.html',1,'']]],
+  ['syscall_2eh_16',['syscall.h',['../syscall_8h.html',1,'']]],
+  ['sysregs_2eh_17',['sysregs.h',['../sysregs_8h.html',1,'']]]
 ];
