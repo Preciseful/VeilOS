@@ -15,3 +15,6 @@ device_tree=dtb/bcm2711-rpi-4-b.dtb
 # display settings
 hdmi_group=2
 hdmi_mode=82
+
+gpio=22-27=np
+enable_jtag_gpio=1
