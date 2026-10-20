@@ -49,6 +49,12 @@ debugscreen: clean linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
 	scripts/debug.sh $(RPI_PATH) $(TTYDEV) $(VIEW_TTY) "screen"
 
+debugupdate: COPS += -DDEBUG -g
+debugupdate: ASMOPS += -DDEBUG -g
+debugupdate: clean linker.ld $(OBJ_FILES)
+	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
+	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img
+
 kernel8.img: linker.ld $(OBJ_FILES)
 	@$(ARMGNU)-ld -pie -T linker.ld -o $(BUILD_DIR)/kernel8.elf  $(OBJ_FILES)
 	@$(ARMGNU)-objcopy $(BUILD_DIR)/kernel8.elf -O binary kernel8.img

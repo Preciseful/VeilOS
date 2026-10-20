@@ -20,18 +20,24 @@
 #define PAGE_TABLE_ENTRIES 512
 #define PAGE_MASK 0xFFFFFFFFF000ULL
 
-PhysicalAddr allocate_new_table(unsigned long *pgd, unsigned long **ln)
+unsigned long *make_valid(unsigned long *pgd, PhysicalAddr phys)
 {
     if ((unsigned long)pgd == HIGH_VA + LOW_MEMORY)
     {
-        PhysicalAddr phys = GetPhysicalPage();
-        MapTablePage(pgd, HIGH_VA, phys, MAIR_IDX_NORMAL, MMU_NORW);
-        *ln = (unsigned long *)HIGH_VA;
-        return phys;
+        VirtualAddr virtual = PHYS_TO_VIRT(phys);
+        MapTablePage(pgd, virtual, phys, MAIR_IDX_NORMAL, MMU_NORW);
+        return (unsigned long *)virtual;
     }
 
-    *ln = malloc(PAGE_SIZE);
-    return VIRT_TO_PHYS(*ln);
+    return (unsigned long *)PHYS_TO_VIRT(phys);
+}
+
+PhysicalAddr allocate_new_table(unsigned long *pgd)
+{
+    if ((unsigned long)pgd == HIGH_VA + LOW_MEMORY)
+        return GetPhysicalPage();
+
+    return VIRT_TO_PHYS(malloc(PAGE_SIZE));
 }
 
 void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned long index, enum MMU_Flags flags)
@@ -44,10 +50,11 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     if (!(pgd[l1_index] & 1))
     {
         unsigned long *l1;
-        PhysicalAddr phys = allocate_new_table(pgd, &l1);
-
-        memset(l1, 0, PAGE_SIZE);
+        PhysicalAddr phys = allocate_new_table(pgd);
         pgd[l1_index] = (phys & PAGE_MASK) | PD_TABLE;
+
+        l1 = make_valid(pgd, phys);
+        memset(l1, 0, PAGE_SIZE);
     }
 
     unsigned long *l1 = (unsigned long *)PHYS_TO_VIRT((pgd[l1_index] & PAGE_MASK));
@@ -55,10 +62,11 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     if (!(l1[l2_index] & 1))
     {
         unsigned long *l2;
-        PhysicalAddr phys = allocate_new_table(pgd, &l2);
-
-        memset(l2, 0, PAGE_SIZE);
+        PhysicalAddr phys = allocate_new_table(pgd);
         l1[l2_index] = (phys & PAGE_MASK) | PD_TABLE;
+
+        l2 = make_valid(pgd, phys);
+        memset(l2, 0, PAGE_SIZE);
     }
 
     unsigned long *l2 = (unsigned long *)PHYS_TO_VIRT((l1[l2_index] & PAGE_MASK));
@@ -66,10 +74,11 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     if (!(l2[l3_index] & 1))
     {
         unsigned long *l3;
-        PhysicalAddr phys = allocate_new_table(pgd, &l3);
-
-        memset(l3, 0, PAGE_SIZE);
+        PhysicalAddr phys = allocate_new_table(pgd);
         l2[l3_index] = (phys & PAGE_MASK) | PD_TABLE;
+
+        l3 = make_valid(pgd, phys);
+        memset(l3, 0, PAGE_SIZE);
     }
     else if ((l2[l3_index] & 0b11) == PD_BLOCK)
     {
@@ -86,12 +95,6 @@ void MapTablePage(unsigned long *pgd, VirtualAddr va, PhysicalAddr pa, unsigned 
     unsigned long perm = flags & 0b11;
 
     unsigned long attr = ((unsigned long)uxn << 54) | ((unsigned long)pxn << 53) | (ng << 11) | PD_ACCESS | (0b11 << 8) | (perm << 6) | (index << 2) | 0b11;
-    if (l3[pte_index] & 1)
-    {
-        LOG("[MMU warning]: Section already mapped (%x).\n", va);
-        return;
-    }
-
     l3[pte_index] = (pa & PAGE_MASK) | attr;
 }
 

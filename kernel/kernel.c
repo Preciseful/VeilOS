@@ -75,7 +75,7 @@ void kmain()
     SetUartDevice();
     FramebufferInit();
 
-    Printf("\n----- VeilOS -----\n");
+    PRINT("\n----- VeilOS -----\n");
     LOG("Console initialized.\n");
 
     set_vtable();

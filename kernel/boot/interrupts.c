@@ -17,6 +17,7 @@
 #include <system/syscall.h>
 #include <lib/string.h>
 #include <system/debug/trace.h>
+#include <system/debug/update.h>
 
 void kill_task()
 {
@@ -39,12 +40,12 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
 
     if (far < HIGH_VA)
     {
-        Printf("\nApplication exception encountered:"
-               "\n\ttype: %lu"
-               "\n\tesr: %lu"
-               "\n\telr: 0x%x"
-               "\n\tfar: 0x%lx\n",
-               type, esr, elr, far);
+        PRINT("\nApplication exception encountered:"
+              "\n\ttype: %lu"
+              "\n\tesr: %lu"
+              "\n\telr: 0x%x"
+              "\n\tfar: 0x%lx\n",
+              type, esr, elr, far);
         sp->spsr_el1 = EL1H_M;
         sp->elr_el1 = (unsigned long)&kill_task;
 
@@ -58,9 +59,9 @@ unsigned long handle_vinvalid(unsigned long type, unsigned long esr, unsigned lo
             "\n\telr: 0x%x"
             "\n\tfar: 0x%lx",
             type, esr, elr, far);
-        Printf("\n\tbacktrace: ");
+        PRINT("\n\tbacktrace: ");
         Trace(sp->x29);
-        Printf("\n");
+        PRINT("\n");
     }
 
     return 0;
@@ -86,6 +87,17 @@ void handle_irq(InterruptStack registers[])
         HandleUartReceive();
         WriteToMMIO(GICC_EOIR, iar);
         break;
+
+#ifdef DEBUG
+    // force debug update
+    case 15:
+        WriteToMMIO(GICC_EOIR, iar);
+        PRINT("\nApplication exception encountered:"
+              "\n\tForce debug update.\n");
+        registers->spsr_el1 = EL1H_M;
+        registers->elr_el1 = (unsigned long)&ForceUpdate;
+        break;
+#endif
 
     default:
         LOG("Unknown IRQ %u\n", id);

@@ -12,7 +12,7 @@ tmux kill-session -t "veil-debug" 2>/dev/null
 tmux new-session -d -s "veil-debug" -n debug
 
 tmux send-keys -t "veil-debug:debug.0" \
-    'clear; until aarch64-none-elf-gdb -q -batch -ex "set remotetimeout 2000" -ex "target remote :3333" -ex "monitor halt" build/kernel8.elf >/dev/null 2>&1; do sleep 1; done; aarch64-none-elf-gdb -q build/kernel8.elf -ex "target remote :3333" -ex "set \$x1 = 0" -ex "monitor arm semihosting enable"' C-m
+    'clear; until aarch64-none-elf-gdb -q -batch -ex "set remotetimeout 2000" -ex "target remote :3333" -ex "monitor halt" build/kernel8.elf >/dev/null 2>&1; do sleep 1; done; aarch64-none-elf-gdb -q build/kernel8.elf -ex "target extended-remote :3333" -ex "set \$x1 = 0" -ex "monitor arm semihosting enable"' C-m
 
 tmux split-window -h -t "veil-debug:debug.0"
 

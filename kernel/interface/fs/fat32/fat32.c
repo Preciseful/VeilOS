@@ -33,9 +33,15 @@ bool FindFat32ByPath(FatFS *fs, const char *path, FatFSNode *buf)
     if (strcmp(path, "/") == 0)
     {
         FatFSNode *root_nodes;
-        GetFatEntries(fs, fs->root_cluster, &root_nodes);
+        unsigned long entries_count = GetFatEntries(fs, fs->root_cluster, &root_nodes);
 
         memcpy(buf, &root_nodes[0], sizeof(FatFSNode));
+
+        for (int i = 1; i < entries_count; i++)
+        {
+            free(root_nodes[i].extension);
+            free(root_nodes[i].name);
+        }
 
         free(root_nodes);
         return true;

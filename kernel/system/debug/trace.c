@@ -23,7 +23,7 @@ KernelSymbols symbols = {0};
 
 void CacheKernelSymbols()
 {
-    FILEHANDLE kernel = OpenFile(FILE_READ, "/kernel/kernel8.elf");
+    FILEHANDLE kernel = OpenFile(FILE_READ, "/firmware/kernel8.elf");
     if (kernel == -1)
     {
         LOG("No kernel8.elf file found for caching.\n");
@@ -71,7 +71,7 @@ void print_best_symbol(unsigned long addr)
 
     if (symbols.table == 0)
     {
-        Printf("0x%lx", addr);
+        PRINT("0x%lx", addr);
         return;
     }
 
@@ -85,7 +85,7 @@ void print_best_symbol(unsigned long addr)
             best_sym = sym;
     }
 
-    Printf("%s", &symbols.names[best_sym.st_name]);
+    PRINT("%s", &symbols.names[best_sym.st_name]);
 }
 
 void Trace(unsigned long x29)
@@ -101,6 +101,6 @@ void Trace(unsigned long x29)
             return;
 
         if (fp)
-            Printf(" <- ");
+            PRINT(" <- ");
     }
 }

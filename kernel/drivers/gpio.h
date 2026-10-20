@@ -57,7 +57,7 @@ void WriteToMMIO(VirtualAddr reg, unsigned int val);
  * @brief Reads from a MMIO register.
  *
  * @param reg The virtual address of the register.
- * @return unsigned int The value at that register.
+ * @return The value at that register.
  */
 unsigned int ReadMMIO(VirtualAddr reg);
 

@@ -11,10 +11,10 @@
 #pragma GCC diagnostic ignored "-Wmultistatement-macros"
 
 #include <stdarg.h>
-#include <system/debug/dcc.h>
+#include <system/debug/semihost.h>
 
 #ifdef DEBUG
-#define LOG_FUNCTION DebugWrite
+#define LOG_FUNCTION DebugPrintf
 #else
 #define LOG_FUNCTION Printf
 #endif
@@ -23,6 +23,9 @@
 #define LOG(x, ...)                                                                                                                                 \
     LOG_FUNCTION("[%s/%s]%s" x, __FILE_NAME__, __func__, PRINTF_MAGIC_PADDING + (sizeof(__func__) - 1 + sizeof(__FILE_NAME__) - 1), ##__VA_ARGS__); \
     _Static_assert(sizeof(__FILE_NAME__) - 1 + sizeof(__func__) - 1 <= sizeof(PRINTF_MAGIC_PADDING), "Function and file name too long for printing.");
+
+#define PRINT(x, ...) \
+    LOG_FUNCTION(x, ##__VA_ARGS__);
 
 /**
  * @brief Sets the function that printf uses to print.

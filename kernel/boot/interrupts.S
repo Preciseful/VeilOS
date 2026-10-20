@@ -61,8 +61,8 @@
 
     popp x28, x29
     pop x30
-
-    msr spsel, #0
+    
+    msr spsel, #0  
     eret
 .endm
 
