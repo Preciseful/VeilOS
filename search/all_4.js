@@ -2,9 +2,9 @@ var searchData=
 [
   ['fat32_2eh_0',['fat32.h',['../fs_2fat32_8h.html',1,'']]],
   ['fatclustersize_1',['FatClusterSize',['../fs_2fat32_8h.html#a36ad339e77d5730b8291468012069886',1,'fat32.c']]],
-  ['fatfs_2',['fatfs',['../structFatFS.html',1,'FatFS'],['../fs_2fat32_8h.html#a439d43803f42b96003d16f3076059d9d',1,'FatFS:&#160;fat32.h']]],
+  ['fatfs_2',['FatFS',['../structFatFS.html',1,'FatFS'],['../fs_2fat32_8h.html#a439d43803f42b96003d16f3076059d9d',1,'FatFS:&#160;fat32.h']]],
   ['fatfsinit_3',['FatFSInit',['../fs_2fat32_8h.html#a9c65cad6b22853d815c0d134f8c039e9',1,'fat32.c']]],
-  ['fatfsnode_4',['fatfsnode',['../structFatFSNode.html',1,'FatFSNode'],['../fs_2fat32_8h.html#a6763916c6cf710184afd6b27484a5ce5',1,'FatFSNode:&#160;fat32.h']]],
+  ['fatfsnode_4',['FatFSNode',['../structFatFSNode.html',1,'FatFSNode'],['../fs_2fat32_8h.html#a6763916c6cf710184afd6b27484a5ce5',1,'FatFSNode:&#160;fat32.h']]],
   ['fdtheader_5',['FDTHeader',['../structFDTHeader.html',1,'']]],
   ['features_6',['Features',['../index.html#autotoc_md0',1,'']]],
   ['filemeta_7',['FileMeta',['../structFileMeta.html',1,'']]],

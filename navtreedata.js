@@ -53,9 +53,9 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"allocator_8h.html",
-"uart_8h.html#a30f837beebf701bbc71ec5208f90fd58"
+"allocator_8h.html"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';
